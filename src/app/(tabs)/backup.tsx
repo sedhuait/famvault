@@ -1,6 +1,15 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ExportVaultModal } from '@/components/export-modal';
@@ -29,6 +38,14 @@ export default function BackupAndSecurityScreen() {
   const [pdfModalVisible, setPdfModalVisible] = useState(false);
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [exportFeedback, setExportFeedback] = useState<string | null>(null);
+  const [shareProvider, setShareProvider] = useState<'GDRIVE' | 'ICLOUD'>('GDRIVE');
+  const [sharedMembers, setSharedMembers] = useState<
+    Array<{ id: string; name: string; contact: string; role: 'EDITOR' | 'VIEWER' }>
+  >([{ id: 'sh-1', name: 'Wife', contact: 'wife@family.in', role: 'EDITOR' }]);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [inviteName, setInviteName] = useState('');
+  const [inviteContact, setInviteContact] = useState('');
+  const [inviteRole, setInviteRole] = useState<'EDITOR' | 'VIEWER'>('VIEWER');
 
   const storageMath = useMemo(() => {
     const photosKb = items.reduce((acc, i) => acc + (i.compressedPhotoKb ?? 0), 0);
@@ -133,6 +150,111 @@ export default function BackupAndSecurityScreen() {
               <Text style={styles.primaryBtnText}>
                 {backupStep ? 'Backing Up...' : 'Run Encrypted Cloud Backup'}
               </Text>
+            </Pressable>
+          </View>
+
+          {/* Shared Family Folder Sync */}
+          <View style={styles.card}>
+            <View style={styles.rowBetween}>
+              <View style={styles.cardHeader}>
+                <Ionicons name="people-outline" size={20} color={palette.gold} />
+                <Text style={styles.cardTitle}>Shared Family Folder</Text>
+              </View>
+              <View style={styles.encryptedPill}>
+                <Ionicons name="lock-closed" size={11} color={VaultPalette.emerald} />
+                <Text style={styles.encryptedPillText}>PIN-Encrypted</Text>
+              </View>
+            </View>
+
+            <View style={styles.segmentRow}>
+              <Pressable
+                onPress={() => setShareProvider('GDRIVE')}
+                style={[
+                  styles.segmentChip,
+                  shareProvider === 'GDRIVE' && {
+                    borderColor: palette.gold,
+                    backgroundColor: palette.goldTint,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.segmentText,
+                    shareProvider === 'GDRIVE' && { color: palette.goldBright },
+                  ]}
+                >
+                  Google Drive (iOS & Android)
+                </Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setShareProvider('ICLOUD')}
+                style={[
+                  styles.segmentChip,
+                  shareProvider === 'ICLOUD' && {
+                    borderColor: palette.gold,
+                    backgroundColor: palette.goldTint,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.segmentText,
+                    shareProvider === 'ICLOUD' && { color: palette.goldBright },
+                  ]}
+                >
+                  iCloud Drive (iOS)
+                </Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.footprintBox}>
+              <View style={styles.footprintRow}>
+                <Text style={styles.footprintLabel}>Folder</Text>
+                <Text style={styles.footprintVal}>Famvault Family</Text>
+              </View>
+              <View style={styles.footprintRow}>
+                <Text style={styles.footprintLabel}>Conflict Mode</Text>
+                <Text style={styles.footprintVal}>Append-Only Sync</Text>
+              </View>
+            </View>
+
+            {sharedMembers.map((m) => (
+              <View key={m.id} style={styles.sharedMemberRow}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.rowLabel}>{m.name}</Text>
+                  <Text style={styles.rowSub}>{m.contact}</Text>
+                </View>
+                <Pressable
+                  onPress={() =>
+                    setSharedMembers((prev) =>
+                      prev.map((x) =>
+                        x.id === m.id
+                          ? { ...x, role: x.role === 'EDITOR' ? 'VIEWER' : 'EDITOR' }
+                          : x,
+                      ),
+                    )
+                  }
+                  style={styles.rolePill}
+                >
+                  <Text style={styles.rolePillText}>
+                    {m.role === 'EDITOR' ? 'Editor' : 'View-Only'}
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setSharedMembers((prev) => prev.filter((x) => x.id !== m.id))}
+                  hitSlop={8}
+                >
+                  <Ionicons name="close-circle-outline" size={18} color={VaultPalette.textMuted} />
+                </Pressable>
+              </View>
+            ))}
+
+            <Pressable
+              onPress={() => setInviteOpen(true)}
+              style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
+            >
+              <Ionicons name="person-add-outline" size={16} color={palette.goldBright} />
+              <Text style={styles.secondaryBtnText}>Invite Family Member</Text>
             </Pressable>
           </View>
 
@@ -281,6 +403,87 @@ export default function BackupAndSecurityScreen() {
       </Modal>
 
       <ExportVaultModal visible={exportModalVisible} onClose={() => setExportModalVisible(false)} />
+
+      {/* Invite Family Member Modal */}
+      <Modal
+        visible={inviteOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setInviteOpen(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Invite to Shared Folder</Text>
+              <Pressable onPress={() => setInviteOpen(false)}>
+                <Ionicons name="close" size={22} color={VaultPalette.textSecondary} />
+              </Pressable>
+            </View>
+            <TextInput
+              value={inviteName}
+              onChangeText={setInviteName}
+              placeholder="Name (e.g., Arjun, Appa)"
+              placeholderTextColor={VaultPalette.textMuted}
+              style={styles.textInput}
+            />
+            <TextInput
+              value={inviteContact}
+              onChangeText={setInviteContact}
+              placeholder={
+                shareProvider === 'GDRIVE'
+                  ? 'Google email (e.g., name@gmail.com)'
+                  : 'Apple ID email'
+              }
+              placeholderTextColor={VaultPalette.textMuted}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              style={styles.textInput}
+            />
+            <View style={styles.segmentRow}>
+              {(['VIEWER', 'EDITOR'] as const).map((r) => {
+                const active = inviteRole === r;
+                return (
+                  <Pressable
+                    key={r}
+                    onPress={() => setInviteRole(r)}
+                    style={[
+                      styles.segmentChip,
+                      active && {
+                        borderColor: palette.gold,
+                        backgroundColor: palette.goldTint,
+                      },
+                    ]}
+                  >
+                    <Text style={[styles.segmentText, active && { color: palette.goldBright }]}>
+                      {r === 'EDITOR' ? 'Editor' : 'View-Only'}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Pressable
+              onPress={() => {
+                if (!inviteName.trim() || !inviteContact.trim()) return;
+                setSharedMembers((prev) => [
+                  ...prev,
+                  {
+                    id: `sh-${Date.now()}`,
+                    name: inviteName.trim(),
+                    contact: inviteContact.trim(),
+                    role: inviteRole,
+                  },
+                ]);
+                setInviteName('');
+                setInviteContact('');
+                setInviteOpen(false);
+              }}
+              style={styles.primaryBtn}
+            >
+              <Text style={styles.primaryBtnText}>Share Folder Access</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -541,5 +744,71 @@ const createStyles = (palette: VaultPaletteType) =>
       fontSize: 11,
       fontWeight: '700',
       color: VaultPalette.emerald,
+    },
+    encryptedPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: VaultPalette.emeraldTint,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 999,
+    },
+    encryptedPillText: {
+      fontSize: 10,
+      fontWeight: '700',
+      color: VaultPalette.emerald,
+    },
+    segmentRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    segmentChip: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      backgroundColor: VaultPalette.bg,
+    },
+    segmentText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    sharedMemberRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      backgroundColor: VaultPalette.bg,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      paddingHorizontal: 12,
+      paddingVertical: 9,
+    },
+    rolePill: {
+      paddingHorizontal: 9,
+      paddingVertical: 4,
+      borderRadius: 8,
+      backgroundColor: palette.goldTint,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+    },
+    rolePillText: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: palette.goldBright,
+    },
+    textInput: {
+      backgroundColor: VaultPalette.bg,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      color: VaultPalette.text,
+      fontSize: 14,
     },
   });
