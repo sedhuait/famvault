@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import {
+  CategoryVisuals,
   LocationVisuals,
   MetalVisuals,
   VaultPalette,
@@ -56,7 +57,10 @@ export function VaultItemCard({
             />
           ) : (
             <MaterialCommunityIcons
-              name={metal.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+              name={
+                (CategoryVisuals[item.category]?.icon ??
+                  metal.icon) as keyof typeof MaterialCommunityIcons.glyphMap
+              }
               size={22}
               color={metal.color}
             />

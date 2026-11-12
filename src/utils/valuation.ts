@@ -22,7 +22,9 @@ export function calculateItemValuation(
   const cashMeltValue = metalComponentValue + diamondComponentValue;
 
   // SGB and Bullion Coins don't carry 12% ornament making charges
-  const makingFactor = item.category === 'SGB' ? 0 : item.category === 'COIN_BAR' ? 0.02 : 0.12;
+  const isBullion =
+    item.category === 'COIN_BAR' || item.category === 'COIN' || item.category === 'BAR';
+  const makingFactor = item.category === 'SGB' ? 0 : isBullion ? 0.02 : 0.12;
   const gstFactor = item.category === 'SGB' ? 0 : 0.03;
 
   const withMaking = cashMeltValue * (1 + makingFactor);

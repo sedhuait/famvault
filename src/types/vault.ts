@@ -2,10 +2,18 @@ export type MetalType = 'GOLD' | 'SILVER' | 'DIAMOND' | 'PLATINUM';
 
 export type ItemCategory =
   | 'NECKLACE'
+  | 'CHAIN'
+  | 'PENDANT'
   | 'BANGLE'
   | 'EARRING'
   | 'RING'
+  | 'NOSE_RING'
+  | 'KOLUSU'
+  | 'OTTIYANAM'
+  | 'NETTI_CHUTTI'
   | 'ANKLET_WAISTBAND'
+  | 'COIN'
+  | 'BAR'
   | 'COIN_BAR'
   | 'SGB'
   | 'POOJA_VESSEL'

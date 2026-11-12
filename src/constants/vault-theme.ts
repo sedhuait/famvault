@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 
-import type { CustodyLocation, MetalType } from '@/types/vault';
+import type { CustodyLocation, ItemCategory, MetalType } from '@/types/vault';
 
 export type AccentThemeId = 'GOLD' | 'ROSE_GOLD' | 'SILVER' | 'DIAMOND';
 
@@ -224,6 +224,46 @@ export const LocationVisuals: Record<
     tint: 'rgba(244, 114, 182, 0.15)',
     icon: 'account-arrow-right-outline',
   },
+};
+
+export const CategoryVisuals: Record<
+  ItemCategory,
+  { label: string; shortLabel: string; icon: string }
+> = {
+  NECKLACE: { label: 'Necklace / Haram', shortLabel: 'Necklace', icon: 'necklace' },
+  CHAIN: { label: 'Chain', shortLabel: 'Chain', icon: 'link-variant' },
+  PENDANT: { label: 'Pendant / Locket', shortLabel: 'Pendant', icon: 'medal-outline' },
+  RING: { label: 'Ring', shortLabel: 'Ring', icon: 'ring' },
+  NOSE_RING: {
+    label: 'Nose Ring / Mookuthi',
+    shortLabel: 'Nose Ring',
+    icon: 'star-four-points-outline',
+  },
+  EARRING: { label: 'Earring / Jhumka', shortLabel: 'Earring', icon: 'ear-hearing' },
+  BANGLE: { label: 'Bangle / Kada', shortLabel: 'Bangle', icon: 'circle-double' },
+  KOLUSU: { label: 'Kolusu / Anklet', shortLabel: 'Kolusu', icon: 'orbit' },
+  OTTIYANAM: {
+    label: 'Ottiyanam / Waistband',
+    shortLabel: 'Ottiyanam',
+    icon: 'ellipse-outline',
+  },
+  NETTI_CHUTTI: {
+    label: 'Netti Chutti / Tikka',
+    shortLabel: 'Netti Chutti',
+    icon: 'crown-outline',
+  },
+  ANKLET_WAISTBAND: { label: 'Kolusu / Waistband', shortLabel: 'Kolusu', icon: 'orbit' },
+  COIN: { label: 'Coin', shortLabel: 'Coin', icon: 'circle-multiple-outline' },
+  BAR: { label: 'Bar / Biscuit', shortLabel: 'Bar', icon: 'gold' },
+  COIN_BAR: { label: 'Coin / Bar', shortLabel: 'Coin / Bar', icon: 'gold' },
+  SGB: { label: 'Sovereign Gold Bond', shortLabel: 'SGB', icon: 'bank-outline' },
+  POOJA_VESSEL: { label: 'Pooja Vessel', shortLabel: 'Pooja Vessel', icon: 'lamp' },
+  SILVER_UTENSIL: {
+    label: 'Silver Utensil',
+    shortLabel: 'Utensil',
+    icon: 'silverware-variant',
+  },
+  OTHER: { label: 'Other', shortLabel: 'Other', icon: 'dots-horizontal-circle-outline' },
 };
 
 export const VaultFonts = Platform.select({

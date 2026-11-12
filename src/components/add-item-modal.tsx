@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 
 import {
+  CategoryVisuals,
   LocationVisuals,
   MetalVisuals,
   VaultPalette,
@@ -30,6 +31,23 @@ interface AddItemModalProps {
 }
 
 const METAL_TYPES: MetalType[] = ['GOLD', 'SILVER', 'DIAMOND', 'PLATINUM'];
+const ITEM_CATEGORIES: ItemCategory[] = [
+  'NECKLACE',
+  'CHAIN',
+  'PENDANT',
+  'RING',
+  'NOSE_RING',
+  'EARRING',
+  'BANGLE',
+  'KOLUSU',
+  'OTTIYANAM',
+  'NETTI_CHUTTI',
+  'COIN',
+  'BAR',
+  'POOJA_VESSEL',
+  'SILVER_UTENSIL',
+  'OTHER',
+];
 const LOCATIONS: CustodyLocation[] = [
   'BANK_LOCKER',
   'HOME_SAFE',
@@ -60,6 +78,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
   const styles = useMemo(() => createStyles(palette), [palette]);
   const [title, setTitle] = useState('');
   const [metalType, setMetalType] = useState<MetalType>('GOLD');
+  const [category, setCategory] = useState<ItemCategory>('NECKLACE');
   const [purity, setPurity] = useState<Purity>('GOLD_22K');
   const [netWeight, setNetWeight] = useState('24.0');
   const [grossWeight, setGrossWeight] = useState('25.2');
@@ -77,6 +96,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
 
   const handleSelectMetal = (m: MetalType) => {
     setMetalType(m);
+    setCategory(DEFAULT_CATEGORY[m]);
     setPurity(DEFAULT_PURITY[m][0]);
     if (m === 'SILVER') {
       setNetWeight('650');
@@ -123,9 +143,10 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
     const net = Number.parseFloat(netWeight) || 10;
     const gross = Number.parseFloat(grossWeight) || net;
     onAdd({
-      title: title.trim() || `New ${MetalVisuals[metalType].label} Heirloom`,
+      title:
+        title.trim() || `${MetalVisuals[metalType].label} ${CategoryVisuals[category].shortLabel}`,
       metalType,
-      category: DEFAULT_CATEGORY[metalType],
+      category,
       purity,
       grossWeightGrams: gross,
       netMetalWeightGrams: net,
@@ -189,11 +210,47 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
                     onPress={() => handleSelectMetal(m)}
                     style={[
                       styles.chip,
+                      styles.iconChip,
                       active && { borderColor: vis.color, backgroundColor: vis.tint },
                     ]}
                   >
+                    <MaterialCommunityIcons
+                      name={vis.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                      size={15}
+                      color={active ? vis.color : VaultPalette.textSecondary}
+                    />
                     <Text style={[styles.chipText, active && { color: vis.color }]}>
                       {vis.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+
+            {/* Jewelry / Item Type Selector */}
+            <Text style={styles.label}>Item / Jewelry Type</Text>
+            <View style={styles.rowWrap}>
+              {ITEM_CATEGORIES.map((cat) => {
+                const vis = CategoryVisuals[cat];
+                const metalVis = MetalVisuals[metalType];
+                const active = category === cat;
+                return (
+                  <Pressable
+                    key={cat}
+                    onPress={() => setCategory(cat)}
+                    style={[
+                      styles.chip,
+                      styles.iconChip,
+                      active && { borderColor: metalVis.color, backgroundColor: metalVis.tint },
+                    ]}
+                  >
+                    <MaterialCommunityIcons
+                      name={vis.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                      size={15}
+                      color={active ? metalVis.color : VaultPalette.textSecondary}
+                    />
+                    <Text style={[styles.chipText, active && { color: metalVis.color }]}>
+                      {vis.shortLabel}
                     </Text>
                   </Pressable>
                 );
@@ -581,6 +638,11 @@ const createStyles = (palette: VaultPaletteType) =>
       flex: 1,
       backgroundColor: 'rgba(0,0,0,0.75)',
       justifyContent: 'flex-end',
+    },
+    iconChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
     },
     sheet: {
       backgroundColor: VaultPalette.surface,
