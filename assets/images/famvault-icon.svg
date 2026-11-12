@@ -24,14 +24,21 @@
     </linearGradient>
   </defs>
   <rect width="1024" height="1024" fill="url(#bgRose)"/>
-  <!-- Inner Diamond facets -->
+  <!-- Delicate secondary inner facets -->
+  <line x1="512" y1="318" x2="512" y2="762"
+        stroke="url(#roseInner)" stroke-width="2.5" stroke-linecap="round" opacity="0.55"/>
+  <polyline points="406,318 305,446 512,762 719,446 618,318"
+            fill="none" stroke="url(#roseInner)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+  <polyline points="305,446 445,572 512,508 579,572 719,446"
+            fill="none" stroke="url(#roseInner)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+  <!-- Primary inner diamond facets -->
   <polyline points="400,446 512,318 624,446"
-            fill="none" stroke="url(#roseInner)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+            fill="none" stroke="url(#roseInner)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
   <polyline points="312,318 400,446 512,762 624,446 712,318"
-            fill="none" stroke="url(#roseInner)" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+            fill="none" stroke="url(#roseInner)" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.88"/>
   <!-- Girdle line -->
-  <polyline points="210,446 814,446" fill="none" stroke="url(#roseGirdle)" stroke-width="5.5" stroke-linecap="round" opacity="0.95"/>
+  <polyline points="210,446 814,446" fill="none" stroke="url(#roseGirdle)" stroke-width="4" stroke-linecap="round" opacity="0.95"/>
   <!-- Outer Diamond Silhouette -->
   <polygon points="312,318 712,318 814,446 512,762 210,446"
-           fill="none" stroke="url(#roseOuter)" stroke-width="9" stroke-linejoin="round"/>
+           fill="none" stroke="url(#roseOuter)" stroke-width="7" stroke-linejoin="round"/>
 </svg>
