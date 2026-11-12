@@ -277,11 +277,11 @@ export default function BackupAndSecurityScreen() {
             </Pressable>
           </View>
 
-          {/* FamVault Pro Showcase */}
+          {/* Famvault Pro Showcase */}
           <View style={[styles.card, styles.proCard]}>
             <View style={styles.proHeader}>
               <View>
-                <Text style={styles.proBadge}>FAMVAULT PRO · LIFETIME</Text>
+                <Text style={styles.proBadge}>Famvault Pro · Lifetime</Text>
                 <Text style={styles.proTitle}>₹499 One-Time Family Unlock</Text>
               </View>
               <Switch
@@ -309,7 +309,7 @@ export default function BackupAndSecurityScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>FamVault Insurance &amp; Locker Schedule</Text>
+              <Text style={styles.modalTitle}>Famvault Insurance &amp; Locker Schedule</Text>
               <Pressable onPress={() => setPdfModalVisible(false)}>
                 <Ionicons name="close" size={22} color={VaultPalette.textSecondary} />
               </Pressable>

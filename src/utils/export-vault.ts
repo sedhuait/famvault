@@ -180,7 +180,7 @@ export function buildVaultReportHtml(params: {
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>FamVault Family Audit Report</title>
+  <title>Famvault Family Audit Report</title>
   <style>
     @page { size: A4; margin: 16mm; }
     * { box-sizing: border-box; }
@@ -201,7 +201,7 @@ export function buildVaultReportHtml(params: {
       padding-bottom: 12px;
       margin-bottom: 16px;
     }
-    .brand { font-size: 22px; font-weight: 800; letter-spacing: 3px; color: #111827; margin: 0; }
+    .brand { font-size: 22px; font-weight: 800; letter-spacing: 0.8px; color: #111827; margin: 0; }
     .subtitle { font-size: 11px; color: #6b7280; margin-top: 2px; }
     .meta { text-align: right; font-size: 10px; color: #4b5563; }
     .summary-grid {
@@ -238,7 +238,7 @@ export function buildVaultReportHtml(params: {
 <body>
   <div class="header">
     <div>
-      <h1 class="brand">FAMVAULT</h1>
+      <h1 class="brand">Famvault</h1>
       <div class="subtitle">Family Precious Metals, Insurance &amp; Bank Locker Audit Schedule${scopeLabel ? ` · ${escapeHtml(scopeLabel)}` : ''}</div>
     </div>
     <div class="meta">
@@ -318,7 +318,7 @@ export function buildVaultReportHtml(params: {
   </table>
 
   <div class="footer">
-    <span>FamVault · 100% On-Device Private Storage</span>
+    <span>Famvault · 100% On-Device Private Storage</span>
     <span>24K ₹${rates.GOLD_24K.toLocaleString('en-IN')}/g · 22K ₹${rates.GOLD_22K.toLocaleString('en-IN')}/g · Silver ₹${rates.SILVER_999}/g</span>
   </div>
 </body>
@@ -360,7 +360,7 @@ export async function exportVaultCsv(
     await Sharing.shareAsync(file.uri, {
       mimeType: 'text/csv',
       UTI: 'public.comma-separated-values-text',
-      dialogTitle: 'Export FamVault CSV',
+      dialogTitle: 'Export Famvault CSV',
     });
   }
 
@@ -414,7 +414,7 @@ export async function exportVaultPdf(params: {
     await Sharing.shareAsync(uri, {
       mimeType: 'application/pdf',
       UTI: '.pdf',
-      dialogTitle: 'Export FamVault Audit PDF',
+      dialogTitle: 'Export Famvault Audit PDF',
     });
   }
 

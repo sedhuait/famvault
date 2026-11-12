@@ -90,7 +90,7 @@ export default function DashboardScreen() {
                 />
               </View>
               <View>
-                <Text style={styles.brandName}>FAMVAULT</Text>
+                <Text style={styles.brandName}>Famvault</Text>
                 <View style={styles.bioVerifiedRow}>
                   <Ionicons name="shield-checkmark" size={11} color={VaultPalette.emerald} />
                   <Text style={styles.bioVerifiedText}>Biometric Unlocked · On-Device</Text>
@@ -511,9 +511,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   brandName: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '700',
-    letterSpacing: 3,
+    letterSpacing: 0.6,
     color: VaultPalette.goldBright,
     fontFamily: VaultFonts.serif,
   },

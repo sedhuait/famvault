@@ -90,7 +90,7 @@ export function BiometricGate() {
         const enrolled = await LocalAuthentication.isEnrolledAsync();
         if (hasHw && enrolled) {
           const result = await LocalAuthentication.authenticateAsync({
-            promptMessage: 'Unlock FamVault',
+            promptMessage: 'Unlock Famvault',
             fallbackLabel: 'Use 6-Digit PIN',
             cancelLabel: 'Cancel',
           });
@@ -152,7 +152,7 @@ export function BiometricGate() {
               color={VaultPalette.gold}
             />
           </View>
-          <Text style={styles.brandTitle}>FAMVAULT</Text>
+          <Text style={styles.brandTitle}>Famvault</Text>
           <Text style={styles.brandSubtitle}>Indian Family Precious Metals & Custody Vault</Text>
         </View>
 
@@ -319,9 +319,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   brandTitle: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '700',
-    letterSpacing: 6,
+    letterSpacing: 1.2,
     color: VaultPalette.goldBright,
     fontFamily: VaultFonts.serif,
   },
