@@ -1,24 +1,10 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import {
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Switch,
-  Text,
-  View,
-} from 'react-native';
+import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ExportVaultModal } from '@/components/export-modal';
-import {
-  AccentThemeList,
-  VaultMaxWidth,
-  VaultPalette,
-  type VaultPaletteType,
-} from '@/constants/vault-theme';
+import { VaultMaxWidth, VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import { exportVaultCsv, exportVaultPdf } from '@/utils/export-vault';
 import { displayINR, formatDateTimeWithTime } from '@/utils/formatters';
@@ -32,17 +18,9 @@ export default function BackupAndSecurityScreen() {
     members,
     valuationMode,
     hidePrices,
-    setHidePrices,
-    accentTheme,
-    setAccentTheme,
     palette,
-    biometricEnabled,
-    setBiometricEnabled,
-    lockVault,
     lastBackupAt,
     recordBackupNow,
-    isProUnlocked,
-    setIsProUnlocked,
   } = useVault();
 
   const styles = useMemo(() => createStyles(palette), [palette]);
@@ -93,87 +71,9 @@ export default function BackupAndSecurityScreen() {
         <View style={styles.container}>
           <View style={styles.header}>
             <View>
-              <Text style={styles.title}>Security & Cloud Backup</Text>
+              <Text style={styles.title}>Cloud Backup & Export</Text>
               <Text style={styles.subtitle}>100% On-Device · Private Family Storage</Text>
             </View>
-          </View>
-
-          {/* Vault Color Theme */}
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="color-palette-outline" size={20} color={palette.gold} />
-              <Text style={styles.cardTitle}>Vault Color</Text>
-            </View>
-            <Text style={styles.rowSub}>Choose your preferred metallic accent finish</Text>
-            <View style={styles.themeRow}>
-              {AccentThemeList.map((theme) => {
-                const active = accentTheme === theme.id;
-                return (
-                  <Pressable
-                    key={theme.id}
-                    onPress={() => setAccentTheme(theme.id)}
-                    style={[
-                      styles.themeChip,
-                      active && {
-                        borderColor: palette.gold,
-                        backgroundColor: palette.goldTint,
-                      },
-                    ]}
-                  >
-                    <View style={[styles.themeSwatch, { backgroundColor: theme.gold }]} />
-                    <Text style={[styles.themeChipText, active && { color: palette.goldBright }]}>
-                      {theme.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-          </View>
-
-          {/* Biometric Lock Controls */}
-          <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Ionicons name="finger-print" size={20} color={palette.gold} />
-              <Text style={styles.cardTitle}>Biometric Vault Lock</Text>
-            </View>
-
-            <View style={styles.rowBetween}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.rowLabel}>Require Face ID / Biometric on Launch</Text>
-                <Text style={styles.rowSub}>
-                  Protects your family vault with a 6-digit PIN backup
-                </Text>
-              </View>
-              <Switch
-                value={biometricEnabled}
-                onValueChange={setBiometricEnabled}
-                trackColor={{ false: VaultPalette.border, true: palette.goldDim }}
-                thumbColor={biometricEnabled ? palette.goldBright : VaultPalette.textMuted}
-              />
-            </View>
-
-            <View style={styles.rowBetween}>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.rowLabel}>Hide ₹ Valuations (Discreet Mode)</Text>
-                <Text style={styles.rowSub}>
-                  Masks portfolio and item rupee amounts while keeping weights and locations visible
-                </Text>
-              </View>
-              <Switch
-                value={hidePrices}
-                onValueChange={setHidePrices}
-                trackColor={{ false: VaultPalette.border, true: VaultPalette.emerald }}
-                thumbColor={hidePrices ? '#ECFDF5' : VaultPalette.textMuted}
-              />
-            </View>
-
-            <Pressable
-              onPress={lockVault}
-              style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
-            >
-              <Ionicons name="lock-closed" size={16} color={palette.goldBright} />
-              <Text style={styles.secondaryBtnText}>Test Biometric Lock Screen Now</Text>
-            </Pressable>
           </View>
 
           {/* Cloud Backup Card */}
@@ -317,26 +217,6 @@ export default function BackupAndSecurityScreen() {
               <Ionicons name="document-text-outline" size={16} color={palette.goldBright} />
               <Text style={styles.secondaryBtnText}>Preview Audit Schedule &amp; CSV</Text>
             </Pressable>
-          </View>
-
-          {/* Famvault Pro Showcase */}
-          <View style={[styles.card, styles.proCard]}>
-            <View style={styles.proHeader}>
-              <View>
-                <Text style={styles.proBadge}>Famvault Pro · Lifetime</Text>
-                <Text style={styles.proTitle}>₹499 One-Time Family Unlock</Text>
-              </View>
-              <Switch
-                value={isProUnlocked}
-                onValueChange={setIsProUnlocked}
-                trackColor={{ false: VaultPalette.border, true: palette.goldDim }}
-                thumbColor={isProUnlocked ? palette.goldBright : VaultPalette.textMuted}
-              />
-            </View>
-            <Text style={styles.rowSub}>
-              Includes Unlimited Vault Items &amp; Bills · Encrypted iCloud / Google Drive Backup ·
-              Gold Loan &amp; Wedding Return Alerts · PDF Audit Export · Biometric App Lock.
-            </Text>
           </View>
         </View>
       </ScrollView>

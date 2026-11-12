@@ -5,10 +5,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddItemModal } from '@/components/add-item-modal';
-import { ExportVaultModal } from '@/components/export-modal';
 import {
-  AccentThemeList,
-  AccentThemes,
   LocationVisuals,
   MetalVisuals,
   VaultFonts,
@@ -35,11 +32,7 @@ export default function DashboardScreen() {
     unitMode,
     valuationMode,
     hidePrices,
-    accentTheme,
-    setAccentTheme,
     palette,
-    toggleUnitMode,
-    toggleValuationMode,
     toggleHidePrices,
     lockVault,
     addVaultItem,
@@ -47,15 +40,7 @@ export default function DashboardScreen() {
   } = useVault();
 
   const styles = useMemo(() => createStyles(palette), [palette]);
-
-  const cycleAccentTheme = () => {
-    const idx = AccentThemeList.findIndex((t) => t.id === accentTheme);
-    const next = AccentThemeList[(idx + 1) % AccentThemeList.length];
-    setAccentTheme(next.id);
-  };
-
   const [addVisible, setAddVisible] = useState(false);
-  const [exportVisible, setExportVisible] = useState(false);
   const [memberModalVisible, setMemberModalVisible] = useState(false);
   const [newMemberName, setNewMemberName] = useState('');
   const [newMemberCategory, setNewMemberCategory] =
@@ -119,13 +104,6 @@ export default function DashboardScreen() {
 
             <View style={styles.headerActions}>
               <Pressable
-                onPress={() => setExportVisible(true)}
-                accessibilityLabel="Export CSV or PDF"
-                style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
-              >
-                <Ionicons name="download-outline" size={17} color={palette.gold} />
-              </Pressable>
-              <Pressable
                 onPress={lockVault}
                 accessibilityLabel="Lock Vault"
                 style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
@@ -158,21 +136,10 @@ export default function DashboardScreen() {
 
           {/* Hero Portfolio Valuation Card */}
           <View style={styles.heroCard}>
-            <View style={styles.heroTopControls}>
-              <Pressable onPress={toggleValuationMode} style={styles.togglePill}>
-                <Ionicons name="swap-vertical" size={12} color={palette.goldBright} />
-                <Text style={styles.togglePillText}>
-                  {valuationMode === 'CASH' ? 'Cash Melt Value' : 'Store Replacement (+MC & GST)'}
-                </Text>
-              </Pressable>
-
-              <Pressable onPress={toggleUnitMode} style={styles.togglePill}>
-                <MaterialCommunityIcons name="scale-balance" size={12} color={palette.goldBright} />
-                <Text style={styles.togglePillText}>
-                  {unitMode === 'GRAMS' ? 'Grams (g)' : 'Pavan (8g)'}
-                </Text>
-              </Pressable>
-
+            <View style={styles.heroHeaderRow}>
+              <Text style={styles.heroLabel}>
+                Total Precious Wealth · {valuationMode === 'CASH' ? 'Melt' : 'Replacement'}
+              </Text>
               <Pressable
                 onPress={toggleHidePrices}
                 style={[
@@ -191,17 +158,10 @@ export default function DashboardScreen() {
                 <Text
                   style={[styles.togglePillText, hidePrices && { color: VaultPalette.emerald }]}
                 >
-                  {hidePrices ? 'Prices Hidden' : 'Hide Prices'}
+                  {hidePrices ? 'Hidden' : 'Hide'}
                 </Text>
               </Pressable>
-
-              <Pressable onPress={cycleAccentTheme} style={styles.togglePill}>
-                <View style={[styles.themeDot, { backgroundColor: palette.gold }]} />
-                <Text style={styles.togglePillText}>{AccentThemes[accentTheme].label}</Text>
-              </Pressable>
             </View>
-
-            <Text style={styles.heroLabel}>Total Family Precious Wealth</Text>
             <Text style={styles.heroAmount}>
               {displayINR(summary.totalActiveValue, hidePrices)}
             </Text>
@@ -492,8 +452,6 @@ export default function DashboardScreen() {
         onAdd={(payload) => addVaultItem(payload)}
       />
 
-      <ExportVaultModal visible={exportVisible} onClose={() => setExportVisible(false)} />
-
       {/* Add Family Member Modal */}
       <Modal
         visible={memberModalVisible}
@@ -680,11 +638,11 @@ const createStyles = (palette: VaultPaletteType) =>
       padding: 18,
       gap: 10,
     },
-    heroTopControls: {
+    heroHeaderRow: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
+      alignItems: 'center',
+      justifyContent: 'space-between',
       gap: 8,
-      marginBottom: 4,
     },
     togglePill: {
       flexDirection: 'row',
@@ -702,18 +660,12 @@ const createStyles = (palette: VaultPaletteType) =>
       fontWeight: '600',
       color: palette.goldBright,
     },
-    themeDot: {
-      width: 9,
-      height: 9,
-      borderRadius: 5,
-      borderWidth: 1,
-      borderColor: 'rgba(255,255,255,0.35)',
-    },
     heroLabel: {
-      fontSize: 12,
+      flex: 1,
+      fontSize: 11,
       color: VaultPalette.textSecondary,
       textTransform: 'uppercase',
-      letterSpacing: 0.8,
+      letterSpacing: 0.7,
     },
     heroAmount: {
       fontSize: 34,
