@@ -9,20 +9,8 @@
       <stop offset="48%" stop-color="#E0A296"/>
       <stop offset="100%" stop-color="#9B5B50"/>
     </linearGradient>
-    <linearGradient id="rgSoftA" x1="0" y1="1" x2="1" y2="0">
-      <stop offset="0%" stop-color="#9B5B50"/>
-      <stop offset="100%" stop-color="#F5CEC6"/>
-    </linearGradient>
   </defs>
   <rect width="1024" height="1024" fill="url(#bgA)"/>
-  <!-- Outer luxury crest -->
-  <path d="M512 146 L786 248 V514 C786 696 666 814 512 878 C358 814 238 696 238 514 V248 Z"
-        fill="none" stroke="url(#rgA)" stroke-width="24" stroke-linejoin="round"/>
-  <path d="M512 184 L748 272 V512 C748 670 644 774 512 832 C380 774 276 670 276 512 V272 Z"
-        fill="#101219" stroke="url(#rgSoftA)" stroke-width="4" opacity="0.65"/>
-  <!-- Centered Faceted Diamond -->
-  <polygon points="386,368 638,368 700,448 512,642 324,448" fill="none" stroke="url(#rgA)" stroke-width="20" stroke-linejoin="round"/>
-  <polyline points="324,448 700,448" fill="none" stroke="url(#rgA)" stroke-width="11" opacity="0.88"/>
-  <polyline points="386,368 440,448 512,642 584,448 638,368" fill="none" stroke="url(#rgA)" stroke-width="11" opacity="0.88"/>
-  <polyline points="440,448 512,368 584,448" fill="none" stroke="url(#rgA)" stroke-width="9" opacity="0.65"/>
+  <!-- Clean Solid Rose Gold Diamond (no shield, no internal lines) -->
+  <polygon points="312,318 712,318 814,446 512,762 210,446" fill="url(#rgA)"/>
 </svg>
