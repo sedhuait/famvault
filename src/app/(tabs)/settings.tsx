@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ExportVaultModal } from '@/components/export-modal';
@@ -284,6 +284,24 @@ export default function SettingsScreen() {
               Unlimited items & bills · Private cloud sync · PDF & CSV audit exports · Biometric
               lock
             </Text>
+          </View>
+
+          {/* Support */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="help-circle-outline" size={18} color={palette.gold} />
+              <Text style={styles.cardTitle}>Support</Text>
+            </View>
+            <Text style={styles.rowSub}>
+              Questions, feedback, or backup help? Contact us directly by email.
+            </Text>
+            <Pressable
+              onPress={() => Linking.openURL('mailto:sedhu@codera.in?subject=Famvault%20Support')}
+              style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
+            >
+              <Ionicons name="mail-outline" size={16} color={palette.goldBright} />
+              <Text style={styles.secondaryBtnText}>sedhu@codera.in</Text>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
