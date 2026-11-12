@@ -1,4 +1,5 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useLocalSearchParams } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -19,6 +20,12 @@ import {
   formatWeightForItem,
   getPurityLabel,
 } from '@/utils/formatters';
+import {
+  isRenderableImageUri,
+  type PickedMediaAsset,
+  pickImageAsset,
+  pickInvoiceDocument,
+} from '@/utils/media-picker';
 import { calculateItemValuation } from '@/utils/valuation';
 
 const OWNERS = ['Wife', 'Amma', 'Daughter', 'Self', 'Joint'];
@@ -36,6 +43,7 @@ export default function ItemDetailScreen() {
     moveItemLocation,
     transferItemOwner,
     attachBillToItem,
+    updateItemPhoto,
   } = useVault();
 
   const item = items.find((i) => i.id === id);
@@ -48,6 +56,7 @@ export default function ItemDetailScreen() {
   const [ownerRemarks, setOwnerRemarks] = useState('');
   const [jewelerInput, setJewelerInput] = useState(item?.jewelerName ?? 'GRT Jewellers');
   const [invoiceInput, setInvoiceInput] = useState(item?.invoiceNumber ?? 'INV-2026-9012');
+  const [pickedBill, setPickedBill] = useState<PickedMediaAsset | null>(null);
 
   const itemHistory = useMemo(
     () =>
@@ -76,18 +85,30 @@ export default function ItemDetailScreen() {
         {/* Hero Asset Card */}
         <View style={styles.heroCard}>
           <View style={styles.heroTop}>
-            <View
+            <Pressable
+              onPress={async () => {
+                const picked = await pickImageAsset('gallery');
+                if (picked) updateItemPhoto(item.id, picked.uri);
+              }}
               style={[
                 styles.emblem,
                 { backgroundColor: metal.tint, borderColor: `${metal.color}55` },
               ]}
             >
-              <MaterialCommunityIcons
-                name={metal.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-                size={28}
-                color={metal.color}
-              />
-            </View>
+              {isRenderableImageUri(item.itemPhotoUri) ? (
+                <Image
+                  source={{ uri: item.itemPhotoUri }}
+                  style={{ width: 52, height: 52, borderRadius: 15 }}
+                  contentFit="cover"
+                />
+              ) : (
+                <MaterialCommunityIcons
+                  name={metal.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                  size={28}
+                  color={metal.color}
+                />
+              )}
+            </Pressable>
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={styles.title}>{item.title}</Text>
               <Text style={styles.meta}>
@@ -344,7 +365,7 @@ export default function ItemDetailScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>
-              {item.billPhotoUri ? 'GST Tax Invoice' : 'Attach GST Bill Copy'}
+              {item.billPhotoUri ? 'GST Tax Invoice' : 'Attach GST Bill (Photo or PDF)'}
             </Text>
 
             {item.billPhotoUri ? (
@@ -353,24 +374,70 @@ export default function ItemDetailScreen() {
                   <Text style={styles.invoiceJeweler}>
                     {item.jewelerName ?? 'Verified Jeweler'}
                   </Text>
-                  <Text style={styles.invoiceTag}>TAX INVOICE</Text>
+                  <Text style={styles.invoiceTag}>
+                    {item.billMimeType === 'application/pdf' ? 'PDF INVOICE' : 'TAX INVOICE'}
+                  </Text>
                 </View>
+                {isRenderableImageUri(item.billPhotoUri) &&
+                item.billMimeType !== 'application/pdf' ? (
+                  <Image
+                    source={{ uri: item.billPhotoUri }}
+                    style={{ width: '100%', height: 180, borderRadius: 8 }}
+                    contentFit="contain"
+                  />
+                ) : null}
                 <Text style={styles.invoiceLine}>
                   Invoice #: {item.invoiceNumber ?? 'INV-VERIFIED'}
                 </Text>
+                {item.billFileName ? (
+                  <Text style={styles.invoiceLine}>File: {item.billFileName}</Text>
+                ) : null}
                 <Text style={styles.invoiceLine}>Item: {item.title}</Text>
                 <Text style={styles.invoiceLine}>
                   Purity: {getPurityLabel(item.purity)} · Net {item.netMetalWeightGrams}g
                 </Text>
                 <Text style={styles.invoiceLine}>
-                  Saved On-Device ({item.compressedBillKb ?? 148} KB · Crisp zoomable copy)
+                  Saved On-Device ({item.compressedBillKb ?? 148} KB)
                 </Text>
               </View>
             ) : (
               <View style={{ gap: 10 }}>
                 <Text style={styles.modalSub}>
-                  Saves a crisp, space-optimized invoice copy (~148 KB) 100% on your device.
+                  Upload a bill photo or PDF invoice (saved 100% on-device).
                 </Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <Pressable
+                    onPress={async () => {
+                      const doc = await pickInvoiceDocument();
+                      if (doc) setPickedBill(doc);
+                    }}
+                    style={[styles.actionBtn, { paddingVertical: 10 }]}
+                  >
+                    <MaterialCommunityIcons
+                      name="file-pdf-box"
+                      size={17}
+                      color={VaultPalette.emerald}
+                    />
+                    <Text style={[styles.actionBtnText, { color: VaultPalette.emerald }]}>
+                      Upload PDF / File
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={async () => {
+                      const img = await pickImageAsset('gallery');
+                      if (img) setPickedBill(img);
+                    }}
+                    style={[styles.actionBtn, { paddingVertical: 10 }]}
+                  >
+                    <Ionicons name="image-outline" size={16} color={VaultPalette.goldBright} />
+                    <Text style={styles.actionBtnText}>Bill Photo</Text>
+                  </Pressable>
+                </View>
+                {pickedBill ? (
+                  <Text style={{ fontSize: 12, color: VaultPalette.emerald, fontWeight: '600' }}>
+                    Selected: {pickedBill.name}
+                  </Text>
+                ) : null}
                 <TextInput
                   value={jewelerInput}
                   onChangeText={setJewelerInput}
@@ -389,18 +456,25 @@ export default function ItemDetailScreen() {
             )}
 
             <View style={styles.modalBtns}>
-              <Pressable onPress={() => setBillOpen(false)} style={styles.modalCancel}>
+              <Pressable
+                onPress={() => {
+                  setPickedBill(null);
+                  setBillOpen(false);
+                }}
+                style={styles.modalCancel}
+              >
                 <Text style={styles.modalCancelText}>Close</Text>
               </Pressable>
               {!item.billPhotoUri ? (
                 <Pressable
                   onPress={() => {
-                    attachBillToItem(item.id, jewelerInput, invoiceInput);
+                    attachBillToItem(item.id, jewelerInput, invoiceInput, pickedBill ?? undefined);
+                    setPickedBill(null);
                     setBillOpen(false);
                   }}
                   style={styles.modalConfirm}
                 >
-                  <Text style={styles.modalConfirmText}>Compress & Attach Bill</Text>
+                  <Text style={styles.modalConfirmText}>Save Bill Copy</Text>
                 </Pressable>
               ) : null}
             </View>

@@ -1,11 +1,12 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { useState } from 'react';
 import {
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   TextInput,
   View,
@@ -15,6 +16,7 @@ import { LocationVisuals, MetalVisuals, VaultPalette } from '@/constants/vault-t
 import type { AddItemPayload } from '@/context/vault-context';
 import type { CustodyLocation, ItemCategory, MetalType, Purity } from '@/types/vault';
 import { getPurityLabel } from '@/utils/formatters';
+import { type PickedMediaAsset, pickImageAsset, pickInvoiceDocument } from '@/utils/media-picker';
 
 interface AddItemModalProps {
   visible: boolean;
@@ -52,8 +54,10 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
   const [ownerName, setOwnerName] = useState('Wife');
   const [jewelerName, setJewelerName] = useState('GRT Jewellers');
   const [invoiceNumber, setInvoiceNumber] = useState('INV-2026-4102');
-  const [attachPhoto, setAttachPhoto] = useState(true);
-  const [attachBill, setAttachBill] = useState(true);
+
+  const [pickedPhoto, setPickedPhoto] = useState<PickedMediaAsset | null>(null);
+  const [pickedInvoice, setPickedInvoice] = useState<PickedMediaAsset | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   const handleSelectMetal = (m: MetalType) => {
     setMetalType(m);
@@ -66,6 +70,36 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
     } else {
       setNetWeight('24.0');
       setGrossWeight('25.2');
+    }
+  };
+
+  const handlePickPhoto = async (source: 'camera' | 'gallery') => {
+    setUploadError(null);
+    try {
+      const asset = await pickImageAsset(source);
+      if (asset) setPickedPhoto(asset);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Unable to select photo.');
+    }
+  };
+
+  const handlePickInvoiceImage = async () => {
+    setUploadError(null);
+    try {
+      const asset = await pickImageAsset('gallery');
+      if (asset) setPickedInvoice(asset);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Unable to select invoice photo.');
+    }
+  };
+
+  const handlePickInvoicePdf = async () => {
+    setUploadError(null);
+    try {
+      const asset = await pickInvoiceDocument();
+      if (asset) setPickedInvoice(asset);
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : 'Unable to select invoice file.');
     }
   };
 
@@ -85,23 +119,34 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
       locationDetail,
       ownerName,
       jewelerName,
-      invoiceNumber: attachBill ? invoiceNumber : undefined,
-      attachPhoto,
-      attachBill,
+      invoiceNumber: pickedInvoice ? invoiceNumber : undefined,
+      itemPhotoUri: pickedPhoto?.uri,
+      billPhotoUri: pickedInvoice?.uri,
+      billFileName: pickedInvoice?.name,
+      billMimeType: pickedInvoice?.mimeType,
+      attachPhoto: Boolean(pickedPhoto),
+      attachBill: Boolean(pickedInvoice),
     });
     setTitle('');
+    setPickedPhoto(null);
+    setPickedInvoice(null);
+    setUploadError(null);
     onClose();
   };
+
+  const isInvoicePdf =
+    pickedInvoice?.mimeType === 'application/pdf' ||
+    pickedInvoice?.name.toLowerCase().endsWith('.pdf');
 
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <View style={styles.sheet}>
           <View style={styles.header}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={styles.title}>Add Precious Asset</Text>
               <Text style={styles.subtitle}>
-                100% On-Device · Saves space automatically on photos &amp; bills
+                100% On-Device · Upload jewel photo &amp; bill (Image or PDF)
               </Text>
             </View>
             <Pressable onPress={onClose} style={styles.closeBtn}>
@@ -109,7 +154,11 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
             </Pressable>
           </View>
 
-          <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.scrollArea}
+            contentContainerStyle={styles.body}
+            showsVerticalScrollIndicator={false}
+          >
             {/* Metal Selector */}
             <Text style={styles.label}>Metal / Asset Type</Text>
             <View style={styles.rowWrap}>
@@ -261,55 +310,151 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
               />
             </View>
 
-            {/* Compression pipeline toggles */}
-            <View style={styles.toggleCard}>
-              <View style={styles.toggleRow}>
+            {/* Real Upload: Jewelry Photo */}
+            <View style={styles.uploadCard}>
+              <View style={styles.uploadHeader}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.toggleTitle}>Attach Item Photo</Text>
-                  <Text style={styles.toggleSub}>Saves crisp photo on-device (~94 KB)</Text>
+                  <Text style={styles.uploadTitle}>Jewelry Photo</Text>
+                  <Text style={styles.uploadSub}>
+                    Upload a clear photo of the ornament (saved 100% on-device)
+                  </Text>
                 </View>
-                <Switch
-                  value={attachPhoto}
-                  onValueChange={setAttachPhoto}
-                  trackColor={{ false: VaultPalette.border, true: VaultPalette.goldDim }}
-                  thumbColor={attachPhoto ? VaultPalette.goldBright : VaultPalette.textMuted}
-                />
               </View>
-              <View style={styles.divider} />
-              <View style={styles.toggleRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.toggleTitle}>Attach GST Tax Invoice</Text>
-                  <Text style={styles.toggleSub}>Zoomable bill copy (~152 KB) for tax audit</Text>
+
+              {pickedPhoto ? (
+                <View style={styles.previewRow}>
+                  <Image
+                    source={{ uri: pickedPhoto.uri }}
+                    style={styles.thumbImg}
+                    contentFit="cover"
+                  />
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={styles.fileName} numberOfLines={1}>
+                      {pickedPhoto.name}
+                    </Text>
+                    <Text style={styles.fileMeta}>
+                      {pickedPhoto.sizeBytes
+                        ? `${Math.max(1, Math.round(pickedPhoto.sizeBytes / 1024))} KB`
+                        : 'Photo attached'}
+                    </Text>
+                  </View>
+                  <Pressable onPress={() => setPickedPhoto(null)} style={styles.removeBtn}>
+                    <Ionicons name="trash-outline" size={16} color={VaultPalette.crimson} />
+                  </Pressable>
                 </View>
-                <Switch
-                  value={attachBill}
-                  onValueChange={setAttachBill}
-                  trackColor={{ false: VaultPalette.border, true: VaultPalette.emerald }}
-                  thumbColor={attachBill ? '#ECFDF5' : VaultPalette.textMuted}
-                />
-              </View>
+              ) : (
+                <View style={styles.uploadBtnRow}>
+                  <Pressable
+                    onPress={() => handlePickPhoto('gallery')}
+                    style={({ pressed }) => [styles.uploadBtn, pressed && { opacity: 0.8 }]}
+                  >
+                    <Ionicons name="images-outline" size={16} color={VaultPalette.goldBright} />
+                    <Text style={styles.uploadBtnText}>Upload Jewel Pic</Text>
+                  </Pressable>
+                  {Platform.OS !== 'web' ? (
+                    <Pressable
+                      onPress={() => handlePickPhoto('camera')}
+                      style={({ pressed }) => [styles.uploadBtn, pressed && { opacity: 0.8 }]}
+                    >
+                      <Ionicons name="camera-outline" size={16} color={VaultPalette.goldBright} />
+                      <Text style={styles.uploadBtnText}>Camera</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
+              )}
             </View>
 
-            {attachBill ? (
-              <View style={styles.rowTwo}>
-                <View style={[styles.field, { flex: 1 }]}>
-                  <Text style={styles.label}>Jeweler</Text>
-                  <TextInput
-                    value={jewelerName}
-                    onChangeText={setJewelerName}
-                    style={styles.input}
-                  />
-                </View>
-                <View style={[styles.field, { flex: 1 }]}>
-                  <Text style={styles.label}>Invoice #</Text>
-                  <TextInput
-                    value={invoiceNumber}
-                    onChangeText={setInvoiceNumber}
-                    style={styles.input}
-                  />
+            {/* Real Upload: GST Invoice (Image or PDF) */}
+            <View style={styles.uploadCard}>
+              <View style={styles.uploadHeader}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.uploadTitle}>GST Invoice / Certificate (Photo or PDF)</Text>
+                  <Text style={styles.uploadSub}>
+                    Attach a bill image or PDF document for tax &amp; insurance records
+                  </Text>
                 </View>
               </View>
-            ) : null}
+
+              {pickedInvoice ? (
+                <View style={styles.previewRow}>
+                  {isInvoicePdf ? (
+                    <View style={styles.pdfThumb}>
+                      <MaterialCommunityIcons
+                        name="file-pdf-box"
+                        size={28}
+                        color={VaultPalette.crimson}
+                      />
+                    </View>
+                  ) : (
+                    <Image
+                      source={{ uri: pickedInvoice.uri }}
+                      style={styles.thumbImg}
+                      contentFit="cover"
+                    />
+                  )}
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={styles.fileName} numberOfLines={1}>
+                      {pickedInvoice.name}
+                    </Text>
+                    <Text style={styles.fileMeta}>
+                      {isInvoicePdf ? 'PDF Invoice' : 'Invoice Image'}
+                      {pickedInvoice.sizeBytes
+                        ? ` · ${Math.max(1, Math.round(pickedInvoice.sizeBytes / 1024))} KB`
+                        : ''}
+                    </Text>
+                  </View>
+                  <Pressable onPress={() => setPickedInvoice(null)} style={styles.removeBtn}>
+                    <Ionicons name="trash-outline" size={16} color={VaultPalette.crimson} />
+                  </Pressable>
+                </View>
+              ) : (
+                <View style={styles.uploadBtnRow}>
+                  <Pressable
+                    onPress={handlePickInvoicePdf}
+                    style={({ pressed }) => [styles.uploadBtn, pressed && { opacity: 0.8 }]}
+                  >
+                    <MaterialCommunityIcons
+                      name="file-pdf-box"
+                      size={17}
+                      color={VaultPalette.emerald}
+                    />
+                    <Text style={[styles.uploadBtnText, { color: VaultPalette.emerald }]}>
+                      Upload PDF / File
+                    </Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={handlePickInvoiceImage}
+                    style={({ pressed }) => [styles.uploadBtn, pressed && { opacity: 0.8 }]}
+                  >
+                    <Ionicons name="image-outline" size={16} color={VaultPalette.goldBright} />
+                    <Text style={styles.uploadBtnText}>Bill Photo</Text>
+                  </Pressable>
+                </View>
+              )}
+
+              {pickedInvoice ? (
+                <View style={styles.rowTwo}>
+                  <View style={[styles.field, { flex: 1 }]}>
+                    <Text style={styles.label}>Jeweler</Text>
+                    <TextInput
+                      value={jewelerName}
+                      onChangeText={setJewelerName}
+                      style={styles.input}
+                    />
+                  </View>
+                  <View style={[styles.field, { flex: 1 }]}>
+                    <Text style={styles.label}>Invoice #</Text>
+                    <TextInput
+                      value={invoiceNumber}
+                      onChangeText={setInvoiceNumber}
+                      style={styles.input}
+                    />
+                  </View>
+                </View>
+              ) : null}
+            </View>
+
+            {uploadError ? <Text style={styles.errorText}>{uploadError}</Text> : null}
           </ScrollView>
 
           <Pressable
@@ -342,12 +487,13 @@ const styles = StyleSheet.create({
     maxWidth: 640,
     width: '100%',
     alignSelf: 'center',
-    gap: 14,
+    gap: 12,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 10,
   },
   title: {
     fontSize: 18,
@@ -367,8 +513,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  scrollArea: {
+    flexShrink: 1,
+  },
   body: {
     gap: 12,
+    paddingTop: 4,
     paddingBottom: 8,
   },
   label: {
@@ -411,7 +561,7 @@ const styles = StyleSheet.create({
     color: VaultPalette.text,
     fontSize: 14,
   },
-  toggleCard: {
+  uploadCard: {
     backgroundColor: VaultPalette.bg,
     borderRadius: 14,
     borderWidth: 1,
@@ -419,24 +569,81 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 10,
   },
-  toggleRow: {
+  uploadHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
   },
-  toggleTitle: {
+  uploadTitle: {
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
     color: VaultPalette.text,
   },
-  toggleSub: {
+  uploadSub: {
     fontSize: 11,
     color: VaultPalette.textMuted,
     marginTop: 2,
   },
-  divider: {
-    height: 1,
-    backgroundColor: VaultPalette.border,
+  uploadBtnRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  uploadBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: VaultPalette.borderGold,
+    backgroundColor: VaultPalette.surfaceElevated,
+  },
+  uploadBtnText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: VaultPalette.goldBright,
+  },
+  previewRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    backgroundColor: VaultPalette.surfaceElevated,
+    borderRadius: 10,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: VaultPalette.border,
+  },
+  thumbImg: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: VaultPalette.surface,
+  },
+  pdfThumb: {
+    width: 44,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: VaultPalette.crimsonTint,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fileName: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: VaultPalette.text,
+  },
+  fileMeta: {
+    fontSize: 11,
+    color: VaultPalette.emerald,
+  },
+  removeBtn: {
+    padding: 6,
+  },
+  errorText: {
+    fontSize: 12,
+    color: VaultPalette.crimson,
   },
   saveBtn: {
     flexDirection: 'row',

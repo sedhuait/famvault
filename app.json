@@ -41,6 +41,13 @@
           "faceIDPermission": "Allow FamVault to unlock your family precious metals vault with Face ID."
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow FamVault to attach jewelry photos and invoice images.",
+          "cameraPermission": "Allow FamVault to capture jewelry photos and GST bills."
+        }
+      ],
       "expo-sharing"
     ],
     "experiments": {

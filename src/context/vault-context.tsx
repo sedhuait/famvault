@@ -51,6 +51,10 @@ export interface AddItemPayload {
   jewelerName?: string;
   invoiceNumber?: string;
   purchasePrice?: number;
+  itemPhotoUri?: string;
+  billPhotoUri?: string;
+  billFileName?: string;
+  billMimeType?: string;
   attachBill?: boolean;
   attachPhoto?: boolean;
   notes?: string;
@@ -81,7 +85,13 @@ interface VaultContextValue {
   updateRate: (purity: Purity, nextRate: number) => void;
   moveItemLocation: (payload: MoveLocationPayload) => void;
   transferItemOwner: (itemId: string, nextOwner: string, remarks: string) => void;
-  attachBillToItem: (itemId: string, jewelerName: string, invoiceNumber: string) => void;
+  attachBillToItem: (
+    itemId: string,
+    jewelerName: string,
+    invoiceNumber: string,
+    billFile?: { uri: string; name?: string; mimeType?: string },
+  ) => void;
+  updateItemPhoto: (itemId: string, photoUri: string) => void;
   addVaultItem: (payload: AddItemPayload) => VaultItem;
   recordBackupNow: () => void;
 }
@@ -231,20 +241,26 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   );
 
   const attachBillToItem = useCallback(
-    (itemId: string, jewelerName: string, invoiceNumber: string) => {
+    (
+      itemId: string,
+      jewelerName: string,
+      invoiceNumber: string,
+      billFile?: { uri: string; name?: string; mimeType?: string },
+    ) => {
       const now = new Date().toISOString();
       const target = items.find((i) => i.id === itemId);
       if (!target) return;
 
-      const fileName = `${itemId}_bill_${Date.now()}.webp`;
+      const fileUri = billFile?.uri ?? `${itemId}_bill_${Date.now()}.webp`;
+      const isPdf = billFile?.mimeType === 'application/pdf';
       const entry: VaultItemHistory = {
         id: `hist-${Date.now()}`,
         itemId,
         actionType: 'BILL_UPLOADED',
         fieldChanged: 'billPhotoUri',
         previousValue: target.billPhotoUri ? 'Previous Bill Replaced' : 'None',
-        newValue: fileName,
-        remarks: `Attached GST invoice (${jewelerName} • ${invoiceNumber}).`,
+        newValue: billFile?.name ?? fileUri,
+        remarks: `Attached ${isPdf ? 'PDF ' : ''}GST invoice (${jewelerName} • ${invoiceNumber}).`,
         timestamp: now,
       };
 
@@ -253,7 +269,9 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
           item.id === itemId
             ? {
                 ...item,
-                billPhotoUri: fileName,
+                billPhotoUri: fileUri,
+                billFileName: billFile?.name ?? item.billFileName,
+                billMimeType: billFile?.mimeType ?? item.billMimeType,
                 compressedBillKb: 148,
                 jewelerName: jewelerName.trim() || item.jewelerName,
                 invoiceNumber: invoiceNumber.trim() || item.invoiceNumber,
@@ -267,6 +285,23 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     },
     [items],
   );
+
+  const updateItemPhoto = useCallback((itemId: string, photoUri: string) => {
+    const now = new Date().toISOString();
+    setItems((prev) =>
+      prev.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              itemPhotoUri: photoUri,
+              compressedPhotoKb: 96,
+              updatedAt: now,
+            }
+          : item,
+      ),
+    );
+    triggerHaptic('success');
+  }, []);
 
   const addVaultItem = useCallback((payload: AddItemPayload): VaultItem => {
     const now = new Date().toISOString();
@@ -286,10 +321,12 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       location: payload.location,
       locationDetail: payload.locationDetail.trim() || undefined,
       ownerName: payload.ownerName,
-      itemPhotoUri: payload.attachPhoto ? `${id}_photo.webp` : undefined,
-      billPhotoUri: payload.attachBill ? `${id}_bill.webp` : undefined,
-      compressedPhotoKb: payload.attachPhoto ? 94 : undefined,
-      compressedBillKb: payload.attachBill ? 152 : undefined,
+      itemPhotoUri: payload.itemPhotoUri ?? (payload.attachPhoto ? `${id}_photo.webp` : undefined),
+      billPhotoUri: payload.billPhotoUri ?? (payload.attachBill ? `${id}_bill.webp` : undefined),
+      billFileName: payload.billFileName,
+      billMimeType: payload.billMimeType,
+      compressedPhotoKb: payload.itemPhotoUri || payload.attachPhoto ? 94 : undefined,
+      compressedBillKb: payload.billPhotoUri || payload.attachBill ? 152 : undefined,
       jewelerName: payload.jewelerName?.trim() || undefined,
       invoiceNumber: payload.invoiceNumber?.trim() || undefined,
       purchasePrice: payload.purchasePrice,
@@ -348,6 +385,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       moveItemLocation,
       transferItemOwner,
       attachBillToItem,
+      updateItemPhoto,
       addVaultItem,
       recordBackupNow,
     }),
@@ -371,6 +409,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       moveItemLocation,
       transferItemOwner,
       attachBillToItem,
+      updateItemPhoto,
       addVaultItem,
       recordBackupNow,
     ],

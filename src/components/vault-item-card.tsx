@@ -1,9 +1,11 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Image } from 'expo-image';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { LocationVisuals, MetalVisuals, VaultPalette } from '@/constants/vault-theme';
 import type { BullionRatesPerGram, ValuationMode, VaultItem, WeightUnitMode } from '@/types/vault';
 import { displayINR, formatWeightForItem, getPurityLabel } from '@/utils/formatters';
+import { isRenderableImageUri } from '@/utils/media-picker';
 import { calculateItemValuation } from '@/utils/valuation';
 
 interface VaultItemCardProps {
@@ -33,15 +35,23 @@ export function VaultItemCard({
       style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
     >
       <View style={styles.topRow}>
-        {/* Metal Emblem */}
+        {/* Metal Emblem or Uploaded Jewel Photo */}
         <View
           style={[styles.emblem, { backgroundColor: metal.tint, borderColor: `${metal.color}44` }]}
         >
-          <MaterialCommunityIcons
-            name={metal.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-            size={22}
-            color={metal.color}
-          />
+          {isRenderableImageUri(item.itemPhotoUri) ? (
+            <Image
+              source={{ uri: item.itemPhotoUri }}
+              style={{ width: 42, height: 42, borderRadius: 11 }}
+              contentFit="cover"
+            />
+          ) : (
+            <MaterialCommunityIcons
+              name={metal.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+              size={22}
+              color={metal.color}
+            />
+          )}
         </View>
 
         {/* Title & Purity/Weight */}
@@ -100,7 +110,9 @@ export function VaultItemCard({
           {item.billPhotoUri ? (
             <View style={[styles.billPill, { backgroundColor: VaultPalette.emeraldTint }]}>
               <Ionicons name="document-text-outline" size={11} color={VaultPalette.emerald} />
-              <Text style={[styles.billText, { color: VaultPalette.emerald }]}>Bill ✓</Text>
+              <Text style={[styles.billText, { color: VaultPalette.emerald }]}>
+                {item.billMimeType === 'application/pdf' ? 'PDF Bill ✓' : 'Bill ✓'}
+              </Text>
             </View>
           ) : (
             <View style={[styles.billPill, { backgroundColor: VaultPalette.amberTint }]}>

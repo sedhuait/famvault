@@ -73,6 +73,8 @@ export interface VaultItem {
   ownerName: string;
   itemPhotoUri?: string;
   billPhotoUri?: string;
+  billFileName?: string;
+  billMimeType?: string;
   certPhotoUri?: string;
   compressedPhotoKb?: number;
   compressedBillKb?: number;
