@@ -11,7 +11,7 @@ import {
   exportVaultCsv,
   exportVaultPdf,
 } from '@/utils/export-vault';
-import { formatINR } from '@/utils/formatters';
+import { displayINR } from '@/utils/formatters';
 import { summarizePortfolio } from '@/utils/valuation';
 
 interface ExportVaultModalProps {
@@ -27,7 +27,7 @@ export function ExportVaultModal({
   filteredItems,
   scopeHint,
 }: ExportVaultModalProps) {
-  const { items, history, rates, members, valuationMode } = useVault();
+  const { items, history, rates, members, valuationMode, hidePrices } = useVault();
 
   const hasSubset = Boolean(filteredItems && filteredItems.length !== items.length);
   const [useFiltered, setUseFiltered] = useState<boolean>(hasSubset);
@@ -92,7 +92,7 @@ export function ExportVaultModal({
             <View>
               <Text style={styles.title}>Export Vault Report</Text>
               <Text style={styles.subtitle}>
-                {exportItems.length} items · {formatINR(summary.totalActiveValue)}
+                {exportItems.length} items · {displayINR(summary.totalActiveValue, hidePrices)}
               </Text>
             </View>
             <Pressable onPress={onClose} style={styles.closeBtn}>

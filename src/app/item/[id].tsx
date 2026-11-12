@@ -13,9 +13,9 @@ import {
 } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import {
+  displayINR,
   formatDateTime,
   formatGoldWeight,
-  formatINR,
   formatWeightForItem,
   getPurityLabel,
 } from '@/utils/formatters';
@@ -31,6 +31,8 @@ export default function ItemDetailScreen() {
     rates,
     unitMode,
     valuationMode,
+    hidePrices,
+    toggleHidePrices,
     moveItemLocation,
     transferItemOwner,
     attachBillToItem,
@@ -138,16 +140,41 @@ export default function ItemDetailScreen() {
 
         {/* Valuation Card */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Valuation & Purchase Audit</Text>
+          <View
+            style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}
+          >
+            <Text style={styles.cardTitle}>Valuation & Purchase Audit</Text>
+            <Pressable
+              onPress={toggleHidePrices}
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 4, padding: 4 }}
+            >
+              <Ionicons
+                name={hidePrices ? 'eye-off-outline' : 'eye-outline'}
+                size={15}
+                color={hidePrices ? VaultPalette.emerald : VaultPalette.gold}
+              />
+              <Text
+                style={{
+                  fontSize: 11,
+                  fontWeight: '600',
+                  color: hidePrices ? VaultPalette.emerald : VaultPalette.gold,
+                }}
+              >
+                {hidePrices ? 'Hidden' : 'Hide'}
+              </Text>
+            </Pressable>
+          </View>
           <View style={styles.valGrid}>
             <View style={styles.valBox}>
               <Text style={styles.valLabel}>Cash Melt Value</Text>
-              <Text style={styles.valAmount}>{formatINR(valuation.cashMeltValue)}</Text>
+              <Text style={styles.valAmount}>
+                {displayINR(valuation.cashMeltValue, hidePrices)}
+              </Text>
             </View>
             <View style={styles.valBox}>
               <Text style={styles.valLabel}>Store Replacement (+MC & GST)</Text>
               <Text style={[styles.valAmount, { color: VaultPalette.goldBright }]}>
-                {formatINR(valuation.replacementValue)}
+                {displayINR(valuation.replacementValue, hidePrices)}
               </Text>
             </View>
           </View>
@@ -156,7 +183,7 @@ export default function ItemDetailScreen() {
             <View style={styles.purchaseRow}>
               <Text style={styles.purchaseText}>
                 Purchased {item.purchaseDate ? formatDateTime(item.purchaseDate) : ''} for{' '}
-                {formatINR(item.purchasePrice)}
+                {displayINR(item.purchasePrice, hidePrices)}
               </Text>
               {gain !== null ? (
                 <Text
@@ -165,8 +192,7 @@ export default function ItemDetailScreen() {
                     { color: gain >= 0 ? VaultPalette.emerald : VaultPalette.crimson },
                   ]}
                 >
-                  {gain >= 0 ? '+' : ''}
-                  {formatINR(gain)}
+                  {hidePrices ? '••••' : `${gain >= 0 ? '+' : ''}${displayINR(gain, false)}`}
                 </Text>
               ) : null}
             </View>

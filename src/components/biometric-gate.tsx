@@ -10,7 +10,7 @@ import { useVault } from '@/context/vault-context';
 const DEMO_PIN = '123456';
 
 export function BiometricGate() {
-  const { unlockVault, biometricEnabled } = useVault();
+  const { unlockVault, biometricEnabled, hidePrices, items } = useVault();
   const [authStatus, setAuthStatus] = useState<'IDLE' | 'SCANNING' | 'VERIFIED' | 'PIN'>('IDLE');
   const [hardwareLabel, setHardwareLabel] = useState<string>('Face ID / Biometric');
   const [pinInput, setPinInput] = useState<string>('');
@@ -249,7 +249,9 @@ export function BiometricGate() {
             <Text style={styles.statusSub}>
               {authStatus === 'SCANNING'
                 ? 'Authenticating local enclave key'
-                : '9 Family Assets • ₹48.3L+ Protected Offline'}
+                : hidePrices
+                  ? `${items.length} Family Assets • Prices Hidden Offline`
+                  : `${items.length} Family Assets • Protected Offline`}
             </Text>
 
             <Pressable

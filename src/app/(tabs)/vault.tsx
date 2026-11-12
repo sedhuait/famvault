@@ -15,7 +15,7 @@ import {
 } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import type { CustodyLocation, MetalType } from '@/types/vault';
-import { formatINR } from '@/utils/formatters';
+import { displayINR } from '@/utils/formatters';
 import { calculateItemValuation } from '@/utils/valuation';
 
 const METAL_FILTERS: Array<'ALL' | MetalType> = ['ALL', 'GOLD', 'SILVER', 'DIAMOND', 'PLATINUM'];
@@ -29,7 +29,16 @@ const LOCATION_FILTERS: Array<'ALL' | CustodyLocation> = [
 ];
 
 export default function VaultLedgerScreen() {
-  const { items, rates, unitMode, valuationMode, toggleUnitMode, addVaultItem } = useVault();
+  const {
+    items,
+    rates,
+    unitMode,
+    valuationMode,
+    hidePrices,
+    toggleUnitMode,
+    toggleHidePrices,
+    addVaultItem,
+  } = useVault();
 
   const [search, setSearch] = useState('');
   const [metalFilter, setMetalFilter] = useState<'ALL' | MetalType>('ALL');
@@ -75,10 +84,24 @@ export default function VaultLedgerScreen() {
           <View>
             <Text style={styles.title}>Family Vault Ledger</Text>
             <Text style={styles.subtitle}>
-              {filteredItems.length} items · {formatINR(filteredValue)}
+              {filteredItems.length} items · {displayINR(filteredValue, hidePrices)}
             </Text>
           </View>
           <View style={styles.headerActions}>
+            <Pressable
+              onPress={toggleHidePrices}
+              style={({ pressed }) => [
+                styles.unitBtn,
+                hidePrices && { borderColor: 'rgba(16, 185, 129, 0.45)' },
+                pressed && { opacity: 0.8 },
+              ]}
+            >
+              <Ionicons
+                name={hidePrices ? 'eye-off-outline' : 'eye-outline'}
+                size={16}
+                color={hidePrices ? VaultPalette.emerald : VaultPalette.goldBright}
+              />
+            </Pressable>
             <Pressable onPress={toggleUnitMode} style={styles.unitBtn}>
               <Text style={styles.unitBtnText}>{unitMode === 'GRAMS' ? 'g' : 'Pavan'}</Text>
             </Pressable>
@@ -189,6 +212,7 @@ export default function VaultLedgerScreen() {
                 rates={rates}
                 unitMode={unitMode}
                 valuationMode={valuationMode}
+                hidePrices={hidePrices}
                 onPress={() => router.push(`/item/${item.id}`)}
               />
             ))

@@ -16,7 +16,7 @@ import { ExportVaultModal } from '@/components/export-modal';
 import { VaultMaxWidth, VaultPalette } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import { exportVaultCsv, exportVaultPdf } from '@/utils/export-vault';
-import { formatDateTimeWithTime, formatINR } from '@/utils/formatters';
+import { displayINR, formatDateTimeWithTime } from '@/utils/formatters';
 import { summarizePortfolio } from '@/utils/valuation';
 
 export default function BackupAndSecurityScreen() {
@@ -26,6 +26,8 @@ export default function BackupAndSecurityScreen() {
     rates,
     members,
     valuationMode,
+    hidePrices,
+    setHidePrices,
     biometricEnabled,
     setBiometricEnabled,
     lockVault,
@@ -105,6 +107,21 @@ export default function BackupAndSecurityScreen() {
                 onValueChange={setBiometricEnabled}
                 trackColor={{ false: VaultPalette.border, true: VaultPalette.goldDim }}
                 thumbColor={biometricEnabled ? VaultPalette.goldBright : VaultPalette.textMuted}
+              />
+            </View>
+
+            <View style={styles.rowBetween}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.rowLabel}>Hide ₹ Valuations (Discreet Mode)</Text>
+                <Text style={styles.rowSub}>
+                  Masks portfolio and item rupee amounts while keeping weights and locations visible
+                </Text>
+              </View>
+              <Switch
+                value={hidePrices}
+                onValueChange={setHidePrices}
+                trackColor={{ false: VaultPalette.border, true: VaultPalette.emerald }}
+                thumbColor={hidePrices ? '#ECFDF5' : VaultPalette.textMuted}
               />
             </View>
 
@@ -299,7 +316,7 @@ export default function BackupAndSecurityScreen() {
             </View>
             <Text style={styles.modalMeta}>
               Generated {formatDateTimeWithTime(new Date().toISOString())} · {items.length} Assets ·
-              Total {formatINR(summary.totalActiveValue)}
+              Total {displayINR(summary.totalActiveValue, hidePrices)}
             </Text>
 
             <ScrollView style={{ maxHeight: 360 }} contentContainerStyle={{ gap: 8 }}>

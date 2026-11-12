@@ -16,10 +16,9 @@ import {
 import { useVault } from '@/context/vault-context';
 import type { CustodyLocation, MetalType } from '@/types/vault';
 import {
+  displayINR,
   formatDateTime,
   formatGoldWeight,
-  formatINR,
-  formatINRCompact,
   formatSilverWeight,
 } from '@/utils/formatters';
 import { calculateItemValuation, computeCbdtCoverage, summarizePortfolio } from '@/utils/valuation';
@@ -32,8 +31,10 @@ export default function DashboardScreen() {
     members,
     unitMode,
     valuationMode,
+    hidePrices,
     toggleUnitMode,
     toggleValuationMode,
+    toggleHidePrices,
     lockVault,
     addVaultItem,
   } = useVault();
@@ -155,21 +156,49 @@ export default function DashboardScreen() {
                   {unitMode === 'GRAMS' ? 'Grams (g)' : 'Pavan (8g)'}
                 </Text>
               </Pressable>
+
+              <Pressable
+                onPress={toggleHidePrices}
+                style={[
+                  styles.togglePill,
+                  hidePrices && {
+                    backgroundColor: VaultPalette.emeraldTint,
+                    borderColor: 'rgba(16, 185, 129, 0.45)',
+                  },
+                ]}
+              >
+                <Ionicons
+                  name={hidePrices ? 'eye-off-outline' : 'eye-outline'}
+                  size={13}
+                  color={hidePrices ? VaultPalette.emerald : VaultPalette.goldBright}
+                />
+                <Text
+                  style={[styles.togglePillText, hidePrices && { color: VaultPalette.emerald }]}
+                >
+                  {hidePrices ? 'Prices Hidden' : 'Hide Prices'}
+                </Text>
+              </Pressable>
             </View>
 
             <Text style={styles.heroLabel}>Total Family Precious Wealth</Text>
-            <Text style={styles.heroAmount}>{formatINR(summary.totalActiveValue)}</Text>
+            <Text style={styles.heroAmount}>
+              {displayINR(summary.totalActiveValue, hidePrices)}
+            </Text>
 
             <View style={styles.heroMetricsRow}>
               <View style={styles.heroMetric}>
                 <Text style={styles.heroMetricLabel}>Net Equity (ex-Loan)</Text>
-                <Text style={styles.heroMetricValue}>{formatINRCompact(netEquity)}</Text>
+                <Text style={styles.heroMetricValue}>
+                  {displayINR(netEquity, hidePrices, true)}
+                </Text>
               </View>
               <View style={styles.heroDivider} />
               <View style={styles.heroMetric}>
                 <Text style={styles.heroMetricLabel}>Appreciation</Text>
                 <Text style={[styles.heroMetricValue, { color: VaultPalette.emerald }]}>
-                  +{formatINRCompact(appreciation)} ({appreciationPct.toFixed(0)}%)
+                  {hidePrices
+                    ? `•••• (${appreciationPct.toFixed(0)}%)`
+                    : `+${displayINR(appreciation, false, true)} (${appreciationPct.toFixed(0)}%)`}
                 </Text>
               </View>
               <View style={styles.heroDivider} />
@@ -236,7 +265,7 @@ export default function DashboardScreen() {
                     </View>
                     <Text style={[styles.metalName, { color: vis.color }]}>{vis.label}</Text>
                   </View>
-                  <Text style={styles.metalValue}>{formatINRCompact(card.value)}</Text>
+                  <Text style={styles.metalValue}>{displayINR(card.value, hidePrices, true)}</Text>
                   <Text style={styles.metalWeight}>{card.weight}</Text>
                   <Text style={styles.metalSub}>{card.sub}</Text>
                 </Pressable>
@@ -271,7 +300,7 @@ export default function DashboardScreen() {
                     />
                   </View>
                   <Text style={styles.custodyLabel}>{vis.shortLabel}</Text>
-                  <Text style={styles.custodyValue}>{formatINRCompact(value)}</Text>
+                  <Text style={styles.custodyValue}>{displayINR(value, hidePrices, true)}</Text>
                   <Text style={styles.custodyCount}>
                     {count} {count === 1 ? 'item' : 'items'}
                   </Text>
@@ -301,8 +330,8 @@ export default function DashboardScreen() {
                     <View style={{ flex: 1, gap: 2 }}>
                       <Text style={styles.alertTitle}>Gold Loan Due · {loanItem.title}</Text>
                       <Text style={styles.alertSub}>
-                        {formatINR(loanItem.loanAmount ?? 0)} @ {loanItem.loanInterestRate}% with{' '}
-                        {loanItem.loanLender}
+                        {displayINR(loanItem.loanAmount ?? 0, hidePrices)} @{' '}
+                        {loanItem.loanInterestRate}% with {loanItem.loanLender}
                         {loanItem.loanMaturityDate
                           ? ` · Due ${formatDateTime(loanItem.loanMaturityDate)}`
                           : ''}

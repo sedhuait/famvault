@@ -1,6 +1,7 @@
 import type { Purity, WeightUnitMode } from '@/types/vault';
 
 export const GRAMS_PER_PAVAN = 8;
+export const MASKED_INR = '₹ ••••••';
 
 /**
  * Formats an INR amount using Indian numbering separators (e.g. ₹12,48,500).
@@ -21,6 +22,14 @@ export function formatINRCompact(amount: number): string {
     return `₹${(amount / 1_00_000).toFixed(2)} L`;
   }
   return formatINR(amount);
+}
+
+/**
+ * Formats or masks an INR amount when discreet "Hide Prices" mode is enabled.
+ */
+export function displayINR(amount: number, hidePrices: boolean, compact = false): string {
+  if (hidePrices) return MASKED_INR;
+  return compact ? formatINRCompact(amount) : formatINR(amount);
 }
 
 /**

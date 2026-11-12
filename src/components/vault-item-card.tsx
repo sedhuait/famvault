@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { LocationVisuals, MetalVisuals, VaultPalette } from '@/constants/vault-theme';
 import type { BullionRatesPerGram, ValuationMode, VaultItem, WeightUnitMode } from '@/types/vault';
-import { formatINR, formatWeightForItem, getPurityLabel } from '@/utils/formatters';
+import { displayINR, formatWeightForItem, getPurityLabel } from '@/utils/formatters';
 import { calculateItemValuation } from '@/utils/valuation';
 
 interface VaultItemCardProps {
@@ -11,6 +11,7 @@ interface VaultItemCardProps {
   rates: BullionRatesPerGram;
   unitMode: WeightUnitMode;
   valuationMode: ValuationMode;
+  hidePrices?: boolean;
   onPress: () => void;
 }
 
@@ -19,6 +20,7 @@ export function VaultItemCard({
   rates,
   unitMode,
   valuationMode,
+  hidePrices = false,
   onPress,
 }: VaultItemCardProps) {
   const metal = MetalVisuals[item.metalType];
@@ -68,9 +70,9 @@ export function VaultItemCard({
 
         {/* Live Valuation */}
         <View style={styles.valueCol}>
-          <Text style={styles.valueText}>{formatINR(val.activeValue)}</Text>
+          <Text style={styles.valueText}>{displayINR(val.activeValue, hidePrices)}</Text>
           <Text style={styles.valueModeLabel}>
-            {valuationMode === 'CASH' ? 'Melt Value' : 'Store Value'}
+            {hidePrices ? 'Price Hidden' : valuationMode === 'CASH' ? 'Melt Value' : 'Store Value'}
           </Text>
         </View>
       </View>
@@ -113,7 +115,7 @@ export function VaultItemCard({
         <View style={styles.loanBanner}>
           <Ionicons name="warning-outline" size={13} color={VaultPalette.crimson} />
           <Text style={styles.loanBannerText}>
-            Pledged: {formatINR(item.loanAmount)} @ {item.loanInterestRate ?? 9.5}% •{' '}
+            Pledged: {displayINR(item.loanAmount, hidePrices)} @ {item.loanInterestRate ?? 9.5}% •{' '}
             {item.loanLender}
           </Text>
         </View>

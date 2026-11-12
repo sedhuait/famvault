@@ -63,6 +63,7 @@ interface VaultContextValue {
   members: FamilyMember[];
   unitMode: WeightUnitMode;
   valuationMode: ValuationMode;
+  hidePrices: boolean;
   isUnlocked: boolean;
   biometricEnabled: boolean;
   lastBackupAt: string;
@@ -71,6 +72,8 @@ interface VaultContextValue {
   toggleUnitMode: () => void;
   setValuationMode: (mode: ValuationMode) => void;
   toggleValuationMode: () => void;
+  setHidePrices: (hidden: boolean) => void;
+  toggleHidePrices: () => void;
   unlockVault: () => void;
   lockVault: () => void;
   setBiometricEnabled: (enabled: boolean) => void;
@@ -100,6 +103,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const [rates, setRates] = useState<BullionRatesPerGram>(INITIAL_BULLION_RATES);
   const [unitMode, setUnitMode] = useState<WeightUnitMode>('GRAMS');
   const [valuationMode, setValuationMode] = useState<ValuationMode>('CASH');
+  const [hidePrices, setHidePrices] = useState<boolean>(false);
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
   const [biometricEnabled, setBiometricEnabled] = useState<boolean>(true);
   const [lastBackupAt, setLastBackupAt] = useState<string>('2026-11-12T05:15:00Z');
@@ -113,6 +117,11 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const toggleValuationMode = useCallback(() => {
     triggerHaptic('light');
     setValuationMode((prev) => (prev === 'CASH' ? 'REPLACEMENT' : 'CASH'));
+  }, []);
+
+  const toggleHidePrices = useCallback(() => {
+    triggerHaptic('light');
+    setHidePrices((prev) => !prev);
   }, []);
 
   const unlockVault = useCallback(() => {
@@ -320,6 +329,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       members: FAMILY_MEMBERS,
       unitMode,
       valuationMode,
+      hidePrices,
       isUnlocked,
       biometricEnabled,
       lastBackupAt,
@@ -328,6 +338,8 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       toggleUnitMode,
       setValuationMode,
       toggleValuationMode,
+      setHidePrices,
+      toggleHidePrices,
       unlockVault,
       lockVault,
       setBiometricEnabled,
@@ -345,12 +357,14 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       rates,
       unitMode,
       valuationMode,
+      hidePrices,
       isUnlocked,
       biometricEnabled,
       lastBackupAt,
       isProUnlocked,
       toggleUnitMode,
       toggleValuationMode,
+      toggleHidePrices,
       unlockVault,
       lockVault,
       updateRate,
