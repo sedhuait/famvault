@@ -5,7 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddItemModal } from '@/components/add-item-modal';
-import { ExportVaultModal } from '@/components/export-modal';
+import { FamvaultLogo } from '@/components/famvault-logo';
 import { VaultItemCard } from '@/components/vault-item-card';
 import {
   CategoryVisuals,
@@ -37,7 +37,6 @@ export default function VaultLedgerScreen() {
     valuationMode,
     hidePrices,
     palette,
-    toggleUnitMode,
     toggleHidePrices,
     addVaultItem,
   } = useVault();
@@ -50,7 +49,6 @@ export default function VaultLedgerScreen() {
   const [locationFilter, setLocationFilter] = useState<'ALL' | CustodyLocation>('ALL');
   const [ownerFilter, setOwnerFilter] = useState<string>('ALL');
   const [addVisible, setAddVisible] = useState(false);
-  const [exportVisible, setExportVisible] = useState(false);
 
   const availableTypes = useMemo<Array<'ALL' | ItemCategory>>(
     () => ['ALL', ...Array.from(new Set(items.map((item) => item.category)))],
@@ -83,13 +81,16 @@ export default function VaultLedgerScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <View style={{ flex: 1, minWidth: 0 }}>
-            <Text style={styles.title} numberOfLines={1}>
-              Family Vault Ledger
-            </Text>
-            <Text style={styles.subtitle} numberOfLines={1}>
-              {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
-            </Text>
+          <View style={styles.brandRow}>
+            <FamvaultLogo size={34} />
+            <View style={{ flex: 1, minWidth: 0 }}>
+              <Text style={styles.title} numberOfLines={1}>
+                Family Vault
+              </Text>
+              <Text style={styles.subtitle} numberOfLines={1}>
+                {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
+              </Text>
+            </View>
           </View>
           <View style={styles.headerActions}>
             <Pressable
@@ -105,15 +106,6 @@ export default function VaultLedgerScreen() {
                 size={16}
                 color={hidePrices ? VaultPalette.emerald : palette.goldBright}
               />
-            </Pressable>
-            <Pressable onPress={toggleUnitMode} style={styles.unitBtn}>
-              <Text style={styles.unitBtnText}>{unitMode === 'GRAMS' ? 'g' : 'Pavan'}</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => setExportVisible(true)}
-              style={({ pressed }) => [styles.unitBtn, pressed && { opacity: 0.8 }]}
-            >
-              <Ionicons name="download-outline" size={16} color={palette.goldBright} />
             </Pressable>
             <Pressable
               onPress={() => setAddVisible(true)}
@@ -262,13 +254,6 @@ export default function VaultLedgerScreen() {
         onClose={() => setAddVisible(false)}
         onAdd={(payload) => addVaultItem(payload)}
       />
-
-      <ExportVaultModal
-        visible={exportVisible}
-        onClose={() => setExportVisible(false)}
-        filteredItems={filteredItems}
-        scopeHint="Filtered Vault View"
-      />
     </SafeAreaView>
   );
 }
@@ -292,6 +277,14 @@ const createStyles = (palette: VaultPaletteType) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      gap: 10,
+    },
+    brandRow: {
+      flex: 1,
+      minWidth: 0,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
     },
     title: {
       fontSize: 22,
@@ -316,11 +309,6 @@ const createStyles = (palette: VaultPaletteType) =>
       backgroundColor: VaultPalette.surface,
       borderWidth: 1,
       borderColor: VaultPalette.border,
-    },
-    unitBtnText: {
-      fontSize: 12,
-      fontWeight: '700',
-      color: palette.goldBright,
     },
     addBtn: {
       flexDirection: 'row',
