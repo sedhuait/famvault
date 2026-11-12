@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 
 import { LocationVisuals, MetalVisuals, VaultPalette } from '@/constants/vault-theme';
-import type { AddItemPayload } from '@/context/vault-context';
+import { type AddItemPayload, useVault } from '@/context/vault-context';
 import type { CustodyLocation, ItemCategory, MetalType, Purity } from '@/types/vault';
 import { getPurityLabel } from '@/utils/formatters';
 import { type PickedMediaAsset, pickImageAsset, pickInvoiceDocument } from '@/utils/media-picker';
@@ -25,7 +25,6 @@ interface AddItemModalProps {
 }
 
 const METAL_TYPES: MetalType[] = ['GOLD', 'SILVER', 'DIAMOND', 'PLATINUM'];
-const OWNERS = ['Wife', 'Amma', 'Daughter', 'Self', 'Joint'];
 const LOCATIONS: CustodyLocation[] = ['BANK_LOCKER', 'HOME_SAFE', 'POOJA_ROOM', 'DAILY_WEAR'];
 
 const DEFAULT_PURITY: Record<MetalType, Purity[]> = {
@@ -43,6 +42,7 @@ const DEFAULT_CATEGORY: Record<MetalType, ItemCategory> = {
 };
 
 export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
+  const { members } = useVault();
   const [title, setTitle] = useState('');
   const [metalType, setMetalType] = useState<MetalType>('GOLD');
   const [purity, setPurity] = useState<Purity>('GOLD_22K');
@@ -256,7 +256,8 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
             {/* Owner */}
             <Text style={styles.label}>Owner / Family Beneficiary</Text>
             <View style={styles.rowWrap}>
-              {OWNERS.map((owner) => {
+              {members.map((member) => {
+                const owner = member.name;
                 const active = ownerName === owner;
                 return (
                   <Pressable

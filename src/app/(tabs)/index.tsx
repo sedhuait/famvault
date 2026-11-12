@@ -1,7 +1,7 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddItemModal } from '@/components/add-item-modal';
@@ -14,7 +14,7 @@ import {
   VaultPalette,
 } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
-import type { CustodyLocation, MetalType } from '@/types/vault';
+import type { CbdtCategory, CustodyLocation, MetalType } from '@/types/vault';
 import {
   displayINR,
   formatDateTime,
@@ -37,10 +37,15 @@ export default function DashboardScreen() {
     toggleHidePrices,
     lockVault,
     addVaultItem,
+    addFamilyMember,
   } = useVault();
 
   const [addVisible, setAddVisible] = useState(false);
   const [exportVisible, setExportVisible] = useState(false);
+  const [memberModalVisible, setMemberModalVisible] = useState(false);
+  const [newMemberName, setNewMemberName] = useState('');
+  const [newMemberCategory, setNewMemberCategory] =
+    useState<Exclude<CbdtCategory, 'JOINT'>>('MALE');
 
   const summary = useMemo(
     () => summarizePortfolio(items, rates, valuationMode),
@@ -376,7 +381,9 @@ export default function DashboardScreen() {
           {/* CBDT Safe-Limit & GST Bill Coverage Meter */}
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>CBDT Limit & Bill Coverage</Text>
-            <Text style={styles.sectionCaption}>Per-member gold audit</Text>
+            <Pressable onPress={() => setMemberModalVisible(true)}>
+              <Text style={styles.sectionLink}>+ Add Member</Text>
+            </Pressable>
           </View>
 
           <View style={styles.cbdtCard}>
@@ -475,6 +482,75 @@ export default function DashboardScreen() {
       />
 
       <ExportVaultModal visible={exportVisible} onClose={() => setExportVisible(false)} />
+
+      {/* Add Family Member Modal */}
+      <Modal
+        visible={memberModalVisible}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setMemberModalVisible(false)}
+      >
+        <View style={styles.memberBackdrop}>
+          <View style={styles.memberCard}>
+            <Text style={styles.memberTitle}>Add Family Member</Text>
+            <Text style={styles.memberSub}>
+              Assign gold holdings &amp; CBDT safe limits to any family member (boys, girls,
+              parents).
+            </Text>
+            <TextInput
+              value={newMemberName}
+              onChangeText={setNewMemberName}
+              placeholder="e.g., Arjun (Son), Appa, Sister"
+              placeholderTextColor={VaultPalette.textMuted}
+              style={styles.memberInput}
+            />
+            <View style={styles.memberCatList}>
+              {(
+                [
+                  { cat: 'MALE', label: 'Boy / Male (100g limit)' },
+                  { cat: 'UNMARRIED_WOMAN', label: 'Girl / Unmarried (250g limit)' },
+                  { cat: 'MARRIED_WOMAN', label: 'Married Woman (500g limit)' },
+                ] as const
+              ).map((opt) => {
+                const active = newMemberCategory === opt.cat;
+                return (
+                  <Pressable
+                    key={opt.cat}
+                    onPress={() => setNewMemberCategory(opt.cat)}
+                    style={[styles.memberCatChip, active && styles.memberCatChipActive]}
+                  >
+                    <Text
+                      style={[styles.memberCatText, active && { color: VaultPalette.goldBright }]}
+                    >
+                      {opt.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <View style={styles.memberBtns}>
+              <Pressable
+                onPress={() => setMemberModalVisible(false)}
+                style={styles.memberCancelBtn}
+              >
+                <Text style={styles.memberCancelText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  if (newMemberName.trim()) {
+                    addFamilyMember(newMemberName, newMemberCategory);
+                    setNewMemberName('');
+                    setMemberModalVisible(false);
+                  }
+                }}
+                style={styles.memberSaveBtn}
+              >
+                <Text style={styles.memberSaveText}>Add Member</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -906,5 +982,91 @@ const styles = StyleSheet.create({
   activityDate: {
     fontSize: 11,
     color: VaultPalette.textMuted,
+  },
+  memberBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  memberCard: {
+    backgroundColor: VaultPalette.surface,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: VaultPalette.borderGold,
+    padding: 18,
+    gap: 12,
+    maxWidth: 440,
+    width: '100%',
+    alignSelf: 'center',
+  },
+  memberTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: VaultPalette.text,
+  },
+  memberSub: {
+    fontSize: 12,
+    color: VaultPalette.textSecondary,
+    lineHeight: 18,
+  },
+  memberInput: {
+    backgroundColor: VaultPalette.bg,
+    borderWidth: 1,
+    borderColor: VaultPalette.border,
+    borderRadius: 11,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    color: VaultPalette.text,
+    fontSize: 14,
+  },
+  memberCatList: {
+    gap: 8,
+  },
+  memberCatChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: VaultPalette.border,
+    backgroundColor: VaultPalette.bg,
+  },
+  memberCatChipActive: {
+    borderColor: VaultPalette.borderGold,
+    backgroundColor: VaultPalette.goldTint,
+  },
+  memberCatText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: VaultPalette.textSecondary,
+  },
+  memberBtns: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 4,
+  },
+  memberCancelBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: VaultPalette.surfaceElevated,
+    alignItems: 'center',
+  },
+  memberCancelText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: VaultPalette.textSecondary,
+  },
+  memberSaveBtn: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    backgroundColor: VaultPalette.gold,
+    alignItems: 'center',
+  },
+  memberSaveText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#090D0B',
   },
 });

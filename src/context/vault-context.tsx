@@ -12,6 +12,7 @@ import {
 } from '@/data/mock-vault';
 import type {
   BullionRatesPerGram,
+  CbdtCategory,
   CustodyLocation,
   FamilyMember,
   HistoryActionType,
@@ -93,6 +94,7 @@ interface VaultContextValue {
   ) => void;
   updateItemPhoto: (itemId: string, photoUri: string) => void;
   addVaultItem: (payload: AddItemPayload) => VaultItem;
+  addFamilyMember: (name: string, cbdtCategory: Exclude<CbdtCategory, 'JOINT'>) => void;
   recordBackupNow: () => void;
 }
 
@@ -110,6 +112,7 @@ function triggerHaptic(type: 'light' | 'success' = 'light') {
 export function VaultProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<VaultItem[]>(INITIAL_VAULT_ITEMS);
   const [history, setHistory] = useState<VaultItemHistory[]>(INITIAL_VAULT_HISTORY);
+  const [members, setMembers] = useState<FamilyMember[]>(FAMILY_MEMBERS);
   const [rates, setRates] = useState<BullionRatesPerGram>(INITIAL_BULLION_RATES);
   const [unitMode, setUnitMode] = useState<WeightUnitMode>('GRAMS');
   const [valuationMode, setValuationMode] = useState<ValuationMode>('CASH');
@@ -353,6 +356,23 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     return newItem;
   }, []);
 
+  const addFamilyMember = useCallback(
+    (name: string, cbdtCategory: Exclude<CbdtCategory, 'JOINT'>) => {
+      const trimmed = name.trim();
+      if (!trimmed) return;
+      const limit =
+        cbdtCategory === 'MARRIED_WOMAN' ? 500 : cbdtCategory === 'UNMARRIED_WOMAN' ? 250 : 100;
+      setMembers((prev) => {
+        if (prev.some((m) => m.name.toLowerCase() === trimmed.toLowerCase())) return prev;
+        const joint = prev.filter((m) => m.cbdtCategory === 'JOINT');
+        const others = prev.filter((m) => m.cbdtCategory !== 'JOINT');
+        return [...others, { name: trimmed, cbdtCategory, cbdtSafeLimitGrams: limit }, ...joint];
+      });
+      triggerHaptic('success');
+    },
+    [],
+  );
+
   const recordBackupNow = useCallback(() => {
     triggerHaptic('success');
     setLastBackupAt(new Date().toISOString());
@@ -363,7 +383,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       items,
       history,
       rates,
-      members: FAMILY_MEMBERS,
+      members,
       unitMode,
       valuationMode,
       hidePrices,
@@ -387,12 +407,14 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       attachBillToItem,
       updateItemPhoto,
       addVaultItem,
+      addFamilyMember,
       recordBackupNow,
     }),
     [
       items,
       history,
       rates,
+      members,
       unitMode,
       valuationMode,
       hidePrices,
@@ -411,6 +433,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       attachBillToItem,
       updateItemPhoto,
       addVaultItem,
+      addFamilyMember,
       recordBackupNow,
     ],
   );

@@ -28,14 +28,13 @@ import {
 } from '@/utils/media-picker';
 import { calculateItemValuation } from '@/utils/valuation';
 
-const OWNERS = ['Wife', 'Amma', 'Daughter', 'Self', 'Joint'];
-
 export default function ItemDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const {
     items,
     history,
     rates,
+    members,
     unitMode,
     valuationMode,
     hidePrices,
@@ -307,7 +306,8 @@ export default function ItemDetailScreen() {
               Records this ownership change permanently in the item timeline.
             </Text>
             <View style={styles.ownerChipsWrap}>
-              {OWNERS.map((owner) => {
+              {members.map((member) => {
+                const owner = member.name;
                 const active = nextOwner === owner;
                 return (
                   <Pressable
