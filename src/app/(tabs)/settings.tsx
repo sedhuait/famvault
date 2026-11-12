@@ -1,4 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -251,12 +252,19 @@ export default function SettingsScreen() {
             </Pressable>
           </View>
 
-          {/* Data & Export */}
+          {/* Data, Backup & Export */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Ionicons name="download-outline" size={18} color={palette.gold} />
-              <Text style={styles.cardTitle}>Data & Export</Text>
+              <Ionicons name="cloud-done-outline" size={18} color={palette.gold} />
+              <Text style={styles.cardTitle}>Backup &amp; Export</Text>
             </View>
+            <Pressable
+              onPress={() => router.push('/backup')}
+              style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
+            >
+              <Ionicons name="cloud-upload-outline" size={16} color={palette.goldBright} />
+              <Text style={styles.secondaryBtnText}>Cloud Backup &amp; Family Sharing</Text>
+            </Pressable>
             <Pressable
               onPress={() => setExportModalVisible(true)}
               style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}

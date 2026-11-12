@@ -56,6 +56,16 @@ function VaultRootNavigator() {
                 headerBackTitle: 'Vault',
               }}
             />
+            <Stack.Screen
+              name="backup"
+              options={{
+                headerShown: true,
+                headerTitle: 'Backup & Family Sharing',
+                headerStyle: { backgroundColor: palette.surface },
+                headerTintColor: palette.goldBright,
+                headerBackTitle: 'Settings',
+              }}
+            />
           </Stack>
         )}
       </View>

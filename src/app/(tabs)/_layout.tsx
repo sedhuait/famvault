@@ -68,19 +68,6 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="backup"
-        options={{
-          title: 'Backup',
-          tabBarIcon: ({ focused, size }) => (
-            <Ionicons
-              name="cloud-done-outline"
-              size={size}
-              color={focused ? palette.goldBright : VaultPalette.textMuted}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="settings"
         options={{
           title: 'Settings',
