@@ -318,7 +318,7 @@ export function buildVaultReportHtml(params: {
   </table>
 
   <div class="footer">
-    <span>Tijori Private On-Device Vault · 100% Local Encrypted Ledger</span>
+    <span>Tijori Family Vault · 100% On-Device Private Storage</span>
     <span>24K ₹${rates.GOLD_24K.toLocaleString('en-IN')}/g · 22K ₹${rates.GOLD_22K.toLocaleString('en-IN')}/g · Silver ₹${rates.SILVER_999}/g</span>
   </div>
 </body>

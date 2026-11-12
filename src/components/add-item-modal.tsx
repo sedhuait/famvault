@@ -101,7 +101,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
             <View>
               <Text style={styles.title}>Add Precious Asset</Text>
               <Text style={styles.subtitle}>
-                Auto-compresses photos (~95 KB) & bills (~150 KB WebP)
+                100% On-Device · Saves space automatically on photos &amp; bills
               </Text>
             </View>
             <Pressable onPress={onClose} style={styles.closeBtn}>
@@ -265,8 +265,8 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
             <View style={styles.toggleCard}>
               <View style={styles.toggleRow}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.toggleTitle}>Attach Item Photo (1200px WebP)</Text>
-                  <Text style={styles.toggleSub}>On-device resize shrinks 7 MB → ~94 KB</Text>
+                  <Text style={styles.toggleTitle}>Attach Item Photo</Text>
+                  <Text style={styles.toggleSub}>Saves crisp photo on-device (~94 KB)</Text>
                 </View>
                 <Switch
                   value={attachPhoto}
@@ -278,8 +278,8 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
               <View style={styles.divider} />
               <View style={styles.toggleRow}>
                 <View style={{ flex: 1 }}>
-                  <Text style={styles.toggleTitle}>Attach GST Tax Invoice (1800px WebP)</Text>
-                  <Text style={styles.toggleSub}>Legible fine print at ~152 KB for CBDT audit</Text>
+                  <Text style={styles.toggleTitle}>Attach GST Tax Invoice</Text>
+                  <Text style={styles.toggleSub}>Zoomable bill copy (~152 KB) for tax audit</Text>
                 </View>
                 <Switch
                   value={attachBill}

@@ -57,16 +57,16 @@ export default function BackupAndSecurityScreen() {
 
   const handleRunBackup = () => {
     if (backupStep) return;
-    setBackupStep('1/4 • Flushing SQLite WAL checkpoint...');
+    setBackupStep('1/4 • Preparing your vault records...');
     setTimeout(() => {
-      setBackupStep('2/4 • Bundling vault.db + WebP media...');
+      setBackupStep('2/4 • Packaging photos and GST bills...');
       setTimeout(() => {
-        setBackupStep('3/4 • Encrypting tijori_backup_v1.zip (AES-256)...');
+        setBackupStep('3/4 • Locking backup with your PIN...');
         setTimeout(() => {
           setBackupStep(
             Platform.OS === 'android'
-              ? '4/4 • Uploading to Google Drive appDataFolder...'
-              : '4/4 • Uploading to Private Cloud Container...',
+              ? '4/4 • Saving to your Google Drive...'
+              : '4/4 • Saving to your private cloud...',
           );
           setTimeout(() => {
             recordBackupNow();
@@ -84,7 +84,7 @@ export default function BackupAndSecurityScreen() {
           <View style={styles.header}>
             <View>
               <Text style={styles.title}>Security & Cloud Backup</Text>
-              <Text style={styles.subtitle}>Zero-server architecture · User-owned storage</Text>
+              <Text style={styles.subtitle}>100% On-Device · Private Family Storage</Text>
             </View>
           </View>
 
@@ -99,7 +99,7 @@ export default function BackupAndSecurityScreen() {
               <View style={{ flex: 1 }}>
                 <Text style={styles.rowLabel}>Require Face ID / Biometric on Launch</Text>
                 <Text style={styles.rowSub}>
-                  Hardware enclave gate with 6-digit recovery PIN fallback
+                  Protects your family vault with a 6-digit PIN backup
                 </Text>
               </View>
               <Switch
@@ -140,37 +140,37 @@ export default function BackupAndSecurityScreen() {
               <Ionicons name="cloud-upload-outline" size={20} color={VaultPalette.emerald} />
               <Text style={styles.cardTitle}>
                 {Platform.OS === 'android'
-                  ? 'Google Drive (appDataFolder)'
+                  ? 'Google Drive Backup'
                   : 'iCloud Drive & Google Drive Sync'}
               </Text>
             </View>
 
             <Text style={styles.backupTimestamp}>
-              Last encrypted backup: {formatDateTimeWithTime(lastBackupAt)}
+              Last private backup: {formatDateTimeWithTime(lastBackupAt)}
             </Text>
 
             {/* Storage Footprint Breakdown */}
             <View style={styles.footprintBox}>
               <View style={styles.footprintRow}>
-                <Text style={styles.footprintLabel}>Compressed Jewelry Photos (1200px WebP)</Text>
+                <Text style={styles.footprintLabel}>Jewelry Photos (Space-Saved)</Text>
                 <Text style={styles.footprintVal}>
                   {(storageMath.photosKb / 1024).toFixed(2)} MB
                 </Text>
               </View>
               <View style={styles.footprintRow}>
-                <Text style={styles.footprintLabel}>Compressed GST Invoices (1800px WebP)</Text>
+                <Text style={styles.footprintLabel}>GST Invoices &amp; Bills (Space-Saved)</Text>
                 <Text style={styles.footprintVal}>
                   {(storageMath.billsKb / 1024).toFixed(2)} MB
                 </Text>
               </View>
               <View style={styles.footprintRow}>
                 <Text style={styles.footprintLabel}>
-                  SQLite Database ({items.length} items, {history.length} audit logs)
+                  Vault Records ({items.length} items, {history.length} history logs)
                 </Text>
                 <Text style={styles.footprintVal}>{storageMath.dbKb} KB</Text>
               </View>
               <View style={[styles.footprintRow, styles.footprintTotal]}>
-                <Text style={styles.footprintTotalLabel}>tijori_backup_v1.zip Size</Text>
+                <Text style={styles.footprintTotalLabel}>Total Backup Size</Text>
                 <Text style={styles.footprintTotalVal}>{storageMath.totalMb.toFixed(2)} MB</Text>
               </View>
             </View>

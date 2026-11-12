@@ -241,16 +241,15 @@ export default function ItemDetailScreen() {
           </Pressable>
         </View>
 
-        {/* Compressed Media Footprint Pill */}
+        {/* Saved Photos & Bills */}
         <View style={styles.mediaCard}>
           <Ionicons name="images-outline" size={18} color={VaultPalette.gold} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.mediaTitle}>On-Device Compressed Media</Text>
+            <Text style={styles.mediaTitle}>Saved Photos &amp; Bills (100% On-Device)</Text>
             <Text style={styles.mediaSub}>
-              Photo: {item.compressedPhotoKb ? `${item.compressedPhotoKb} KB WebP` : 'Not added'} ·
-              Bill:{' '}
+              Photo: {item.compressedPhotoKb ? `${item.compressedPhotoKb} KB` : 'Not added'} · Bill:{' '}
               {item.compressedBillKb
-                ? `${item.compressedBillKb} KB WebP (${item.invoiceNumber ?? 'Invoice'})`
+                ? `${item.compressedBillKb} KB (${item.invoiceNumber ?? 'Invoice'})`
                 : 'No GST bill attached'}
             </Text>
           </View>
@@ -284,7 +283,7 @@ export default function ItemDetailScreen() {
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>Transfer Family Ownership</Text>
             <Text style={styles.modalSub}>
-              Logs an immutable OWNER_TRANSFERRED event in the item audit trail.
+              Records this ownership change permanently in the item timeline.
             </Text>
             <View style={styles.ownerChipsWrap}>
               {OWNERS.map((owner) => {
@@ -345,7 +344,7 @@ export default function ItemDetailScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <Text style={styles.modalTitle}>
-              {item.billPhotoUri ? 'GST Tax Invoice (WebP)' : 'Attach Compressed Bill Copy'}
+              {item.billPhotoUri ? 'GST Tax Invoice' : 'Attach GST Bill Copy'}
             </Text>
 
             {item.billPhotoUri ? (
@@ -364,14 +363,13 @@ export default function ItemDetailScreen() {
                   Purity: {getPurityLabel(item.purity)} · Net {item.netMetalWeightGrams}g
                 </Text>
                 <Text style={styles.invoiceLine}>
-                  File: {item.billPhotoUri} ({item.compressedBillKb ?? 148} KB · 1800px WebP)
+                  Saved On-Device ({item.compressedBillKb ?? 148} KB · Crisp zoomable copy)
                 </Text>
               </View>
             ) : (
               <View style={{ gap: 10 }}>
                 <Text style={styles.modalSub}>
-                  Simulates capturing camera invoice and running expo-image-manipulator (1800px,
-                  0.80 WebP) → ~148 KB.
+                  Saves a crisp, space-optimized invoice copy (~148 KB) 100% on your device.
                 </Text>
                 <TextInput
                   value={jewelerInput}

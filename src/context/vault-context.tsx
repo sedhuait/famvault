@@ -244,7 +244,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
         fieldChanged: 'billPhotoUri',
         previousValue: target.billPhotoUri ? 'Previous Bill Replaced' : 'None',
         newValue: fileName,
-        remarks: `Compressed GST invoice (${jewelerName} • ${invoiceNumber}) to 148 KB WebP.`,
+        remarks: `Attached GST invoice (${jewelerName} • ${invoiceNumber}).`,
         timestamp: now,
       };
 
@@ -305,7 +305,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       fieldChanged: 'created',
       newValue: `${payload.netMetalWeightGrams}g (${getPurityLabel(payload.purity)}) • Owner: ${payload.ownerName}`,
       remarks: payload.attachBill
-        ? 'Added item with 152 KB WebP GST invoice copy.'
+        ? 'Added item with GST invoice copy.'
         : 'Added item to family vault.',
       timestamp: now,
     };

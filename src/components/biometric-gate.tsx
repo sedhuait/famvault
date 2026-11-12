@@ -248,10 +248,10 @@ export function BiometricGate() {
             </Text>
             <Text style={styles.statusSub}>
               {authStatus === 'SCANNING'
-                ? 'Authenticating local enclave key'
+                ? 'Verifying your identity...'
                 : hidePrices
-                  ? `${items.length} Family Assets • Prices Hidden Offline`
-                  : `${items.length} Family Assets • Protected Offline`}
+                  ? `${items.length} Family Assets • Prices Hidden`
+                  : `${items.length} Family Assets • 100% On-Device`}
             </Text>
 
             <Pressable
@@ -276,11 +276,11 @@ export function BiometricGate() {
         <View style={styles.trustFooter}>
           <View style={styles.trustPill}>
             <Ionicons name="lock-closed" size={12} color={VaultPalette.emerald} />
-            <Text style={styles.trustText}>100% On-Device SQLite</Text>
+            <Text style={styles.trustText}>100% On-Device</Text>
           </View>
           <View style={styles.trustPill}>
             <Ionicons name="cloud-done-outline" size={12} color={VaultPalette.gold} />
-            <Text style={styles.trustText}>iCloud / Drive Encrypted</Text>
+            <Text style={styles.trustText}>Private Cloud Backup</Text>
           </View>
         </View>
       </View>
