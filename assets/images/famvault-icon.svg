@@ -1,22 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
-    <radialGradient id="bgA" cx="50%" cy="42%" r="65%">
+    <radialGradient id="bgMulti" cx="50%" cy="42%" r="65%">
       <stop offset="0%" stop-color="#1A1D26"/>
       <stop offset="100%" stop-color="#090A0E"/>
     </radialGradient>
-    <linearGradient id="rgA" gradientUnits="userSpaceOnUse" x1="210" y1="318" x2="814" y2="762">
-      <stop offset="0%" stop-color="#FBE2DA"/>
-      <stop offset="48%" stop-color="#E0A296"/>
-      <stop offset="100%" stop-color="#9B5B50"/>
+    <!-- 24K Gold -> Rose Gold outer frame -->
+    <linearGradient id="goldRose" gradientUnits="userSpaceOnUse" x1="210" y1="318" x2="814" y2="762">
+      <stop offset="0%" stop-color="#FCE79C"/>
+      <stop offset="45%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#E0A296"/>
+    </linearGradient>
+    <!-- Silver -> Platinum girdle -->
+    <linearGradient id="silverPlat" gradientUnits="userSpaceOnUse" x1="210" y1="446" x2="814" y2="446">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="50%" stop-color="#CBD5E1"/>
+      <stop offset="100%" stop-color="#94A3B8"/>
+    </linearGradient>
+    <!-- Diamond icy blue -> Platinum facets -->
+    <linearGradient id="diamondBlue" gradientUnits="userSpaceOnUse" x1="312" y1="318" x2="712" y2="762">
+      <stop offset="0%" stop-color="#E0F2FE"/>
+      <stop offset="50%" stop-color="#93C5FD"/>
+      <stop offset="100%" stop-color="#CBD5E1"/>
     </linearGradient>
   </defs>
-  <rect width="1024" height="1024" fill="url(#bgA)"/>
-  <!-- Centered Faceted Rose Gold Diamond (no shield, no FV) -->
-  <polygon points="312,318 712,318 814,446 512,762 210,446"
-           fill="none" stroke="url(#rgA)" stroke-width="26" stroke-linejoin="round"/>
-  <polyline points="210,446 814,446" fill="none" stroke="url(#rgA)" stroke-width="14" opacity="0.9"/>
-  <polyline points="312,318 400,446 512,762 624,446 712,318"
-            fill="none" stroke="url(#rgA)" stroke-width="14" stroke-linejoin="round" opacity="0.9"/>
+  <rect width="1024" height="1024" fill="url(#bgMulti)"/>
+  <!-- Inner Diamond facets (Diamond Blue -> Platinum) -->
   <polyline points="400,446 512,318 624,446"
-            fill="none" stroke="url(#rgA)" stroke-width="12" stroke-linejoin="round" opacity="0.68"/>
+            fill="none" stroke="url(#diamondBlue)" stroke-width="13" stroke-linejoin="round" opacity="0.88"/>
+  <polyline points="312,318 400,446 512,762 624,446 712,318"
+            fill="none" stroke="url(#diamondBlue)" stroke-width="15" stroke-linejoin="round" opacity="0.92"/>
+  <!-- Girdle line (Silver -> Platinum) -->
+  <polyline points="210,446 814,446" fill="none" stroke="url(#silverPlat)" stroke-width="15"/>
+  <!-- Outer Diamond Silhouette (24K Gold -> Rose Gold) -->
+  <polygon points="312,318 712,318 814,446 512,762 210,446"
+           fill="none" stroke="url(#goldRose)" stroke-width="26" stroke-linejoin="round"/>
 </svg>
