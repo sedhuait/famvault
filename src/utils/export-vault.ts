@@ -197,7 +197,7 @@ export function buildVaultReportHtml(params: {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      border-bottom: 2px solid #b58921;
+      border-bottom: 2px solid #b87b72;
       padding-bottom: 12px;
       margin-bottom: 16px;
     }
@@ -214,7 +214,7 @@ export function buildVaultReportHtml(params: {
       border: 1px solid #e5e7eb;
       border-radius: 8px;
       padding: 10px;
-      background: #faf8f3;
+      background: #faf6f5;
     }
     .stat-label { font-size: 9px; text-transform: uppercase; color: #6b7280; letter-spacing: 0.5px; }
     .stat-val { font-size: 14px; font-weight: 800; color: #111827; margin-top: 3px; }
@@ -222,7 +222,7 @@ export function buildVaultReportHtml(params: {
       font-size: 13px;
       margin: 18px 0 8px;
       color: #111827;
-      border-left: 3px solid #b58921;
+      border-left: 3px solid #b87b72;
       padding-left: 8px;
     }
     table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }

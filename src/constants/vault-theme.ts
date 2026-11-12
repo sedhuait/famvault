@@ -3,40 +3,40 @@ import { Platform } from 'react-native';
 import type { CustodyLocation, MetalType } from '@/types/vault';
 
 export const VaultPalette = {
-  // Core obsidian & emerald-tinted vault surfaces
-  bg: '#080C0B',
-  surface: '#101715',
-  surfaceElevated: '#17211E',
-  surfaceGlass: 'rgba(23, 33, 30, 0.88)',
-  border: '#23312C',
-  borderGold: 'rgba(218, 179, 86, 0.35)',
+  // Core brushed platinum surfaces
+  bg: '#0B0C10',
+  surface: '#14161D',
+  surfaceElevated: '#1C1F28',
+  surfaceGlass: 'rgba(28, 31, 40, 0.90)',
+  border: '#2A2E3B',
+  borderGold: 'rgba(229, 178, 166, 0.36)',
 
-  // Typography
-  text: '#F7F4EC',
-  textSecondary: '#A8B3AD',
-  textMuted: '#6D7A74',
+  // Platinum typography
+  text: '#F4F5F7',
+  textSecondary: '#B5BCC9',
+  textMuted: '#7C8494',
 
-  // Signature 24K Antique Gold
-  gold: '#DFB955',
-  goldBright: '#F6DF96',
-  goldDim: '#8D6F28',
-  goldTint: 'rgba(223, 185, 85, 0.14)',
+  // Signature Rose Gold accents
+  gold: '#E0A296',
+  goldBright: '#F5CEC6',
+  goldDim: '#9B645A',
+  goldTint: 'rgba(224, 162, 150, 0.14)',
 
-  // Emerald trust & semantic tones
-  emerald: '#10B981',
-  emeraldTint: 'rgba(16, 185, 129, 0.14)',
-  amber: '#F59E0B',
-  amberTint: 'rgba(245, 158, 11, 0.15)',
-  crimson: '#F43F5E',
-  crimsonTint: 'rgba(244, 63, 94, 0.15)',
-  sky: '#38BDF8',
-  skyTint: 'rgba(56, 189, 248, 0.14)',
-  violet: '#A78BFA',
-  violetTint: 'rgba(167, 139, 250, 0.14)',
-  silver: '#CBD5E1',
-  silverTint: 'rgba(203, 213, 225, 0.14)',
-  platinum: '#94A3B8',
-  platinumTint: 'rgba(148, 163, 184, 0.14)',
+  // Platinum, Diamond & semantic tones
+  emerald: '#34D399',
+  emeraldTint: 'rgba(52, 211, 153, 0.14)',
+  amber: '#FBBF24',
+  amberTint: 'rgba(251, 191, 36, 0.15)',
+  crimson: '#FB7185',
+  crimsonTint: 'rgba(251, 113, 133, 0.15)',
+  sky: '#93C5FD',
+  skyTint: 'rgba(147, 197, 253, 0.14)',
+  violet: '#C4B5FD',
+  violetTint: 'rgba(196, 181, 253, 0.14)',
+  silver: '#E2E8F0',
+  silverTint: 'rgba(226, 232, 240, 0.14)',
+  platinum: '#CBD5E1',
+  platinumTint: 'rgba(203, 213, 225, 0.14)',
 } as const;
 
 export const MetalVisuals: Record<
