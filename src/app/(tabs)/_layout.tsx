@@ -31,10 +31,10 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Dashboard',
+          title: 'Home',
           tabBarIcon: ({ focused, size }) => (
             <Ionicons
-              name="shield-checkmark-outline"
+              name="home-outline"
               size={size}
               color={focused ? palette.goldBright : VaultPalette.textMuted}
             />
@@ -57,7 +57,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="rates"
         options={{
-          title: 'Rates & Calc',
+          title: 'Gold Rates',
           tabBarIcon: ({ focused, size }) => (
             <Ionicons
               name="stats-chart-outline"

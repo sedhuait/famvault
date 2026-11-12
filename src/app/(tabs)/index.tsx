@@ -97,7 +97,7 @@ export default function DashboardScreen() {
                 <View style={styles.bioVerifiedRow}>
                   <Ionicons name="shield-checkmark" size={11} color={VaultPalette.emerald} />
                   <Text style={styles.bioVerifiedText} numberOfLines={1}>
-                    Biometric · On-Device
+                    Private &amp; Protected
                   </Text>
                 </View>
               </View>
