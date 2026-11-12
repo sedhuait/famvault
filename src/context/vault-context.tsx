@@ -37,11 +37,24 @@ import type {
 } from '@/types/vault';
 import { getPurityLabel } from '@/utils/formatters';
 import {
-  loadVaultSnapshot,
+  clearBiometricPin,
+  getBiometricPin,
+  hasEncryptedVault,
   type SharedFamilyMember,
-  saveVaultSnapshot,
+  saveBiometricPin,
+  saveEncryptedVaultSnapshot,
+  unlockAndDecryptVault,
   type VaultSnapshot,
 } from '@/utils/vault-storage';
+
+export type VaultStatus = 'LOADING' | 'ONBOARDING' | 'LOCKED' | 'UNLOCKED';
+
+export interface CompleteOnboardingPayload {
+  pin: string;
+  enableBiometric: boolean;
+  includeSampleData: boolean;
+  restoredSnapshot?: VaultSnapshot;
+}
 
 export interface MoveLocationPayload {
   itemId: string;
@@ -91,6 +104,7 @@ interface VaultContextValue {
   compactMode: boolean;
   accentTheme: AccentThemeId;
   palette: VaultPaletteType;
+  vaultStatus: VaultStatus;
   isUnlocked: boolean;
   biometricEnabled: boolean;
   lastBackupAt: string;
@@ -105,7 +119,9 @@ interface VaultContextValue {
   toggleHidePrices: () => void;
   setCompactMode: (compact: boolean) => void;
   setAccentTheme: (theme: AccentThemeId) => void;
-  unlockVault: () => void;
+  completeOnboarding: (payload: CompleteOnboardingPayload) => Promise<void>;
+  unlockWithPin: (pin: string) => Promise<void>;
+  unlockWithBiometric: () => Promise<boolean>;
   lockVault: () => void;
   setBiometricEnabled: (enabled: boolean) => void;
   setIsProUnlocked: (enabled: boolean) => void;
@@ -142,8 +158,8 @@ function triggerHaptic(type: 'light' | 'success' = 'light') {
 }
 
 export function VaultProvider({ children }: { children: React.ReactNode }) {
-  const [items, setItems] = useState<VaultItem[]>(INITIAL_VAULT_ITEMS);
-  const [history, setHistory] = useState<VaultItemHistory[]>(INITIAL_VAULT_HISTORY);
+  const [items, setItems] = useState<VaultItem[]>([]);
+  const [history, setHistory] = useState<VaultItemHistory[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>(FAMILY_MEMBERS);
   const [rates, setRates] = useState<BullionRatesPerGram>(INITIAL_BULLION_RATES);
   const [unitMode, setUnitMode] = useState<WeightUnitMode>('GRAMS');
@@ -151,11 +167,11 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const [hidePrices, setHidePrices] = useState<boolean>(false);
   const [compactMode, setCompactMode] = useState<boolean>(true);
   const [accentTheme, setAccentThemeState] = useState<AccentThemeId>('ROSE_GOLD');
-  const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
-  const [biometricEnabled, setBiometricEnabled] = useState<boolean>(true);
-  const [lastBackupAt, setLastBackupAt] = useState<string>('2026-11-12T05:15:00Z');
+  const [vaultStatus, setVaultStatus] = useState<VaultStatus>('LOADING');
+  const [biometricEnabled, setBiometricEnabledState] = useState<boolean>(false);
+  const [lastBackupAt, setLastBackupAt] = useState<string>(new Date().toISOString());
   const [isProUnlocked, setIsProUnlocked] = useState<boolean>(true);
-  const [vaultPin, setVaultPinState] = useState<string>('123456');
+  const [vaultPin, setVaultPinState] = useState<string>('');
   const [sharedMembers, setSharedMembers] = useState<SharedFamilyMember[]>([
     { id: 'sh-1', name: 'Wife', contact: 'wife@family.in', role: 'EDITOR' },
   ]);
@@ -171,7 +187,9 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     if (typeof saved.hidePrices === 'boolean') setHidePrices(saved.hidePrices);
     if (typeof saved.compactMode === 'boolean') setCompactMode(saved.compactMode);
     if (saved.accentTheme) setAccentThemeState(saved.accentTheme);
-    if (typeof saved.biometricEnabled === 'boolean') setBiometricEnabled(saved.biometricEnabled);
+    if (typeof saved.biometricEnabled === 'boolean') {
+      setBiometricEnabledState(saved.biometricEnabled);
+    }
     if (typeof saved.lastBackupAt === 'string') setLastBackupAt(saved.lastBackupAt);
     if (typeof saved.isProUnlocked === 'boolean') setIsProUnlocked(saved.isProUnlocked);
     if (typeof saved.vaultPin === 'string' && /^\d{6}$/.test(saved.vaultPin)) {
@@ -183,16 +201,14 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let active = true;
     (async () => {
-      const saved = await loadVaultSnapshot();
-      if (active && saved) {
-        applySnapshot(saved);
-      }
-      hydratedRef.current = true;
+      const exists = await hasEncryptedVault();
+      if (!active) return;
+      setVaultStatus(exists ? 'LOCKED' : 'ONBOARDING');
     })();
     return () => {
       active = false;
     };
-  }, [applySnapshot]);
+  }, []);
 
   const createVaultSnapshot = useCallback(
     (): VaultSnapshot => ({
@@ -232,12 +248,12 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    if (!hydratedRef.current) return;
+    if (!hydratedRef.current || vaultStatus !== 'UNLOCKED' || !/^\d{6}$/.test(vaultPin)) return;
     const timer = setTimeout(() => {
-      void saveVaultSnapshot(createVaultSnapshot());
-    }, 200);
+      void saveEncryptedVaultSnapshot(createVaultSnapshot(), vaultPin);
+    }, 150);
     return () => clearTimeout(timer);
-  }, [createVaultSnapshot]);
+  }, [createVaultSnapshot, vaultStatus, vaultPin]);
 
   const toggleUnitMode = useCallback(() => {
     triggerHaptic('light');
@@ -261,14 +277,89 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
   const palette = useMemo(() => getVaultPalette(accentTheme), [accentTheme]);
 
-  const unlockVault = useCallback(() => {
-    triggerHaptic('success');
-    setIsUnlocked(true);
-  }, []);
+  const completeOnboarding = useCallback(
+    async ({
+      pin,
+      enableBiometric,
+      includeSampleData,
+      restoredSnapshot,
+    }: CompleteOnboardingPayload) => {
+      const snapshot: VaultSnapshot = restoredSnapshot
+        ? {
+            ...restoredSnapshot,
+            vaultPin: pin,
+            biometricEnabled: enableBiometric,
+            savedAt: new Date().toISOString(),
+          }
+        : {
+            version: 1,
+            savedAt: new Date().toISOString(),
+            items: includeSampleData ? INITIAL_VAULT_ITEMS : [],
+            history: includeSampleData ? INITIAL_VAULT_HISTORY : [],
+            rates: INITIAL_BULLION_RATES,
+            members: FAMILY_MEMBERS,
+            unitMode: 'GRAMS',
+            valuationMode: 'CASH',
+            hidePrices: false,
+            compactMode: true,
+            accentTheme: 'ROSE_GOLD',
+            biometricEnabled: enableBiometric,
+            lastBackupAt: new Date().toISOString(),
+            isProUnlocked: true,
+            vaultPin: pin,
+            sharedMembers: [],
+          };
+
+      await saveEncryptedVaultSnapshot(snapshot, pin);
+      if (enableBiometric) {
+        await saveBiometricPin(pin);
+      } else {
+        await clearBiometricPin();
+      }
+      applySnapshot(snapshot);
+      hydratedRef.current = true;
+      triggerHaptic('success');
+      setVaultStatus('UNLOCKED');
+    },
+    [applySnapshot],
+  );
+
+  const unlockWithPin = useCallback(
+    async (pin: string) => {
+      const decrypted = await unlockAndDecryptVault(pin);
+      applySnapshot({ ...decrypted, vaultPin: pin });
+      if (decrypted.biometricEnabled) {
+        await saveBiometricPin(pin);
+      }
+      hydratedRef.current = true;
+      triggerHaptic('success');
+      setVaultStatus('UNLOCKED');
+    },
+    [applySnapshot],
+  );
+
+  const unlockWithBiometric = useCallback(async (): Promise<boolean> => {
+    const pin = await getBiometricPin();
+    if (!pin) return false;
+    try {
+      const decrypted = await unlockAndDecryptVault(pin);
+      applySnapshot({ ...decrypted, vaultPin: pin });
+      hydratedRef.current = true;
+      triggerHaptic('success');
+      setVaultStatus('UNLOCKED');
+      return true;
+    } catch {
+      return false;
+    }
+  }, [applySnapshot]);
 
   const lockVault = useCallback(() => {
     triggerHaptic('light');
-    setIsUnlocked(false);
+    setItems([]);
+    setHistory([]);
+    setVaultPinState('');
+    hydratedRef.current = false;
+    setVaultStatus('LOCKED');
   }, []);
 
   const updateRate = useCallback((purity: Purity, nextRate: number) => {
@@ -537,11 +628,32 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     setLastBackupAt(new Date().toISOString());
   }, []);
 
-  const setVaultPin = useCallback((nextPin: string) => {
-    if (!/^\d{6}$/.test(nextPin)) return;
-    triggerHaptic('success');
-    setVaultPinState(nextPin);
-  }, []);
+  const setVaultPin = useCallback(
+    (nextPin: string) => {
+      if (!/^\d{6}$/.test(nextPin)) return;
+      triggerHaptic('success');
+      setVaultPinState(nextPin);
+      if (biometricEnabled) {
+        void saveBiometricPin(nextPin);
+      }
+      const nextSnapshot = { ...createVaultSnapshot(), vaultPin: nextPin };
+      void saveEncryptedVaultSnapshot(nextSnapshot, nextPin);
+    },
+    [biometricEnabled, createVaultSnapshot],
+  );
+
+  const setBiometricEnabled = useCallback(
+    (enabled: boolean) => {
+      triggerHaptic('light');
+      setBiometricEnabledState(enabled);
+      if (enabled && /^\d{6}$/.test(vaultPin)) {
+        void saveBiometricPin(vaultPin);
+      } else {
+        void clearBiometricPin();
+      }
+    },
+    [vaultPin],
+  );
 
   const addSharedMember = useCallback((member: Omit<SharedFamilyMember, 'id'>) => {
     triggerHaptic('success');
@@ -555,12 +667,18 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
 
   const restoreVaultSnapshot = useCallback(
     (snapshot: VaultSnapshot) => {
-      applySnapshot(snapshot);
+      const activePin = /^\d{6}$/.test(vaultPin) ? vaultPin : snapshot.vaultPin;
+      const merged = { ...snapshot, vaultPin: activePin };
+      applySnapshot(merged);
       triggerHaptic('success');
-      void saveVaultSnapshot(snapshot);
+      if (/^\d{6}$/.test(activePin)) {
+        void saveEncryptedVaultSnapshot(merged, activePin);
+      }
     },
-    [applySnapshot],
+    [applySnapshot, vaultPin],
   );
+
+  const isUnlocked = vaultStatus === 'UNLOCKED';
 
   const value = useMemo<VaultContextValue>(
     () => ({
@@ -574,6 +692,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       compactMode,
       accentTheme,
       palette,
+      vaultStatus,
       isUnlocked,
       biometricEnabled,
       lastBackupAt,
@@ -588,7 +707,9 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       toggleHidePrices,
       setCompactMode,
       setAccentTheme,
-      unlockVault,
+      completeOnboarding,
+      unlockWithPin,
+      unlockWithBiometric,
       lockVault,
       setBiometricEnabled,
       setIsProUnlocked,
@@ -618,6 +739,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       compactMode,
       accentTheme,
       palette,
+      vaultStatus,
       isUnlocked,
       biometricEnabled,
       lastBackupAt,
@@ -628,8 +750,11 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       toggleValuationMode,
       toggleHidePrices,
       setAccentTheme,
-      unlockVault,
+      completeOnboarding,
+      unlockWithPin,
+      unlockWithBiometric,
       lockVault,
+      setBiometricEnabled,
       updateRate,
       moveItemLocation,
       transferItemOwner,

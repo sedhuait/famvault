@@ -58,7 +58,8 @@
           "cameraPermission": "Allow Famvault to capture jewelry photos and GST bills."
         }
       ],
-      "expo-sharing"
+      "expo-sharing",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

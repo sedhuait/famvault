@@ -9,9 +9,12 @@ import { VaultFonts, VaultPalette, type VaultPaletteType } from '@/constants/vau
 import { useVault } from '@/context/vault-context';
 
 export function BiometricGate() {
-  const { unlockVault, biometricEnabled, hidePrices, items, palette, vaultPin } = useVault();
+  const { unlockWithPin, unlockWithBiometric, biometricEnabled, palette } = useVault();
   const styles = useMemo(() => createStyles(palette), [palette]);
-  const [authStatus, setAuthStatus] = useState<'IDLE' | 'SCANNING' | 'VERIFIED' | 'PIN'>('IDLE');
+  const [biometricReady, setBiometricReady] = useState<boolean>(false);
+  const [authStatus, setAuthStatus] = useState<'IDLE' | 'SCANNING' | 'VERIFIED' | 'PIN'>(
+    Platform.OS === 'web' || !biometricEnabled ? 'PIN' : 'IDLE',
+  );
   const [hardwareLabel, setHardwareLabel] = useState<string>('Face ID / Biometric');
   const [pinInput, setPinInput] = useState<string>('');
   const [pinError, setPinError] = useState<string | null>(null);
@@ -55,8 +58,10 @@ export function BiometricGate() {
   }, [pulseAnim, ringOpacity]);
 
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      setHardwareLabel('Biometric Vault Lock');
+    if (Platform.OS === 'web' || !biometricEnabled) {
+      setBiometricReady(false);
+      setAuthStatus('PIN');
+      setHardwareLabel('6-Digit Vault PIN');
       return;
     }
 
@@ -65,6 +70,7 @@ export function BiometricGate() {
         const hasHw = await LocalAuthentication.hasHardwareAsync();
         const enrolled = await LocalAuthentication.isEnrolledAsync();
         if (hasHw && enrolled) {
+          setBiometricReady(true);
           const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
           if (types.includes(LocalAuthentication.AuthenticationType.FACIAL_RECOGNITION)) {
             setHardwareLabel('Face ID');
@@ -72,48 +78,44 @@ export function BiometricGate() {
             setHardwareLabel('Touch ID / Fingerprint');
           }
         } else {
-          setHardwareLabel('Simulator Biometric / PIN');
+          setBiometricReady(false);
+          setAuthStatus('PIN');
+          setHardwareLabel('6-Digit Vault PIN');
         }
       } catch {
-        setHardwareLabel('Biometric / PIN');
+        setBiometricReady(false);
+        setAuthStatus('PIN');
+        setHardwareLabel('6-Digit Vault PIN');
       }
     })();
-  }, []);
+  }, [biometricEnabled]);
 
   const handleBiometricUnlock = async () => {
+    if (!biometricReady || !biometricEnabled || Platform.OS === 'web') {
+      setAuthStatus('PIN');
+      return;
+    }
     setPinError(null);
     setAuthStatus('SCANNING');
 
-    if (Platform.OS !== 'web' && biometricEnabled) {
-      try {
-        const hasHw = await LocalAuthentication.hasHardwareAsync();
-        const enrolled = await LocalAuthentication.isEnrolledAsync();
-        if (hasHw && enrolled) {
-          const result = await LocalAuthentication.authenticateAsync({
-            promptMessage: 'Unlock Famvault',
-            fallbackLabel: 'Use 6-Digit PIN',
-            cancelLabel: 'Cancel',
-          });
-          if (result.success) {
-            setAuthStatus('VERIFIED');
-            setTimeout(unlockVault, 320);
-            return;
-          }
-          setAuthStatus('PIN');
+    try {
+      const result = await LocalAuthentication.authenticateAsync({
+        promptMessage: 'Decrypt & Unlock Famvault',
+        fallbackLabel: 'Use 6-Digit PIN',
+        cancelLabel: 'Use PIN',
+      });
+      if (result.success) {
+        const decrypted = await unlockWithBiometric();
+        if (decrypted) {
+          setAuthStatus('VERIFIED');
           return;
         }
-      } catch {
-        // Fall through to simulated scan on Expo Go / Simulator
+        setPinError('Enter your 6-digit PIN once to enable biometric decryption.');
       }
+    } catch {
+      // Fall back to PIN decryption
     }
-
-    // Polished interactive biometric scan animation for Web / Simulator preview
-    setTimeout(() => {
-      setAuthStatus('VERIFIED');
-      setTimeout(() => {
-        unlockVault();
-      }, 420);
-    }, 650);
+    setAuthStatus('PIN');
   };
 
   const handlePinDigit = (digit: string) => {
@@ -122,20 +124,16 @@ export function BiometricGate() {
     const next = `${pinInput}${digit}`;
     setPinInput(next);
     if (next.length === 6) {
-      if (next === vaultPin) {
-        setAuthStatus('VERIFIED');
-        setTimeout(() => {
+      void (async () => {
+        try {
+          await unlockWithPin(next);
+          setAuthStatus('VERIFIED');
           setPinInput('');
-          unlockVault();
-        }, 280);
-      } else {
-        setPinError(
-          vaultPin === '123456'
-            ? 'Incorrect PIN. Demo PIN is 123456.'
-            : 'Incorrect 6-digit Vault PIN.',
-        );
-        setTimeout(() => setPinInput(''), 450);
-      }
+        } catch {
+          setPinError('Incorrect 6-digit Vault PIN.');
+          setTimeout(() => setPinInput(''), 350);
+        }
+      })();
     }
   };
 
@@ -157,10 +155,8 @@ export function BiometricGate() {
         {/* Center Interactive Biometric / PIN Area */}
         {authStatus === 'PIN' ? (
           <View style={styles.pinContainer}>
-            <Text style={styles.pinHeading}>Enter 6-Digit Recovery PIN</Text>
-            <Text style={styles.pinHint}>
-              {vaultPin === '123456' ? 'Default PIN: 123456' : 'Enter your custom 6-digit PIN'}
-            </Text>
+            <Text style={styles.pinHeading}>Enter 6-Digit Vault PIN</Text>
+            <Text style={styles.pinHint}>Required to decrypt your on-device vault</Text>
 
             <View style={styles.pinDotsRow}>
               {[0, 1, 2, 3, 4, 5].map((idx) => {
@@ -181,12 +177,19 @@ export function BiometricGate() {
                   <Text style={styles.keyText}>{digit}</Text>
                 </Pressable>
               ))}
-              <Pressable
-                onPress={() => setAuthStatus('IDLE')}
-                style={({ pressed }) => [styles.keyButtonGhost, pressed && styles.keyButtonPressed]}
-              >
-                <Ionicons name="finger-print" size={22} color={palette.gold} />
-              </Pressable>
+              {biometricReady && biometricEnabled ? (
+                <Pressable
+                  onPress={() => setAuthStatus('IDLE')}
+                  style={({ pressed }) => [
+                    styles.keyButtonGhost,
+                    pressed && styles.keyButtonPressed,
+                  ]}
+                >
+                  <Ionicons name="finger-print" size={22} color={palette.gold} />
+                </Pressable>
+              ) : (
+                <View style={styles.keyButtonGhost} />
+              )}
               <Pressable
                 onPress={() => handlePinDigit('0')}
                 style={({ pressed }) => [styles.keyButton, pressed && styles.keyButtonPressed]}
@@ -247,10 +250,8 @@ export function BiometricGate() {
             </Text>
             <Text style={styles.statusSub}>
               {authStatus === 'SCANNING'
-                ? 'Verifying your identity...'
-                : hidePrices
-                  ? `${items.length} Family Assets • Prices Hidden`
-                  : `${items.length} Family Assets • 100% On-Device`}
+                ? 'Decrypting your vault...'
+                : 'Encrypted On-Device · Works 100% Offline'}
             </Text>
 
             <Pressable

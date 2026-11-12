@@ -1,5 +1,6 @@
 import * as DocumentPicker from 'expo-document-picker';
 import { File, Paths } from 'expo-file-system';
+import * as SecureStore from 'expo-secure-store';
 import * as Sharing from 'expo-sharing';
 import { Platform } from 'react-native';
 
@@ -47,8 +48,9 @@ interface EncryptedBackupEnvelope {
   payload: string;
 }
 
-const STORAGE_KEY = 'famvault_state_v1';
-const STATE_FILE_NAME = 'famvault-state.json';
+const ENCRYPTED_STORAGE_KEY = 'famvault_encrypted_v1';
+const ENCRYPTED_FILE_NAME = 'famvault-vault.enc';
+const BIOMETRIC_PIN_KEY = 'famvault_bio_pin';
 
 function fnv1aHex(input: string): string {
   let hash = 0x811c9dc5;
@@ -116,7 +118,7 @@ export function decryptVaultBackup(rawText: string, pin: string): VaultSnapshot 
   try {
     parsed = JSON.parse(rawText) as Partial<EncryptedBackupEnvelope>;
   } catch {
-    throw new Error('Invalid backup file format.');
+    throw new Error('Invalid encrypted vault format.');
   }
 
   if (
@@ -125,7 +127,7 @@ export function decryptVaultBackup(rawText: string, pin: string): VaultSnapshot 
     typeof parsed.checksum !== 'string' ||
     typeof parsed.payload !== 'string'
   ) {
-    throw new Error('Unsupported Famvault backup file.');
+    throw new Error('Unsupported Famvault encrypted file.');
   }
 
   const cipherBytes = base64ToBytes(parsed.payload);
@@ -133,48 +135,90 @@ export function decryptVaultBackup(rawText: string, pin: string): VaultSnapshot 
   const json = new TextDecoder().decode(plainBytes);
 
   if (fnv1aHex(`${pin}:${parsed.salt}:${json}`) !== parsed.checksum) {
-    throw new Error('Incorrect Vault PIN or corrupted backup file.');
+    throw new Error('Incorrect 6-digit Vault PIN.');
   }
 
   const snapshot = JSON.parse(json) as VaultSnapshot;
   if (!Array.isArray(snapshot.items) || !snapshot.rates) {
-    throw new Error('Backup file is missing required vault records.');
+    throw new Error('Encrypted vault is missing required records.');
   }
   return snapshot;
 }
 
-export async function loadVaultSnapshot(): Promise<Partial<VaultSnapshot> | null> {
+export async function hasEncryptedVault(): Promise<boolean> {
   try {
     if (Platform.OS === 'web') {
-      if (typeof localStorage === 'undefined') return null;
-      const raw = localStorage.getItem(STORAGE_KEY);
-      return raw ? (JSON.parse(raw) as Partial<VaultSnapshot>) : null;
+      if (typeof localStorage === 'undefined') return false;
+      return Boolean(localStorage.getItem(ENCRYPTED_STORAGE_KEY));
     }
 
-    const file = new File(Paths.document, STATE_FILE_NAME);
-    if (!file.exists) return null;
-    const raw = await file.text();
-    return raw ? (JSON.parse(raw) as Partial<VaultSnapshot>) : null;
+    const file = new File(Paths.document, ENCRYPTED_FILE_NAME);
+    return file.exists;
+  } catch {
+    return false;
+  }
+}
+
+export async function saveEncryptedVaultSnapshot(
+  snapshot: VaultSnapshot,
+  pin: string,
+): Promise<void> {
+  const encrypted = encryptVaultBackup(snapshot, pin);
+  if (Platform.OS === 'web') {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(ENCRYPTED_STORAGE_KEY, encrypted);
+    }
+    return;
+  }
+
+  const file = new File(Paths.document, ENCRYPTED_FILE_NAME);
+  file.create({ overwrite: true });
+  await file.write(encrypted);
+}
+
+export async function unlockAndDecryptVault(pin: string): Promise<VaultSnapshot> {
+  let raw: string | null = null;
+
+  if (Platform.OS === 'web') {
+    raw = typeof localStorage !== 'undefined' ? localStorage.getItem(ENCRYPTED_STORAGE_KEY) : null;
+  } else {
+    const file = new File(Paths.document, ENCRYPTED_FILE_NAME);
+    if (file.exists) {
+      raw = await file.text();
+    }
+  }
+
+  if (!raw) {
+    throw new Error('No encrypted vault found on this device.');
+  }
+
+  return decryptVaultBackup(raw, pin);
+}
+
+export async function saveBiometricPin(pin: string): Promise<void> {
+  if (Platform.OS === 'web') return;
+  try {
+    await SecureStore.setItemAsync(BIOMETRIC_PIN_KEY, pin);
+  } catch {
+    // Keychain/Keystore unavailable on simulator without entitlement
+  }
+}
+
+export async function getBiometricPin(): Promise<string | null> {
+  if (Platform.OS === 'web') return null;
+  try {
+    return await SecureStore.getItemAsync(BIOMETRIC_PIN_KEY);
   } catch {
     return null;
   }
 }
 
-export async function saveVaultSnapshot(snapshot: VaultSnapshot): Promise<void> {
+export async function clearBiometricPin(): Promise<void> {
+  if (Platform.OS === 'web') return;
   try {
-    const raw = JSON.stringify(snapshot);
-    if (Platform.OS === 'web') {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(STORAGE_KEY, raw);
-      }
-      return;
-    }
-
-    const file = new File(Paths.document, STATE_FILE_NAME);
-    file.create({ overwrite: true });
-    await file.write(raw);
+    await SecureStore.deleteItemAsync(BIOMETRIC_PIN_KEY);
   } catch {
-    // Non-fatal persistence guard
+    // Ignore
   }
 }
 

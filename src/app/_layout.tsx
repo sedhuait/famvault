@@ -5,13 +5,15 @@ import { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 
 import { BiometricGate } from '@/components/biometric-gate';
+import { FamvaultLogo } from '@/components/famvault-logo';
+import { OnboardingScreen } from '@/components/onboarding-screen';
 import { VaultPalette } from '@/constants/vault-theme';
 import { useVault, VaultProvider } from '@/context/vault-context';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function VaultRootNavigator() {
-  const { isUnlocked, palette } = useVault();
+  const { vaultStatus, palette } = useVault();
 
   useEffect(() => {
     SplashScreen.hideAsync().catch(() => {});
@@ -36,7 +38,13 @@ function VaultRootNavigator() {
   return (
     <ThemeProvider value={navTheme}>
       <View style={{ flex: 1, backgroundColor: VaultPalette.bg }}>
-        {!isUnlocked ? (
+        {vaultStatus === 'LOADING' ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <FamvaultLogo size={64} />
+          </View>
+        ) : vaultStatus === 'ONBOARDING' ? (
+          <OnboardingScreen />
+        ) : vaultStatus === 'LOCKED' ? (
           <BiometricGate />
         ) : (
           <Stack
