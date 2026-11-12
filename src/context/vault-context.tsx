@@ -93,6 +93,7 @@ interface VaultContextValue {
     billFile?: { uri: string; name?: string; mimeType?: string },
   ) => void;
   updateItemPhoto: (itemId: string, photoUri: string) => void;
+  updateItemNotes: (itemId: string, notes: string) => void;
   addVaultItem: (payload: AddItemPayload) => VaultItem;
   addFamilyMember: (name: string, cbdtCategory: Exclude<CbdtCategory, 'JOINT'>) => void;
   recordBackupNow: () => void;
@@ -306,6 +307,41 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     triggerHaptic('success');
   }, []);
 
+  const updateItemNotes = useCallback(
+    (itemId: string, notes: string) => {
+      const now = new Date().toISOString();
+      const trimmed = notes.trim();
+      const target = items.find((i) => i.id === itemId);
+      if (!target) return;
+
+      const entry: VaultItemHistory = {
+        id: `hist-${Date.now()}`,
+        itemId,
+        actionType: 'NOTE_LOGGED',
+        fieldChanged: 'notes',
+        previousValue: target.notes ?? 'None',
+        newValue: trimmed || 'Cleared',
+        remarks: trimmed || 'Note cleared',
+        timestamp: now,
+      };
+
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                notes: trimmed || undefined,
+                updatedAt: now,
+              }
+            : item,
+        ),
+      );
+      setHistory((prev) => [entry, ...prev]);
+      triggerHaptic('success');
+    },
+    [items],
+  );
+
   const addVaultItem = useCallback((payload: AddItemPayload): VaultItem => {
     const now = new Date().toISOString();
     const id = `item-${Date.now()}`;
@@ -406,6 +442,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       transferItemOwner,
       attachBillToItem,
       updateItemPhoto,
+      updateItemNotes,
       addVaultItem,
       addFamilyMember,
       recordBackupNow,
@@ -432,6 +469,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       transferItemOwner,
       attachBillToItem,
       updateItemPhoto,
+      updateItemNotes,
       addVaultItem,
       addFamilyMember,
       recordBackupNow,

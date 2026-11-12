@@ -54,6 +54,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
   const [ownerName, setOwnerName] = useState('Wife');
   const [jewelerName, setJewelerName] = useState('GRT Jewellers');
   const [invoiceNumber, setInvoiceNumber] = useState('INV-2026-4102');
+  const [notes, setNotes] = useState('');
 
   const [pickedPhoto, setPickedPhoto] = useState<PickedMediaAsset | null>(null);
   const [pickedInvoice, setPickedInvoice] = useState<PickedMediaAsset | null>(null);
@@ -126,8 +127,10 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
       billMimeType: pickedInvoice?.mimeType,
       attachPhoto: Boolean(pickedPhoto),
       attachBill: Boolean(pickedInvoice),
+      notes,
     });
     setTitle('');
+    setNotes('');
     setPickedPhoto(null);
     setPickedInvoice(null);
     setUploadError(null);
@@ -308,6 +311,18 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
                 value={locationDetail}
                 onChangeText={setLocationDetail}
                 style={styles.input}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Notes (Optional)</Text>
+              <TextInput
+                value={notes}
+                onChangeText={setNotes}
+                placeholder="e.g., Hallmark HUID, gifting occasion, stone details..."
+                placeholderTextColor={VaultPalette.textMuted}
+                multiline
+                style={[styles.input, { minHeight: 68, textAlignVertical: 'top' }]}
               />
             </View>
 

@@ -43,6 +43,7 @@ export default function ItemDetailScreen() {
     transferItemOwner,
     attachBillToItem,
     updateItemPhoto,
+    updateItemNotes,
   } = useVault();
 
   const item = items.find((i) => i.id === id);
@@ -50,6 +51,8 @@ export default function ItemDetailScreen() {
   const [moveOpen, setMoveOpen] = useState(false);
   const [ownerOpen, setOwnerOpen] = useState(false);
   const [billOpen, setBillOpen] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [notesDraft, setNotesDraft] = useState(item?.notes ?? '');
 
   const [nextOwner, setNextOwner] = useState(item?.ownerName ?? 'Daughter');
   const [ownerRemarks, setOwnerRemarks] = useState('');
@@ -155,7 +158,19 @@ export default function ItemDetailScreen() {
             </View>
           </View>
 
-          {item.notes ? <Text style={styles.notes}>{item.notes}</Text> : null}
+          <View style={styles.notesRow}>
+            <Text style={styles.notes}>{item.notes ? item.notes : 'No notes added yet.'}</Text>
+            <Pressable
+              onPress={() => {
+                setNotesDraft(item.notes ?? '');
+                setNotesOpen(true);
+              }}
+              style={styles.editNoteBtn}
+            >
+              <Ionicons name="create-outline" size={14} color={VaultPalette.goldBright} />
+              <Text style={styles.editNoteText}>{item.notes ? 'Edit Note' : 'Add Note'}</Text>
+            </Pressable>
+          </View>
         </View>
 
         {/* Valuation Card */}
@@ -481,6 +496,44 @@ export default function ItemDetailScreen() {
           </View>
         </View>
       </Modal>
+      {/* Edit Notes Modal */}
+      <Modal
+        visible={notesOpen}
+        animationType="fade"
+        transparent
+        onRequestClose={() => setNotesOpen(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            <Text style={styles.modalTitle}>Item Notes</Text>
+            <Text style={styles.modalSub}>
+              Record hallmark HUID, gifting details, or polish/alteration history.
+            </Text>
+            <TextInput
+              value={notesDraft}
+              onChangeText={setNotesDraft}
+              placeholder="Enter notes..."
+              placeholderTextColor={VaultPalette.textMuted}
+              multiline
+              style={[styles.input, { minHeight: 96, textAlignVertical: 'top' }]}
+            />
+            <View style={styles.modalBtns}>
+              <Pressable onPress={() => setNotesOpen(false)} style={styles.modalCancel}>
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => {
+                  updateItemNotes(item.id, notesDraft);
+                  setNotesOpen(false);
+                }}
+                style={styles.modalConfirm}
+              >
+                <Text style={styles.modalConfirmText}>Save Note</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -593,10 +646,36 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: VaultPalette.text,
   },
+  notesRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    gap: 10,
+    paddingTop: 4,
+    borderTopWidth: 1,
+    borderTopColor: VaultPalette.border,
+  },
   notes: {
+    flex: 1,
     fontSize: 12,
     color: VaultPalette.textSecondary,
     lineHeight: 18,
+  },
+  editNoteBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 9,
+    paddingVertical: 5,
+    borderRadius: 8,
+    backgroundColor: VaultPalette.surface,
+    borderWidth: 1,
+    borderColor: VaultPalette.borderGold,
+  },
+  editNoteText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: VaultPalette.goldBright,
   },
   card: {
     backgroundColor: VaultPalette.surface,
