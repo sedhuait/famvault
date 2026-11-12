@@ -89,11 +89,15 @@ export default function DashboardScreen() {
                   color={VaultPalette.gold}
                 />
               </View>
-              <View>
-                <Text style={styles.brandName}>Famvault</Text>
+              <View style={styles.brandTextCol}>
+                <Text style={styles.brandName} numberOfLines={1}>
+                  Famvault
+                </Text>
                 <View style={styles.bioVerifiedRow}>
                   <Ionicons name="shield-checkmark" size={11} color={VaultPalette.emerald} />
-                  <Text style={styles.bioVerifiedText}>Biometric Unlocked · On-Device</Text>
+                  <Text style={styles.bioVerifiedText} numberOfLines={1}>
+                    Biometric · On-Device
+                  </Text>
                 </View>
               </View>
             </View>
@@ -101,20 +105,21 @@ export default function DashboardScreen() {
             <View style={styles.headerActions}>
               <Pressable
                 onPress={() => setExportVisible(true)}
+                accessibilityLabel="Export CSV or PDF"
                 style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
               >
-                <Ionicons name="download-outline" size={16} color={VaultPalette.gold} />
-                <Text style={styles.iconBtnText}>Export</Text>
+                <Ionicons name="download-outline" size={17} color={VaultPalette.gold} />
               </Pressable>
               <Pressable
                 onPress={lockVault}
+                accessibilityLabel="Lock Vault"
                 style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
               >
-                <Ionicons name="lock-closed-outline" size={16} color={VaultPalette.gold} />
-                <Text style={styles.iconBtnText}>Lock</Text>
+                <Ionicons name="lock-closed-outline" size={17} color={VaultPalette.gold} />
               </Pressable>
               <Pressable
                 onPress={() => setAddVisible(true)}
+                accessibilityLabel="Add Precious Asset"
                 style={({ pressed }) => [styles.addBtn, pressed && { opacity: 0.85 }]}
               >
                 <Ionicons name="add" size={18} color="#090D0B" />
@@ -494,11 +499,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 10,
   },
   brandGroup: {
+    flex: 1,
+    minWidth: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
+  },
+  brandTextCol: {
+    flex: 1,
+    minWidth: 0,
   },
   logoMark: {
     width: 38,
@@ -531,22 +543,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+    flexShrink: 0,
   },
   iconBtn: {
-    flexDirection: 'row',
+    width: 36,
+    height: 36,
     alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 11,
-    paddingVertical: 8,
+    justifyContent: 'center',
     borderRadius: 10,
     backgroundColor: VaultPalette.surface,
     borderWidth: 1,
     borderColor: VaultPalette.borderGold,
-  },
-  iconBtnText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.gold,
   },
   addBtn: {
     width: 36,

@@ -81,9 +81,11 @@ export default function VaultLedgerScreen() {
       <View style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={styles.title}>Family Vault Ledger</Text>
-            <Text style={styles.subtitle}>
+          <View style={{ flex: 1, minWidth: 0 }}>
+            <Text style={styles.title} numberOfLines={1}>
+              Family Vault Ledger
+            </Text>
+            <Text style={styles.subtitle} numberOfLines={1}>
               {filteredItems.length} items · {displayINR(filteredValue, hidePrices)}
             </Text>
           </View>
