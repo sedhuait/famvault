@@ -11,6 +11,12 @@
     </linearGradient>
   </defs>
   <rect width="1024" height="1024" fill="url(#bgA)"/>
-  <!-- Clean Solid Rose Gold Diamond (no shield, no internal lines) -->
+  <!-- Clean Rose Gold Diamond -->
   <polygon points="312,318 712,318 814,446 512,762 210,446" fill="url(#rgA)"/>
+  <!-- F on the left -->
+  <path d="M382 554 V378 H484 M382 458 H464"
+        fill="none" stroke="#11131A" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- V on the right -->
+  <path d="M524 378 L586 554 L648 378"
+        fill="none" stroke="#11131A" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
