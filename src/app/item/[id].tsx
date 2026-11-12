@@ -244,8 +244,10 @@ export default function ItemDetailScreen() {
             onPress={() => setMoveOpen(true)}
             style={({ pressed }) => [styles.actionBtnPrimary, pressed && { opacity: 0.85 }]}
           >
-            <Ionicons name="swap-horizontal" size={16} color="#090D0B" />
-            <Text style={styles.actionBtnPrimaryText}>Quick Move</Text>
+            <Ionicons name="swap-horizontal" size={15} color="#090D0B" />
+            <Text style={styles.actionBtnPrimaryText} numberOfLines={1}>
+              Quick Move
+            </Text>
           </Pressable>
 
           <Pressable
@@ -256,8 +258,10 @@ export default function ItemDetailScreen() {
             }}
             style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.8 }]}
           >
-            <Ionicons name="people-outline" size={16} color={palette.goldBright} />
-            <Text style={styles.actionBtnText}>Transfer Owner</Text>
+            <Ionicons name="people-outline" size={15} color={palette.goldBright} />
+            <Text style={styles.actionBtnText} numberOfLines={1}>
+              Transfer
+            </Text>
           </Pressable>
 
           <Pressable
@@ -266,7 +270,7 @@ export default function ItemDetailScreen() {
           >
             <Ionicons
               name="document-text-outline"
-              size={16}
+              size={15}
               color={item.billPhotoUri ? VaultPalette.emerald : VaultPalette.amber}
             />
             <Text
@@ -274,6 +278,7 @@ export default function ItemDetailScreen() {
                 styles.actionBtnText,
                 { color: item.billPhotoUri ? VaultPalette.emerald : VaultPalette.amber },
               ]}
+              numberOfLines={1}
             >
               {item.billPhotoUri ? 'View Bill' : 'Attach Bill'}
             </Text>
@@ -740,13 +745,14 @@ const createStyles = (palette: VaultPaletteType) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 6,
+      gap: 5,
       backgroundColor: palette.gold,
       borderRadius: 12,
       paddingVertical: 12,
+      paddingHorizontal: 8,
     },
     actionBtnPrimaryText: {
-      fontSize: 13,
+      fontSize: 12,
       fontWeight: '700',
       color: '#090D0B',
     },
@@ -761,6 +767,7 @@ const createStyles = (palette: VaultPaletteType) =>
       borderColor: VaultPalette.border,
       borderRadius: 12,
       paddingVertical: 12,
+      paddingHorizontal: 8,
     },
     actionBtnText: {
       fontSize: 12,
