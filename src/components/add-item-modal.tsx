@@ -31,6 +31,9 @@ interface AddItemModalProps {
 
 const METAL_TYPES: MetalType[] = ['GOLD', 'SILVER', 'DIAMOND', 'PLATINUM'];
 const LOCATIONS: CustodyLocation[] = ['BANK_LOCKER', 'HOME_SAFE', 'POOJA_ROOM', 'DAILY_WEAR'];
+const LOCATION_DETAIL_PRESETS = ['SBI Locker', 'HDFC Locker', 'Home Safe', 'Pooja Shelf'];
+const NOTE_PRESETS = ['Heirloom', 'Wedding Gift', '916 Hallmarked', 'Insured'];
+const JEWELER_PRESETS = ['GRT Jewellers', 'Tanishq', 'Malabar Gold', 'Kalyan Jewellers'];
 
 const DEFAULT_PURITY: Record<MetalType, Purity[]> = {
   GOLD: ['GOLD_22K', 'GOLD_24K', 'GOLD_18K'],
@@ -289,7 +292,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
             </View>
 
             {/* Custody Location */}
-            <Text style={styles.label}>Initial Custody Location</Text>
+            <Text style={styles.label}>Location</Text>
             <View style={styles.rowWrap}>
               {LOCATIONS.map((loc) => {
                 const vis = LocationVisuals[loc];
@@ -313,22 +316,72 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
 
             <View style={styles.field}>
               <Text style={styles.label}>Location Detail</Text>
+              <View style={styles.rowWrap}>
+                {LOCATION_DETAIL_PRESETS.map((preset) => {
+                  const active = locationDetail === preset;
+                  return (
+                    <Pressable
+                      key={preset}
+                      onPress={() => setLocationDetail(preset)}
+                      style={[
+                        styles.chip,
+                        active && {
+                          borderColor: palette.gold,
+                          backgroundColor: palette.goldTint,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.chipText, active && { color: palette.goldBright }]}>
+                        {preset}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
               <TextInput
                 value={locationDetail}
                 onChangeText={setLocationDetail}
+                placeholder="Or type custom location..."
+                placeholderTextColor={VaultPalette.textMuted}
                 style={styles.input}
               />
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Notes (Optional)</Text>
+              <Text style={styles.label}>Notes</Text>
+              <View style={styles.rowWrap}>
+                {NOTE_PRESETS.map((tag) => {
+                  const active = notes.includes(tag);
+                  return (
+                    <Pressable
+                      key={tag}
+                      onPress={() =>
+                        setNotes((prev) =>
+                          prev.includes(tag) ? prev : prev.trim() ? `${prev.trim()} · ${tag}` : tag,
+                        )
+                      }
+                      style={[
+                        styles.chip,
+                        active && {
+                          borderColor: palette.gold,
+                          backgroundColor: palette.goldTint,
+                        },
+                      ]}
+                    >
+                      <Text style={[styles.chipText, active && { color: palette.goldBright }]}>
+                        {tag}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
               <TextInput
                 value={notes}
                 onChangeText={setNotes}
-                placeholder="e.g., Hallmark HUID, gifting occasion, stone details..."
+                placeholder="Tap a tag above or add note..."
                 placeholderTextColor={VaultPalette.textMuted}
                 multiline
-                style={[styles.input, { minHeight: 68, textAlignVertical: 'top' }]}
+                style={[styles.input, { minHeight: 58, textAlignVertical: 'top' }]}
               />
             </View>
 
@@ -455,24 +508,48 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
               )}
 
               {pickedInvoice ? (
-                <View style={styles.rowTwo}>
-                  <View style={[styles.field, { flex: 1 }]}>
-                    <Text style={styles.label}>Jeweler</Text>
-                    <TextInput
-                      value={jewelerName}
-                      onChangeText={setJewelerName}
-                      style={styles.input}
-                    />
+                <>
+                  <View style={styles.rowWrap}>
+                    {JEWELER_PRESETS.map((j) => {
+                      const active = jewelerName === j;
+                      return (
+                        <Pressable
+                          key={j}
+                          onPress={() => setJewelerName(j)}
+                          style={[
+                            styles.chip,
+                            active && {
+                              borderColor: palette.gold,
+                              backgroundColor: palette.goldTint,
+                            },
+                          ]}
+                        >
+                          <Text style={[styles.chipText, active && { color: palette.goldBright }]}>
+                            {j}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
                   </View>
-                  <View style={[styles.field, { flex: 1 }]}>
-                    <Text style={styles.label}>Invoice #</Text>
-                    <TextInput
-                      value={invoiceNumber}
-                      onChangeText={setInvoiceNumber}
-                      style={styles.input}
-                    />
+                  <View style={styles.rowTwo}>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={styles.label}>Jeweler</Text>
+                      <TextInput
+                        value={jewelerName}
+                        onChangeText={setJewelerName}
+                        style={styles.input}
+                      />
+                    </View>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={styles.label}>Invoice #</Text>
+                      <TextInput
+                        value={invoiceNumber}
+                        onChangeText={setInvoiceNumber}
+                        style={styles.input}
+                      />
+                    </View>
                   </View>
-                </View>
+                </>
               ) : null}
             </View>
 

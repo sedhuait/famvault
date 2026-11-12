@@ -74,6 +74,7 @@ interface VaultContextValue {
   unitMode: WeightUnitMode;
   valuationMode: ValuationMode;
   hidePrices: boolean;
+  compactMode: boolean;
   accentTheme: AccentThemeId;
   palette: VaultPaletteType;
   isUnlocked: boolean;
@@ -86,6 +87,7 @@ interface VaultContextValue {
   toggleValuationMode: () => void;
   setHidePrices: (hidden: boolean) => void;
   toggleHidePrices: () => void;
+  setCompactMode: (compact: boolean) => void;
   setAccentTheme: (theme: AccentThemeId) => void;
   unlockVault: () => void;
   lockVault: () => void;
@@ -126,6 +128,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const [unitMode, setUnitMode] = useState<WeightUnitMode>('GRAMS');
   const [valuationMode, setValuationMode] = useState<ValuationMode>('CASH');
   const [hidePrices, setHidePrices] = useState<boolean>(false);
+  const [compactMode, setCompactMode] = useState<boolean>(true);
   const [accentTheme, setAccentThemeState] = useState<AccentThemeId>('ROSE_GOLD');
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
   const [biometricEnabled, setBiometricEnabled] = useState<boolean>(true);
@@ -439,6 +442,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       unitMode,
       valuationMode,
       hidePrices,
+      compactMode,
       accentTheme,
       palette,
       isUnlocked,
@@ -451,6 +455,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       toggleValuationMode,
       setHidePrices,
       toggleHidePrices,
+      setCompactMode,
       setAccentTheme,
       unlockVault,
       lockVault,
@@ -474,6 +479,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       unitMode,
       valuationMode,
       hidePrices,
+      compactMode,
       accentTheme,
       palette,
       isUnlocked,

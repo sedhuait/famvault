@@ -32,6 +32,7 @@ export default function DashboardScreen() {
     unitMode,
     valuationMode,
     hidePrices,
+    compactMode,
     palette,
     toggleHidePrices,
     lockVault,
@@ -248,7 +249,7 @@ export default function DashboardScreen() {
                   </View>
                   <Text style={styles.metalValue}>{displayINR(card.value, hidePrices, true)}</Text>
                   <Text style={styles.metalWeight}>{card.weight}</Text>
-                  <Text style={styles.metalSub}>{card.sub}</Text>
+                  {!compactMode && <Text style={styles.metalSub}>{card.sub}</Text>}
                 </Pressable>
               );
             })}
@@ -256,8 +257,8 @@ export default function DashboardScreen() {
 
           {/* Custody Snapshot */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Custody Snapshot</Text>
-            <Text style={styles.sectionCaption}>Where items sit right now</Text>
+            <Text style={styles.sectionTitle}>Custody</Text>
+            {!compactMode && <Text style={styles.sectionCaption}>Where items sit right now</Text>}
           </View>
 
           <ScrollView
@@ -351,7 +352,7 @@ export default function DashboardScreen() {
 
           {/* CBDT Safe-Limit & GST Bill Coverage Meter */}
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>CBDT Limit & Bill Coverage</Text>
+            <Text style={styles.sectionTitle}>CBDT Limits</Text>
             <Pressable onPress={() => setMemberModalVisible(true)}>
               <Text style={styles.sectionLink}>+ Add Member</Text>
             </Pressable>

@@ -20,6 +20,8 @@ export default function SettingsScreen() {
     setValuationMode,
     hidePrices,
     setHidePrices,
+    compactMode,
+    setCompactMode,
     accentTheme,
     setAccentTheme,
     palette,
@@ -39,7 +41,7 @@ export default function SettingsScreen() {
         <View style={styles.container}>
           <View style={styles.header}>
             <Text style={styles.title}>Settings</Text>
-            <Text style={styles.subtitle}>100% On-Device · Appearance, Privacy & Security</Text>
+            <Text style={styles.subtitle}>100% On-Device · Theme, Display & Security</Text>
           </View>
 
           {/* Appearance */}
@@ -82,8 +84,8 @@ export default function SettingsScreen() {
 
             <View style={styles.rowBetween}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.rowLabel}>Hide ₹ Prices (Discreet Mode)</Text>
-                <Text style={styles.rowSub}>Mask rupee amounts across all screens</Text>
+                <Text style={styles.rowLabel}>Hide ₹ Prices</Text>
+                <Text style={styles.rowSub}>Mask rupee amounts</Text>
               </View>
               <Switch
                 value={hidePrices}
@@ -91,6 +93,42 @@ export default function SettingsScreen() {
                 trackColor={{ false: VaultPalette.border, true: VaultPalette.emerald }}
                 thumbColor={hidePrices ? '#ECFDF5' : VaultPalette.textMuted}
               />
+            </View>
+
+            <View style={styles.divider} />
+
+            <View style={styles.fieldBlock}>
+              <Text style={styles.rowLabel}>View Detail</Text>
+              <View style={styles.segmentRow}>
+                <Pressable
+                  onPress={() => setCompactMode(true)}
+                  style={[
+                    styles.segmentChip,
+                    compactMode && {
+                      borderColor: palette.gold,
+                      backgroundColor: palette.goldTint,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.segmentText, compactMode && { color: palette.goldBright }]}>
+                    Compact
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setCompactMode(false)}
+                  style={[
+                    styles.segmentChip,
+                    !compactMode && {
+                      borderColor: palette.gold,
+                      backgroundColor: palette.goldTint,
+                    },
+                  ]}
+                >
+                  <Text style={[styles.segmentText, !compactMode && { color: palette.goldBright }]}>
+                    Detailed
+                  </Text>
+                </Pressable>
+              </View>
             </View>
 
             <View style={styles.divider} />
@@ -193,8 +231,8 @@ export default function SettingsScreen() {
 
             <View style={styles.rowBetween}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.rowLabel}>Biometric Lock on Launch</Text>
-                <Text style={styles.rowSub}>Face ID / Touch ID with 6-digit PIN fallback</Text>
+                <Text style={styles.rowLabel}>Biometric Lock</Text>
+                <Text style={styles.rowSub}>Face ID / PIN on launch</Text>
               </View>
               <Switch
                 value={biometricEnabled}
