@@ -277,11 +277,11 @@ export default function BackupAndSecurityScreen() {
             </Pressable>
           </View>
 
-          {/* Tijori Pro Showcase */}
+          {/* FamVault Pro Showcase */}
           <View style={[styles.card, styles.proCard]}>
             <View style={styles.proHeader}>
               <View>
-                <Text style={styles.proBadge}>TIJORI PRO · LIFETIME</Text>
+                <Text style={styles.proBadge}>FAMVAULT PRO · LIFETIME</Text>
                 <Text style={styles.proTitle}>₹499 One-Time Family Unlock</Text>
               </View>
               <Switch
@@ -292,8 +292,8 @@ export default function BackupAndSecurityScreen() {
               />
             </View>
             <Text style={styles.rowSub}>
-              Includes Unlimited Vault Items & Bills · Encrypted iCloud / Google Drive Backup · Gold
-              Loan & Wedding Return Alerts · PDF Audit Export · Biometric App Lock.
+              Includes Unlimited Vault Items &amp; Bills · Encrypted iCloud / Google Drive Backup ·
+              Gold Loan &amp; Wedding Return Alerts · PDF Audit Export · Biometric App Lock.
             </Text>
           </View>
         </View>
@@ -309,7 +309,7 @@ export default function BackupAndSecurityScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Tijori Insurance & Locker Schedule</Text>
+              <Text style={styles.modalTitle}>FamVault Insurance &amp; Locker Schedule</Text>
               <Pressable onPress={() => setPdfModalVisible(false)}>
                 <Ionicons name="close" size={22} color={VaultPalette.textSecondary} />
               </Pressable>

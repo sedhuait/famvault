@@ -1,18 +1,18 @@
 {
   "expo": {
-    "name": "Tijori",
-    "slug": "tijori-family-vault",
+    "name": "FamVault",
+    "slug": "famvault",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "tijori",
+    "scheme": "famvault",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/expo.icon",
-      "bundleIdentifier": "com.tijori.familyvault"
+      "bundleIdentifier": "com.famvault.app"
     },
     "android": {
-      "package": "com.tijori.familyvault",
+      "package": "com.famvault.app",
       "adaptiveIcon": {
         "backgroundColor": "#0B0C10",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -38,7 +38,7 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Allow Tijori to unlock your family precious metals vault with Face ID."
+          "faceIDPermission": "Allow FamVault to unlock your family precious metals vault with Face ID."
         }
       ],
       "expo-sharing"

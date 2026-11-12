@@ -90,7 +90,7 @@ export default function DashboardScreen() {
                 />
               </View>
               <View>
-                <Text style={styles.brandName}>TIJORI</Text>
+                <Text style={styles.brandName}>FAMVAULT</Text>
                 <View style={styles.bioVerifiedRow}>
                   <Ionicons name="shield-checkmark" size={11} color={VaultPalette.emerald} />
                   <Text style={styles.bioVerifiedText}>Biometric Unlocked · On-Device</Text>

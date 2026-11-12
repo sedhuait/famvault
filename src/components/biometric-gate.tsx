@@ -90,7 +90,7 @@ export function BiometricGate() {
         const enrolled = await LocalAuthentication.isEnrolledAsync();
         if (hasHw && enrolled) {
           const result = await LocalAuthentication.authenticateAsync({
-            promptMessage: 'Unlock Tijori Family Vault',
+            promptMessage: 'Unlock FamVault',
             fallbackLabel: 'Use 6-Digit PIN',
             cancelLabel: 'Cancel',
           });
@@ -152,7 +152,7 @@ export function BiometricGate() {
               color={VaultPalette.gold}
             />
           </View>
-          <Text style={styles.brandTitle}>TIJORI</Text>
+          <Text style={styles.brandTitle}>FAMVAULT</Text>
           <Text style={styles.brandSubtitle}>Indian Family Precious Metals & Custody Vault</Text>
         </View>
 
