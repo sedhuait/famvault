@@ -18,6 +18,7 @@ import { useVault } from '@/context/vault-context';
 import { exportVaultCsv, exportVaultPdf } from '@/utils/export-vault';
 import { displayINR, formatDateTimeWithTime } from '@/utils/formatters';
 import { summarizePortfolio } from '@/utils/valuation';
+import { exportEncryptedBackupFile, pickAndRestoreBackupFile } from '@/utils/vault-storage';
 
 export default function BackupAndSecurityScreen() {
   const {
@@ -29,19 +30,26 @@ export default function BackupAndSecurityScreen() {
     hidePrices,
     palette,
     lastBackupAt,
+    vaultPin,
+    sharedMembers,
     recordBackupNow,
+    addSharedMember,
+    removeSharedMember,
+    createVaultSnapshot,
+    restoreVaultSnapshot,
   } = useVault();
 
   const styles = useMemo(() => createStyles(palette), [palette]);
 
   const [backupStep, setBackupStep] = useState<string | null>(null);
+  const [backupFeedback, setBackupFeedback] = useState<string | null>(null);
+  const [backupError, setBackupError] = useState<string | null>(null);
   const [pdfModalVisible, setPdfModalVisible] = useState(false);
   const [exportModalVisible, setExportModalVisible] = useState(false);
   const [exportFeedback, setExportFeedback] = useState<string | null>(null);
-  const [shareProvider, setShareProvider] = useState<'GDRIVE' | 'ICLOUD'>('GDRIVE');
-  const [sharedMembers, setSharedMembers] = useState<
-    Array<{ id: string; name: string; contact: string; role: 'EDITOR' | 'VIEWER' }>
-  >([{ id: 'sh-1', name: 'Wife', contact: 'wife@family.in', role: 'EDITOR' }]);
+  const [shareProvider, setShareProvider] = useState<'GDRIVE' | 'ICLOUD'>(
+    Platform.OS === 'ios' ? 'ICLOUD' : 'GDRIVE',
+  );
   const [inviteOpen, setInviteOpen] = useState(false);
   const [inviteName, setInviteName] = useState('');
   const [inviteContact, setInviteContact] = useState('');
@@ -60,26 +68,47 @@ export default function BackupAndSecurityScreen() {
     [items, rates, valuationMode],
   );
 
-  const handleRunBackup = () => {
+  const handleRunBackup = async () => {
     if (backupStep) return;
-    setBackupStep('1/4 • Preparing your vault records...');
-    setTimeout(() => {
-      setBackupStep('2/4 • Packaging photos and GST bills...');
-      setTimeout(() => {
-        setBackupStep('3/4 • Locking backup with your PIN...');
-        setTimeout(() => {
-          setBackupStep(
-            Platform.OS === 'android'
-              ? '4/4 • Saving to your Google Drive...'
-              : '4/4 • Saving to your private cloud...',
-          );
-          setTimeout(() => {
-            recordBackupNow();
-            setBackupStep(null);
-          }, 550);
-        }, 550);
-      }, 500);
-    }, 500);
+    setBackupError(null);
+    setBackupFeedback(null);
+    const providerLabel = shareProvider === 'ICLOUD' ? 'iCloud Drive' : 'Google Drive';
+    try {
+      setBackupStep('1/3 • Encrypting vault with your PIN...');
+      const snapshot = createVaultSnapshot();
+      setBackupStep(`2/3 • Preparing encrypted backup for ${providerLabel}...`);
+      const res = await exportEncryptedBackupFile(snapshot, vaultPin, providerLabel);
+      setBackupStep('3/3 • Finalizing backup...');
+      recordBackupNow();
+      setBackupFeedback(
+        res.method === 'WEB_DOWNLOAD'
+          ? `Downloaded encrypted backup: ${res.fileName}`
+          : `Ready to save ${res.fileName} to ${providerLabel}`,
+      );
+    } catch (err) {
+      setBackupError(err instanceof Error ? err.message : 'Unable to create backup file.');
+    } finally {
+      setBackupStep(null);
+    }
+  };
+
+  const handleRestoreBackup = async () => {
+    if (backupStep) return;
+    setBackupError(null);
+    setBackupFeedback(null);
+    try {
+      setBackupStep('Selecting & decrypting backup...');
+      const { fileName, snapshot } = await pickAndRestoreBackupFile(vaultPin);
+      restoreVaultSnapshot(snapshot);
+      setBackupFeedback(`Restored ${snapshot.items.length} items from ${fileName}`);
+    } catch (err) {
+      if (err instanceof Error && err.message === 'CANCELLED') {
+        return;
+      }
+      setBackupError(err instanceof Error ? err.message : 'Unable to restore backup file.');
+    } finally {
+      setBackupStep(null);
+    }
   };
 
   return (
@@ -141,6 +170,30 @@ export default function BackupAndSecurityScreen() {
               </View>
             ) : null}
 
+            {backupFeedback ? (
+              <View style={styles.progressBanner}>
+                <Ionicons name="checkmark-circle" size={16} color={VaultPalette.emerald} />
+                <Text style={styles.progressText}>{backupFeedback}</Text>
+              </View>
+            ) : null}
+
+            {backupError ? (
+              <View
+                style={[
+                  styles.progressBanner,
+                  {
+                    backgroundColor: VaultPalette.crimsonTint,
+                    borderColor: 'rgba(239, 68, 68, 0.35)',
+                  },
+                ]}
+              >
+                <Ionicons name="alert-circle" size={16} color={VaultPalette.crimson} />
+                <Text style={[styles.progressText, { color: VaultPalette.crimson }]}>
+                  {backupError}
+                </Text>
+              </View>
+            ) : null}
+
             <Pressable
               onPress={handleRunBackup}
               disabled={Boolean(backupStep)}
@@ -148,8 +201,19 @@ export default function BackupAndSecurityScreen() {
             >
               <Ionicons name="cloud-done" size={18} color="#090D0B" />
               <Text style={styles.primaryBtnText}>
-                {backupStep ? 'Backing Up...' : 'Run Encrypted Cloud Backup'}
+                {backupStep
+                  ? 'Backing Up...'
+                  : `Save Encrypted Backup (${shareProvider === 'ICLOUD' ? 'iCloud' : 'Drive'})`}
               </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={handleRestoreBackup}
+              disabled={Boolean(backupStep)}
+              style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
+            >
+              <Ionicons name="cloud-download-outline" size={16} color={palette.goldBright} />
+              <Text style={styles.secondaryBtnText}>Restore from iCloud / Google Drive</Text>
             </Pressable>
           </View>
 
@@ -224,26 +288,12 @@ export default function BackupAndSecurityScreen() {
                   <Text style={styles.rowLabel}>{m.name}</Text>
                   <Text style={styles.rowSub}>{m.contact}</Text>
                 </View>
-                <Pressable
-                  onPress={() =>
-                    setSharedMembers((prev) =>
-                      prev.map((x) =>
-                        x.id === m.id
-                          ? { ...x, role: x.role === 'EDITOR' ? 'VIEWER' : 'EDITOR' }
-                          : x,
-                      ),
-                    )
-                  }
-                  style={styles.rolePill}
-                >
+                <View style={styles.rolePill}>
                   <Text style={styles.rolePillText}>
                     {m.role === 'EDITOR' ? 'Editor' : 'View-Only'}
                   </Text>
-                </Pressable>
-                <Pressable
-                  onPress={() => setSharedMembers((prev) => prev.filter((x) => x.id !== m.id))}
-                  hitSlop={8}
-                >
+                </View>
+                <Pressable onPress={() => removeSharedMember(m.id)} hitSlop={8}>
                   <Ionicons name="close-circle-outline" size={18} color={VaultPalette.textMuted} />
                 </Pressable>
               </View>
@@ -464,15 +514,11 @@ export default function BackupAndSecurityScreen() {
             <Pressable
               onPress={() => {
                 if (!inviteName.trim() || !inviteContact.trim()) return;
-                setSharedMembers((prev) => [
-                  ...prev,
-                  {
-                    id: `sh-${Date.now()}`,
-                    name: inviteName.trim(),
-                    contact: inviteContact.trim(),
-                    role: inviteRole,
-                  },
-                ]);
+                addSharedMember({
+                  name: inviteName.trim(),
+                  contact: inviteContact.trim(),
+                  role: inviteRole,
+                });
                 setInviteName('');
                 setInviteContact('');
                 setInviteOpen(false);

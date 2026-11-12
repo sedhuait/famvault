@@ -1,7 +1,16 @@
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Switch, Text, View } from 'react-native';
+import {
+  Linking,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Switch,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ExportVaultModal } from '@/components/export-modal';
@@ -28,6 +37,8 @@ export default function SettingsScreen() {
     palette,
     biometricEnabled,
     setBiometricEnabled,
+    vaultPin,
+    setVaultPin,
     lockVault,
     isProUnlocked,
     setIsProUnlocked,
@@ -35,6 +46,8 @@ export default function SettingsScreen() {
 
   const styles = useMemo(() => createStyles(palette), [palette]);
   const [exportModalVisible, setExportModalVisible] = useState(false);
+  const [pinDraft, setPinDraft] = useState(vaultPin);
+  const [pinSavedMsg, setPinSavedMsg] = useState<string | null>(null);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -243,6 +256,42 @@ export default function SettingsScreen() {
               />
             </View>
 
+            <View style={styles.pinBox}>
+              <Text style={styles.rowLabel}>6-Digit Vault &amp; Backup PIN</Text>
+              <Text style={styles.rowSub}>
+                Used for unlock fallback and encrypting iCloud / Google Drive backups.
+              </Text>
+              <View style={styles.pinRow}>
+                <TextInput
+                  value={pinDraft}
+                  onChangeText={(text) => {
+                    setPinSavedMsg(null);
+                    setPinDraft(text.replace(/[^0-9]/g, '').slice(0, 6));
+                  }}
+                  keyboardType="numeric"
+                  secureTextEntry
+                  maxLength={6}
+                  placeholder="6-digit PIN"
+                  placeholderTextColor={VaultPalette.textMuted}
+                  style={styles.pinInput}
+                />
+                <Pressable
+                  onPress={() => {
+                    if (!/^\d{6}$/.test(pinDraft)) {
+                      setPinSavedMsg('Enter exactly 6 digits.');
+                      return;
+                    }
+                    setVaultPin(pinDraft);
+                    setPinSavedMsg('Vault PIN updated.');
+                  }}
+                  style={({ pressed }) => [styles.pinSaveBtn, pressed && { opacity: 0.85 }]}
+                >
+                  <Text style={styles.pinSaveBtnText}>Save PIN</Text>
+                </Pressable>
+              </View>
+              {pinSavedMsg ? <Text style={styles.pinStatusText}>{pinSavedMsg}</Text> : null}
+            </View>
+
             <Pressable
               onPress={lockVault}
               style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
@@ -433,6 +482,43 @@ const createStyles = (palette: VaultPaletteType) =>
       fontSize: 13,
       fontWeight: '600',
       color: palette.goldBright,
+    },
+    pinBox: {
+      gap: 6,
+      paddingTop: 4,
+    },
+    pinRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    pinInput: {
+      flex: 1,
+      backgroundColor: VaultPalette.surfaceElevated,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      color: VaultPalette.text,
+      fontSize: 14,
+      letterSpacing: 3,
+    },
+    pinSaveBtn: {
+      backgroundColor: palette.gold,
+      borderRadius: 10,
+      paddingHorizontal: 14,
+      paddingVertical: 10,
+    },
+    pinSaveBtnText: {
+      color: '#090D0B',
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    pinStatusText: {
+      fontSize: 12,
+      color: VaultPalette.emerald,
+      fontWeight: '600',
     },
     proCard: {
       borderColor: palette.borderGold,

@@ -8,10 +8,8 @@ import { FamvaultLogo } from '@/components/famvault-logo';
 import { VaultFonts, VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 
-const DEMO_PIN = '123456';
-
 export function BiometricGate() {
-  const { unlockVault, biometricEnabled, hidePrices, items, palette } = useVault();
+  const { unlockVault, biometricEnabled, hidePrices, items, palette, vaultPin } = useVault();
   const styles = useMemo(() => createStyles(palette), [palette]);
   const [authStatus, setAuthStatus] = useState<'IDLE' | 'SCANNING' | 'VERIFIED' | 'PIN'>('IDLE');
   const [hardwareLabel, setHardwareLabel] = useState<string>('Face ID / Biometric');
@@ -124,14 +122,18 @@ export function BiometricGate() {
     const next = `${pinInput}${digit}`;
     setPinInput(next);
     if (next.length === 6) {
-      if (next === DEMO_PIN) {
+      if (next === vaultPin) {
         setAuthStatus('VERIFIED');
         setTimeout(() => {
           setPinInput('');
           unlockVault();
         }, 280);
       } else {
-        setPinError('Incorrect PIN. Demo PIN is 123456.');
+        setPinError(
+          vaultPin === '123456'
+            ? 'Incorrect PIN. Demo PIN is 123456.'
+            : 'Incorrect 6-digit Vault PIN.',
+        );
         setTimeout(() => setPinInput(''), 450);
       }
     }
@@ -156,7 +158,9 @@ export function BiometricGate() {
         {authStatus === 'PIN' ? (
           <View style={styles.pinContainer}>
             <Text style={styles.pinHeading}>Enter 6-Digit Recovery PIN</Text>
-            <Text style={styles.pinHint}>Demo PIN: 123456</Text>
+            <Text style={styles.pinHint}>
+              {vaultPin === '123456' ? 'Default PIN: 123456' : 'Enter your custom 6-digit PIN'}
+            </Text>
 
             <View style={styles.pinDotsRow}>
               {[0, 1, 2, 3, 4, 5].map((idx) => {

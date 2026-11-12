@@ -1,6 +1,14 @@
 import * as Haptics from 'expo-haptics';
 import type React from 'react';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Platform } from 'react-native';
 
 import {
@@ -28,6 +36,12 @@ import type {
   WeightUnitMode,
 } from '@/types/vault';
 import { getPurityLabel } from '@/utils/formatters';
+import {
+  loadVaultSnapshot,
+  type SharedFamilyMember,
+  saveVaultSnapshot,
+  type VaultSnapshot,
+} from '@/utils/vault-storage';
 
 export interface MoveLocationPayload {
   itemId: string;
@@ -81,6 +95,8 @@ interface VaultContextValue {
   biometricEnabled: boolean;
   lastBackupAt: string;
   isProUnlocked: boolean;
+  vaultPin: string;
+  sharedMembers: SharedFamilyMember[];
   setUnitMode: (mode: WeightUnitMode) => void;
   toggleUnitMode: () => void;
   setValuationMode: (mode: ValuationMode) => void;
@@ -107,6 +123,11 @@ interface VaultContextValue {
   addVaultItem: (payload: AddItemPayload) => VaultItem;
   addFamilyMember: (name: string, cbdtCategory: Exclude<CbdtCategory, 'JOINT'>) => void;
   recordBackupNow: () => void;
+  setVaultPin: (nextPin: string) => void;
+  addSharedMember: (member: Omit<SharedFamilyMember, 'id'>) => void;
+  removeSharedMember: (id: string) => void;
+  createVaultSnapshot: () => VaultSnapshot;
+  restoreVaultSnapshot: (snapshot: VaultSnapshot) => void;
 }
 
 const VaultContext = createContext<VaultContextValue | null>(null);
@@ -134,6 +155,89 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const [biometricEnabled, setBiometricEnabled] = useState<boolean>(true);
   const [lastBackupAt, setLastBackupAt] = useState<string>('2026-11-12T05:15:00Z');
   const [isProUnlocked, setIsProUnlocked] = useState<boolean>(true);
+  const [vaultPin, setVaultPinState] = useState<string>('123456');
+  const [sharedMembers, setSharedMembers] = useState<SharedFamilyMember[]>([
+    { id: 'sh-1', name: 'Wife', contact: 'wife@family.in', role: 'EDITOR' },
+  ]);
+  const hydratedRef = useRef(false);
+
+  const applySnapshot = useCallback((saved: Partial<VaultSnapshot>) => {
+    if (Array.isArray(saved.items)) setItems(saved.items);
+    if (Array.isArray(saved.history)) setHistory(saved.history);
+    if (Array.isArray(saved.members)) setMembers(saved.members);
+    if (saved.rates) setRates(saved.rates);
+    if (saved.unitMode) setUnitMode(saved.unitMode);
+    if (saved.valuationMode) setValuationMode(saved.valuationMode);
+    if (typeof saved.hidePrices === 'boolean') setHidePrices(saved.hidePrices);
+    if (typeof saved.compactMode === 'boolean') setCompactMode(saved.compactMode);
+    if (saved.accentTheme) setAccentThemeState(saved.accentTheme);
+    if (typeof saved.biometricEnabled === 'boolean') setBiometricEnabled(saved.biometricEnabled);
+    if (typeof saved.lastBackupAt === 'string') setLastBackupAt(saved.lastBackupAt);
+    if (typeof saved.isProUnlocked === 'boolean') setIsProUnlocked(saved.isProUnlocked);
+    if (typeof saved.vaultPin === 'string' && /^\d{6}$/.test(saved.vaultPin)) {
+      setVaultPinState(saved.vaultPin);
+    }
+    if (Array.isArray(saved.sharedMembers)) setSharedMembers(saved.sharedMembers);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const saved = await loadVaultSnapshot();
+      if (active && saved) {
+        applySnapshot(saved);
+      }
+      hydratedRef.current = true;
+    })();
+    return () => {
+      active = false;
+    };
+  }, [applySnapshot]);
+
+  const createVaultSnapshot = useCallback(
+    (): VaultSnapshot => ({
+      version: 1,
+      savedAt: new Date().toISOString(),
+      items,
+      history,
+      rates,
+      members,
+      unitMode,
+      valuationMode,
+      hidePrices,
+      compactMode,
+      accentTheme,
+      biometricEnabled,
+      lastBackupAt,
+      isProUnlocked,
+      vaultPin,
+      sharedMembers,
+    }),
+    [
+      items,
+      history,
+      rates,
+      members,
+      unitMode,
+      valuationMode,
+      hidePrices,
+      compactMode,
+      accentTheme,
+      biometricEnabled,
+      lastBackupAt,
+      isProUnlocked,
+      vaultPin,
+      sharedMembers,
+    ],
+  );
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    const timer = setTimeout(() => {
+      void saveVaultSnapshot(createVaultSnapshot());
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [createVaultSnapshot]);
 
   const toggleUnitMode = useCallback(() => {
     triggerHaptic('light');
@@ -433,6 +537,31 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     setLastBackupAt(new Date().toISOString());
   }, []);
 
+  const setVaultPin = useCallback((nextPin: string) => {
+    if (!/^\d{6}$/.test(nextPin)) return;
+    triggerHaptic('success');
+    setVaultPinState(nextPin);
+  }, []);
+
+  const addSharedMember = useCallback((member: Omit<SharedFamilyMember, 'id'>) => {
+    triggerHaptic('success');
+    setSharedMembers((prev) => [...prev, { ...member, id: `sh-${Date.now()}` }]);
+  }, []);
+
+  const removeSharedMember = useCallback((id: string) => {
+    triggerHaptic('light');
+    setSharedMembers((prev) => prev.filter((m) => m.id !== id));
+  }, []);
+
+  const restoreVaultSnapshot = useCallback(
+    (snapshot: VaultSnapshot) => {
+      applySnapshot(snapshot);
+      triggerHaptic('success');
+      void saveVaultSnapshot(snapshot);
+    },
+    [applySnapshot],
+  );
+
   const value = useMemo<VaultContextValue>(
     () => ({
       items,
@@ -449,6 +578,8 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       biometricEnabled,
       lastBackupAt,
       isProUnlocked,
+      vaultPin,
+      sharedMembers,
       setUnitMode,
       toggleUnitMode,
       setValuationMode,
@@ -470,6 +601,11 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       addVaultItem,
       addFamilyMember,
       recordBackupNow,
+      setVaultPin,
+      addSharedMember,
+      removeSharedMember,
+      createVaultSnapshot,
+      restoreVaultSnapshot,
     }),
     [
       items,
@@ -486,6 +622,8 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       biometricEnabled,
       lastBackupAt,
       isProUnlocked,
+      vaultPin,
+      sharedMembers,
       toggleUnitMode,
       toggleValuationMode,
       toggleHidePrices,
@@ -501,6 +639,11 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       addVaultItem,
       addFamilyMember,
       recordBackupNow,
+      setVaultPin,
+      addSharedMember,
+      removeSharedMember,
+      createVaultSnapshot,
+      restoreVaultSnapshot,
     ],
   );
 
