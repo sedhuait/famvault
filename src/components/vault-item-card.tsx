@@ -9,7 +9,7 @@ import {
   VaultPalette,
   type VaultPaletteType,
 } from '@/constants/vault-theme';
-import { useVaultPalette } from '@/context/vault-context';
+import { useVault } from '@/context/vault-context';
 import type { BullionRatesPerGram, ValuationMode, VaultItem, WeightUnitMode } from '@/types/vault';
 import { displayINR, formatWeightForItem, getPurityLabel } from '@/utils/formatters';
 import { isRenderableImageUri } from '@/utils/media-picker';
@@ -32,7 +32,7 @@ export function VaultItemCard({
   hidePrices = false,
   onPress,
 }: VaultItemCardProps) {
-  const palette = useVaultPalette();
+  const { palette, compactMode } = useVault();
   const styles = useMemo(() => createStyles(palette), [palette]);
   const metal = MetalVisuals[item.metalType];
   const loc = LocationVisuals[item.location];
@@ -90,49 +90,57 @@ export function VaultItemCard({
         {/* Live Valuation */}
         <View style={styles.valueCol}>
           <Text style={styles.valueText}>{displayINR(val.activeValue, hidePrices)}</Text>
-          <Text style={styles.valueModeLabel}>
-            {hidePrices ? 'Price Hidden' : valuationMode === 'CASH' ? 'Melt Value' : 'Store Value'}
-          </Text>
-        </View>
-      </View>
-
-      {/* Bottom Badges Row */}
-      <View style={styles.bottomRow}>
-        <View style={[styles.pill, { backgroundColor: loc.tint }]}>
-          <MaterialCommunityIcons
-            name={loc.icon as keyof typeof MaterialCommunityIcons.glyphMap}
-            size={12}
-            color={loc.color}
-          />
-          <Text style={[styles.pillText, { color: loc.color }]} numberOfLines={1}>
-            {loc.shortLabel}
-            {item.locationDetail ? ` · ${item.locationDetail}` : ''}
-          </Text>
-        </View>
-
-        <View style={styles.rightPills}>
-          <View style={styles.ownerPill}>
-            <Ionicons name="person-outline" size={11} color={VaultPalette.textSecondary} />
-            <Text style={styles.ownerText}>{item.ownerName}</Text>
-          </View>
-
-          {item.billPhotoUri ? (
-            <View style={[styles.billPill, { backgroundColor: VaultPalette.emeraldTint }]}>
-              <Ionicons name="document-text-outline" size={11} color={VaultPalette.emerald} />
-              <Text style={[styles.billText, { color: VaultPalette.emerald }]}>
-                {item.billMimeType === 'application/pdf' ? 'PDF Bill ✓' : 'Bill ✓'}
-              </Text>
-            </View>
-          ) : (
-            <View style={[styles.billPill, { backgroundColor: VaultPalette.amberTint }]}>
-              <Ionicons name="alert-circle-outline" size={11} color={VaultPalette.amber} />
-              <Text style={[styles.billText, { color: VaultPalette.amber }]}>No Bill</Text>
-            </View>
+          {!compactMode && (
+            <Text style={styles.valueModeLabel}>
+              {hidePrices
+                ? 'Price Hidden'
+                : valuationMode === 'CASH'
+                  ? 'Melt Value'
+                  : 'Store Value'}
+            </Text>
           )}
         </View>
       </View>
 
-      {item.location === 'GOLD_LOAN' && item.loanAmount ? (
+      {/* Bottom Badges Row */}
+      {!compactMode && (
+        <View style={styles.bottomRow}>
+          <View style={[styles.pill, { backgroundColor: loc.tint }]}>
+            <MaterialCommunityIcons
+              name={loc.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+              size={12}
+              color={loc.color}
+            />
+            <Text style={[styles.pillText, { color: loc.color }]} numberOfLines={1}>
+              {loc.shortLabel}
+              {item.locationDetail ? ` · ${item.locationDetail}` : ''}
+            </Text>
+          </View>
+
+          <View style={styles.rightPills}>
+            <View style={styles.ownerPill}>
+              <Ionicons name="person-outline" size={11} color={VaultPalette.textSecondary} />
+              <Text style={styles.ownerText}>{item.ownerName}</Text>
+            </View>
+
+            {item.billPhotoUri ? (
+              <View style={[styles.billPill, { backgroundColor: VaultPalette.emeraldTint }]}>
+                <Ionicons name="document-text-outline" size={11} color={VaultPalette.emerald} />
+                <Text style={[styles.billText, { color: VaultPalette.emerald }]}>
+                  {item.billMimeType === 'application/pdf' ? 'PDF Bill ✓' : 'Bill ✓'}
+                </Text>
+              </View>
+            ) : (
+              <View style={[styles.billPill, { backgroundColor: VaultPalette.amberTint }]}>
+                <Ionicons name="alert-circle-outline" size={11} color={VaultPalette.amber} />
+                <Text style={[styles.billText, { color: VaultPalette.amber }]}>No Bill</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      )}
+
+      {!compactMode && item.location === 'GOLD_LOAN' && item.loanAmount ? (
         <View style={styles.loanBanner}>
           <Ionicons name="warning-outline" size={13} color={VaultPalette.crimson} />
           <Text style={styles.loanBannerText}>

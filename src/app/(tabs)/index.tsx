@@ -167,30 +167,32 @@ export default function DashboardScreen() {
               {displayINR(summary.totalActiveValue, hidePrices)}
             </Text>
 
-            <View style={styles.heroMetricsRow}>
-              <View style={styles.heroMetric}>
-                <Text style={styles.heroMetricLabel}>Net Equity (ex-Loan)</Text>
-                <Text style={styles.heroMetricValue}>
-                  {displayINR(netEquity, hidePrices, true)}
-                </Text>
+            {!compactMode && (
+              <View style={styles.heroMetricsRow}>
+                <View style={styles.heroMetric}>
+                  <Text style={styles.heroMetricLabel}>Net Equity (ex-Loan)</Text>
+                  <Text style={styles.heroMetricValue}>
+                    {displayINR(netEquity, hidePrices, true)}
+                  </Text>
+                </View>
+                <View style={styles.heroDivider} />
+                <View style={styles.heroMetric}>
+                  <Text style={styles.heroMetricLabel}>Appreciation</Text>
+                  <Text style={[styles.heroMetricValue, { color: VaultPalette.emerald }]}>
+                    {hidePrices
+                      ? `•••• (${appreciationPct.toFixed(0)}%)`
+                      : `+${displayINR(appreciation, false, true)} (${appreciationPct.toFixed(0)}%)`}
+                  </Text>
+                </View>
+                <View style={styles.heroDivider} />
+                <View style={styles.heroMetric}>
+                  <Text style={styles.heroMetricLabel}>GST Bills</Text>
+                  <Text style={styles.heroMetricValue}>
+                    {summary.billCoveredCount}/{summary.totalItemsCount} Items
+                  </Text>
+                </View>
               </View>
-              <View style={styles.heroDivider} />
-              <View style={styles.heroMetric}>
-                <Text style={styles.heroMetricLabel}>Appreciation</Text>
-                <Text style={[styles.heroMetricValue, { color: VaultPalette.emerald }]}>
-                  {hidePrices
-                    ? `•••• (${appreciationPct.toFixed(0)}%)`
-                    : `+${displayINR(appreciation, false, true)} (${appreciationPct.toFixed(0)}%)`}
-                </Text>
-              </View>
-              <View style={styles.heroDivider} />
-              <View style={styles.heroMetric}>
-                <Text style={styles.heroMetricLabel}>GST Bills</Text>
-                <Text style={styles.heroMetricValue}>
-                  {summary.billCoveredCount}/{summary.totalItemsCount} Items
-                </Text>
-              </View>
-            </View>
+            )}
           </View>
 
           {/* 4-Metal Breakdown Grid */}
@@ -368,15 +370,22 @@ export default function DashboardScreen() {
                   <View style={styles.cbdtRowHeader}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                       <Text style={styles.cbdtMember}>{row.member.name}</Text>
-                      <Text style={styles.cbdtCategory}>
-                        ({row.member.cbdtSafeLimitGrams}g limit)
-                      </Text>
+                      {!compactMode && (
+                        <Text style={styles.cbdtCategory}>
+                          ({row.member.cbdtSafeLimitGrams}g limit)
+                        </Text>
+                      )}
                     </View>
                     <Text style={styles.cbdtValues}>
-                      {formatGoldWeight(row.totalGoldGrams, unitMode)} total ·{' '}
-                      <Text style={{ color: VaultPalette.emerald }}>
-                        {row.billBackedGrams.toFixed(0)}g billed
-                      </Text>
+                      {formatGoldWeight(row.totalGoldGrams, unitMode)}
+                      {!compactMode && (
+                        <>
+                          {' total · '}
+                          <Text style={{ color: VaultPalette.emerald }}>
+                            {row.billBackedGrams.toFixed(0)}g billed
+                          </Text>
+                        </>
+                      )}
                     </Text>
                   </View>
 
@@ -394,16 +403,18 @@ export default function DashboardScreen() {
                 </View>
               );
             })}
-            <View style={styles.cbdtLegend}>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: VaultPalette.emerald }]} />
-                <Text style={styles.legendText}>GST Bill Attached</Text>
+            {!compactMode && (
+              <View style={styles.cbdtLegend}>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: VaultPalette.emerald }]} />
+                  <Text style={styles.legendText}>GST Bill Attached</Text>
+                </View>
+                <View style={styles.legendItem}>
+                  <View style={[styles.legendDot, { backgroundColor: palette.gold }]} />
+                  <Text style={styles.legendText}>Unbilled (Within CBDT Exemption)</Text>
+                </View>
               </View>
-              <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: palette.gold }]} />
-                <Text style={styles.legendText}>Unbilled (Within CBDT Exemption)</Text>
-              </View>
-            </View>
+            )}
           </View>
 
           {/* Recent Custody Activity */}
@@ -415,7 +426,7 @@ export default function DashboardScreen() {
           </View>
 
           <View style={styles.activityCard}>
-            {history.slice(0, 4).map((entry, index) => {
+            {history.slice(0, compactMode ? 2 : 4).map((entry, index, arr) => {
               const targetItem = items.find((i) => i.id === entry.itemId);
               return (
                 <Pressable
@@ -423,7 +434,7 @@ export default function DashboardScreen() {
                   onPress={() => {
                     if (targetItem) router.push(`/item/${targetItem.id}`);
                   }}
-                  style={[styles.activityRow, index < 3 && styles.activityDivider]}
+                  style={[styles.activityRow, index < arr.length - 1 && styles.activityDivider]}
                 >
                   <View style={styles.activityDot} />
                   <View style={{ flex: 1, gap: 2 }}>
@@ -433,13 +444,15 @@ export default function DashboardScreen() {
                     <Text style={styles.activityDelta} numberOfLines={1}>
                       {entry.newValue ?? entry.actionType}
                     </Text>
-                    {entry.remarks ? (
+                    {!compactMode && entry.remarks ? (
                       <Text style={styles.activityRemarks} numberOfLines={1}>
                         “{entry.remarks}”
                       </Text>
                     ) : null}
                   </View>
-                  <Text style={styles.activityDate}>{formatDateTime(entry.timestamp)}</Text>
+                  {!compactMode && (
+                    <Text style={styles.activityDate}>{formatDateTime(entry.timestamp)}</Text>
+                  )}
                 </Pressable>
               );
             })}
