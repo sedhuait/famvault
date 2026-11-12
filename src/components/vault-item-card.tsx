@@ -22,6 +22,7 @@ interface VaultItemCardProps {
   unitMode: WeightUnitMode;
   valuationMode: ValuationMode;
   hidePrices?: boolean;
+  hideCardPrice?: boolean;
   onPress: () => void;
 }
 
@@ -31,6 +32,7 @@ export function VaultItemCard({
   unitMode,
   valuationMode,
   hidePrices = false,
+  hideCardPrice = false,
   onPress,
 }: VaultItemCardProps) {
   const { palette, compactMode } = useVault();
@@ -91,17 +93,32 @@ export function VaultItemCard({
           </View>
         </View>
 
-        {/* Live Valuation */}
+        {/* Live Valuation or Item Type */}
         <View style={styles.valueCol}>
-          <Text style={styles.valueText}>{displayINR(val.activeValue, hidePrices)}</Text>
-          {!compactMode && (
-            <Text style={styles.valueModeLabel}>
-              {hidePrices
-                ? 'Price Hidden'
-                : valuationMode === 'CASH'
-                  ? 'Melt Value'
-                  : 'Store Value'}
-            </Text>
+          {hideCardPrice ? (
+            <View
+              style={[
+                styles.typePill,
+                { backgroundColor: metal.tint, borderColor: `${metal.color}33` },
+              ]}
+            >
+              <Text style={[styles.typePillText, { color: metal.color }]} numberOfLines={1}>
+                {CategoryVisuals[item.category]?.shortLabel ?? item.category}
+              </Text>
+            </View>
+          ) : (
+            <>
+              <Text style={styles.valueText}>{displayINR(val.activeValue, hidePrices)}</Text>
+              {!compactMode && (
+                <Text style={styles.valueModeLabel}>
+                  {hidePrices
+                    ? 'Price Hidden'
+                    : valuationMode === 'CASH'
+                      ? 'Melt Value'
+                      : 'Store Value'}
+                </Text>
+              )}
+            </>
           )}
         </View>
       </View>
@@ -220,6 +237,16 @@ const createStyles = (palette: VaultPaletteType) =>
     valueCol: {
       alignItems: 'flex-end',
       gap: 2,
+    },
+    typePill: {
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 999,
+      borderWidth: 1,
+    },
+    typePillText: {
+      fontSize: 12,
+      fontWeight: '700',
     },
     valueText: {
       fontSize: 15,

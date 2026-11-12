@@ -1,4 +1,4 @@
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -8,6 +8,7 @@ import { AddItemModal } from '@/components/add-item-modal';
 import { ExportVaultModal } from '@/components/export-modal';
 import { VaultItemCard } from '@/components/vault-item-card';
 import {
+  CategoryVisuals,
   LocationVisuals,
   MetalVisuals,
   VaultMaxWidth,
@@ -15,9 +16,7 @@ import {
   type VaultPaletteType,
 } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
-import type { CustodyLocation, MetalType } from '@/types/vault';
-import { displayINR } from '@/utils/formatters';
-import { calculateItemValuation } from '@/utils/valuation';
+import type { CustodyLocation, ItemCategory, MetalType } from '@/types/vault';
 
 const METAL_FILTERS: Array<'ALL' | MetalType> = ['ALL', 'GOLD', 'SILVER', 'DIAMOND', 'PLATINUM'];
 const LOCATION_FILTERS: Array<'ALL' | CustodyLocation> = [
@@ -47,10 +46,16 @@ export default function VaultLedgerScreen() {
 
   const [search, setSearch] = useState('');
   const [metalFilter, setMetalFilter] = useState<'ALL' | MetalType>('ALL');
+  const [typeFilter, setTypeFilter] = useState<'ALL' | ItemCategory>('ALL');
   const [locationFilter, setLocationFilter] = useState<'ALL' | CustodyLocation>('ALL');
   const [ownerFilter, setOwnerFilter] = useState<string>('ALL');
   const [addVisible, setAddVisible] = useState(false);
   const [exportVisible, setExportVisible] = useState(false);
+
+  const availableTypes = useMemo<Array<'ALL' | ItemCategory>>(
+    () => ['ALL', ...Array.from(new Set(items.map((item) => item.category)))],
+    [items],
+  );
 
   const owners = useMemo(
     () => ['ALL', ...Array.from(new Set(items.map((item) => item.ownerName)))],
@@ -61,6 +66,7 @@ export default function VaultLedgerScreen() {
     const q = search.trim().toLowerCase();
     return items.filter((item) => {
       if (metalFilter !== 'ALL' && item.metalType !== metalFilter) return false;
+      if (typeFilter !== 'ALL' && item.category !== typeFilter) return false;
       if (locationFilter !== 'ALL' && item.location !== locationFilter) return false;
       if (ownerFilter !== 'ALL' && item.ownerName !== ownerFilter) return false;
       if (q) {
@@ -70,16 +76,7 @@ export default function VaultLedgerScreen() {
       }
       return true;
     });
-  }, [items, metalFilter, locationFilter, ownerFilter, search]);
-
-  const filteredValue = useMemo(
-    () =>
-      filteredItems.reduce(
-        (sum, item) => sum + calculateItemValuation(item, rates, valuationMode).activeValue,
-        0,
-      ),
-    [filteredItems, rates, valuationMode],
-  );
+  }, [items, metalFilter, typeFilter, locationFilter, ownerFilter, search]);
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top']}>
@@ -91,7 +88,7 @@ export default function VaultLedgerScreen() {
               Family Vault Ledger
             </Text>
             <Text style={styles.subtitle} numberOfLines={1}>
-              {filteredItems.length} items · {displayINR(filteredValue, hidePrices)}
+              {filteredItems.length} {filteredItems.length === 1 ? 'item' : 'items'}
             </Text>
           </View>
           <View style={styles.headerActions}>
@@ -201,6 +198,38 @@ export default function VaultLedgerScreen() {
               );
             })}
           </ScrollView>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.chipRow}
+          >
+            {availableTypes.map((cat) => {
+              const active = typeFilter === cat;
+              const vis = cat === 'ALL' ? null : CategoryVisuals[cat];
+              const label = vis ? vis.shortLabel : 'All Types';
+              return (
+                <Pressable
+                  key={cat}
+                  onPress={() => setTypeFilter(cat)}
+                  style={[
+                    styles.chip,
+                    vis && { flexDirection: 'row', alignItems: 'center', gap: 5 },
+                    active && styles.chipActive,
+                  ]}
+                >
+                  {vis ? (
+                    <MaterialCommunityIcons
+                      name={vis.icon as keyof typeof MaterialCommunityIcons.glyphMap}
+                      size={13}
+                      color={active ? palette.goldBright : VaultPalette.textSecondary}
+                    />
+                  ) : null}
+                  <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
         </View>
 
         {/* Items List */}
@@ -220,6 +249,7 @@ export default function VaultLedgerScreen() {
                 unitMode={unitMode}
                 valuationMode={valuationMode}
                 hidePrices={hidePrices}
+                hideCardPrice
                 onPress={() => router.push(`/item/${item.id}`)}
               />
             ))
