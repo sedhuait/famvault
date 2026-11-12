@@ -14,6 +14,7 @@ import {
 
 import {
   CategoryVisuals,
+  LocationDetailConfig,
   LocationVisuals,
   MetalVisuals,
   VaultPalette,
@@ -55,7 +56,6 @@ const LOCATIONS: CustodyLocation[] = [
   'DAILY_WEAR',
   'BORROWED',
 ];
-const LOCATION_DETAIL_PRESETS = ['SBI Locker', 'HDFC Locker', 'Home Safe', 'Pooja Shelf'];
 const NOTE_PRESETS = ['Heirloom', 'Wedding Gift', '916 Hallmarked', 'Insured'];
 const JEWELER_PRESETS = ['GRT Jewellers', 'Tanishq', 'Malabar Gold', 'Kalyan Jewellers'];
 
@@ -363,7 +363,10 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
                 return (
                   <Pressable
                     key={loc}
-                    onPress={() => setLocation(loc)}
+                    onPress={() => {
+                      setLocation(loc);
+                      setLocationDetail(LocationDetailConfig[loc].presets[0]);
+                    }}
                     style={[
                       styles.chip,
                       active && { borderColor: vis.color, backgroundColor: vis.tint },
@@ -378,9 +381,9 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
             </View>
 
             <View style={styles.field}>
-              <Text style={styles.label}>Location Detail</Text>
+              <Text style={styles.label}>{LocationDetailConfig[location].label}</Text>
               <View style={styles.rowWrap}>
-                {LOCATION_DETAIL_PRESETS.map((preset) => {
+                {LocationDetailConfig[location].presets.map((preset) => {
                   const active = locationDetail === preset;
                   return (
                     <Pressable
@@ -404,7 +407,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
               <TextInput
                 value={locationDetail}
                 onChangeText={setLocationDetail}
-                placeholder="Or type custom location..."
+                placeholder={LocationDetailConfig[location].placeholder}
                 placeholderTextColor={VaultPalette.textMuted}
                 style={styles.input}
               />

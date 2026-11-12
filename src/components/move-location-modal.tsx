@@ -2,7 +2,12 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useEffect, useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { LocationVisuals, VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
+import {
+  LocationDetailConfig,
+  LocationVisuals,
+  VaultPalette,
+  type VaultPaletteType,
+} from '@/constants/vault-theme';
 import { type MoveLocationPayload, useVaultPalette } from '@/context/vault-context';
 import type { CustodyLocation, VaultItem } from '@/types/vault';
 
@@ -91,8 +96,11 @@ export function MoveLocationModal({ visible, item, onClose, onSubmit }: MoveLoca
                     key={loc}
                     onPress={() => {
                       setSelectedLoc(loc);
-                      if (loc === 'BANK_LOCKER' && !detail) setDetail('SBI Anna Nagar #42');
-                      if (loc === 'HOME_SAFE' && !detail) setDetail('Godrej Matrix • Master');
+                      if (loc === item.location && item.locationDetail) {
+                        setDetail(item.locationDetail);
+                      } else {
+                        setDetail(LocationDetailConfig[loc].presets[0]);
+                      }
                     }}
                     style={[
                       styles.locChip,
@@ -121,11 +129,31 @@ export function MoveLocationModal({ visible, item, onClose, onSubmit }: MoveLoca
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.fieldLabel}>Locker / Safe / Holder Detail</Text>
+              <Text style={styles.fieldLabel}>{LocationDetailConfig[selectedLoc].label}</Text>
+              <View style={styles.locGrid}>
+                {LocationDetailConfig[selectedLoc].presets.map((preset) => {
+                  const active = detail === preset;
+                  const vis = LocationVisuals[selectedLoc];
+                  return (
+                    <Pressable
+                      key={preset}
+                      onPress={() => setDetail(preset)}
+                      style={[
+                        styles.presetChip,
+                        active && { borderColor: vis.color, backgroundColor: vis.tint },
+                      ]}
+                    >
+                      <Text style={[styles.presetText, active && { color: vis.color }]}>
+                        {preset}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
               <TextInput
                 value={detail}
                 onChangeText={setDetail}
-                placeholder="e.g., SBI Anna Nagar #42 or Godrej Safe"
+                placeholder={LocationDetailConfig[selectedLoc].placeholder}
                 placeholderTextColor={VaultPalette.textMuted}
                 style={styles.input}
               />
@@ -262,6 +290,19 @@ const createStyles = (palette: VaultPaletteType) =>
       borderWidth: 1,
       borderColor: VaultPalette.border,
       backgroundColor: VaultPalette.surfaceElevated,
+    },
+    presetChip: {
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      backgroundColor: VaultPalette.surfaceElevated,
+    },
+    presetText: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      fontWeight: '600',
     },
     locChipText: {
       fontSize: 12,

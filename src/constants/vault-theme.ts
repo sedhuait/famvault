@@ -226,6 +226,47 @@ export const LocationVisuals: Record<
   },
 };
 
+export const LocationDetailConfig: Record<
+  CustodyLocation,
+  { label: string; placeholder: string; presets: string[] }
+> = {
+  BANK_LOCKER: {
+    label: 'Bank & Locker Number',
+    placeholder: 'e.g., SBI Anna Nagar #42',
+    presets: ['SBI Anna Nagar #42', 'HDFC Locker', 'ICICI Locker'],
+  },
+  HOME_SAFE: {
+    label: 'Safe / Cupboard Location',
+    placeholder: 'e.g., Godrej Matrix • Master',
+    presets: ['Godrej Matrix • Master', 'Bedroom Almirah', 'Wall Safe'],
+  },
+  POOJA_ROOM: {
+    label: 'Pooja Room / Mandir Spot',
+    placeholder: 'e.g., Main Mandir Shelf',
+    presets: ['Main Mandir', 'Pooja Shelf', 'Silver Pooja Box'],
+  },
+  GOLD_LOAN: {
+    label: 'Branch / Receipt Reference',
+    placeholder: 'e.g., SBI / Muthoot Branch',
+    presets: ['SBI Gold Loan', 'Muthoot Finance', 'Manappuram Gold'],
+  },
+  DAILY_WEAR: {
+    label: 'Who Is Wearing It',
+    placeholder: 'e.g., Worn by Wife / Self',
+    presets: ['Worn by Wife', 'Worn by Amma', 'Worn by Self'],
+  },
+  WITH_FAMILY: {
+    label: 'Which Family Member',
+    placeholder: 'e.g., With Amma / Daughter',
+    presets: ['With Amma', 'With Daughter', 'With Sister'],
+  },
+  BORROWED: {
+    label: 'Borrowed By (Name & Occasion)',
+    placeholder: 'e.g., Aunt Kavitha (Wedding)',
+    presets: ['Relative (Wedding)', 'Friend (Function)', 'Cousin'],
+  },
+};
+
 export const CategoryVisuals: Record<
   ItemCategory,
   { label: string; shortLabel: string; icon: string }
