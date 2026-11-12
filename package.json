@@ -1,16 +1,29 @@
 {
-  "name": "family-vault",
+  "name": "tijori-family-vault",
   "version": "1.0.0",
   "main": "expo-router/entry",
+  "engines": {
+    "node": ">=26.0.0"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "typescript"
+      ]
+    }
+  },
   "dependencies": {
     "@expo/ui": "~58.0.28",
+    "@expo/vector-icons": "^15.0.2",
     "expo": "~58.0.24",
     "expo-constants": "~58.0.16",
     "expo-device": "~58.0.5",
     "expo-font": "~58.0.12",
     "expo-glass-effect": "~58.0.5",
+    "expo-haptics": "~58.0.8",
     "expo-image": "~58.0.18",
     "expo-linking": "~58.0.17",
+    "expo-local-authentication": "~58.0.3",
     "expo-router": "~58.0.31",
     "expo-splash-screen": "~58.0.14",
     "expo-status-bar": "~58.0.5",
@@ -28,8 +41,9 @@
     "react-native-worklets": "0.13.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.6.7",
     "@types/react": "~19.3.0",
-    "typescript": "~6.0.3"
+    "typescript": "^7.0.2"
   },
   "scripts": {
     "start": "expo start",
@@ -37,7 +51,11 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck"
   },
   "private": true
 }
