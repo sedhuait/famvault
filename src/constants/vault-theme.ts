@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 
 import type { CustodyLocation, MetalType } from '@/types/vault';
 
-export type AccentThemeId = 'GOLD' | 'ROSE_GOLD' | 'SILVER';
+export type AccentThemeId = 'GOLD' | 'ROSE_GOLD' | 'SILVER' | 'DIAMOND';
 
 export interface AccentThemeOption {
   id: AccentThemeId;
@@ -42,12 +42,22 @@ export const AccentThemes: Record<AccentThemeId, AccentThemeOption> = {
     goldTint: 'rgba(203, 213, 225, 0.15)',
     borderGold: 'rgba(203, 213, 225, 0.38)',
   },
+  DIAMOND: {
+    id: 'DIAMOND',
+    label: 'Diamond',
+    gold: '#93C5FD',
+    goldBright: '#E0F2FE',
+    goldDim: '#3B82F6',
+    goldTint: 'rgba(147, 197, 253, 0.15)',
+    borderGold: 'rgba(147, 197, 253, 0.40)',
+  },
 };
 
 export const AccentThemeList: AccentThemeOption[] = [
   AccentThemes.GOLD,
   AccentThemes.ROSE_GOLD,
   AccentThemes.SILVER,
+  AccentThemes.DIAMOND,
 ];
 
 const BaseVaultPalette = {
