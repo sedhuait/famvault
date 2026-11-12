@@ -1,37 +1,37 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
   <defs>
-    <radialGradient id="bgMulti" cx="50%" cy="42%" r="65%">
-      <stop offset="0%" stop-color="#1A1D26"/>
-      <stop offset="100%" stop-color="#090A0E"/>
+    <radialGradient id="bgRose" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#1C1518"/>
+      <stop offset="100%" stop-color="#09080A"/>
     </radialGradient>
-    <!-- 24K Gold -> Rose Gold outer frame -->
-    <linearGradient id="goldRose" gradientUnits="userSpaceOnUse" x1="210" y1="318" x2="814" y2="762">
-      <stop offset="0%" stop-color="#FCE79C"/>
-      <stop offset="45%" stop-color="#D4AF37"/>
-      <stop offset="100%" stop-color="#E0A296"/>
+    <!-- 18K Rose Gold outer frame -->
+    <linearGradient id="roseOuter" gradientUnits="userSpaceOnUse" x1="210" y1="318" x2="814" y2="762">
+      <stop offset="0%" stop-color="#FCE3DD"/>
+      <stop offset="45%" stop-color="#E5A193"/>
+      <stop offset="100%" stop-color="#B56558"/>
     </linearGradient>
-    <!-- Silver -> Platinum girdle -->
-    <linearGradient id="silverPlat" gradientUnits="userSpaceOnUse" x1="210" y1="446" x2="814" y2="446">
-      <stop offset="0%" stop-color="#F8FAFC"/>
-      <stop offset="50%" stop-color="#CBD5E1"/>
-      <stop offset="100%" stop-color="#94A3B8"/>
+    <!-- Brushed Rose Gold girdle -->
+    <linearGradient id="roseGirdle" gradientUnits="userSpaceOnUse" x1="210" y1="446" x2="814" y2="446">
+      <stop offset="0%" stop-color="#F7D7CF"/>
+      <stop offset="50%" stop-color="#DD9486"/>
+      <stop offset="100%" stop-color="#B86B5E"/>
     </linearGradient>
-    <!-- Diamond icy blue -> Platinum facets -->
-    <linearGradient id="diamondBlue" gradientUnits="userSpaceOnUse" x1="312" y1="318" x2="712" y2="762">
-      <stop offset="0%" stop-color="#E0F2FE"/>
-      <stop offset="50%" stop-color="#93C5FD"/>
-      <stop offset="100%" stop-color="#CBD5E1"/>
+    <!-- Soft Rose Gold inner facets -->
+    <linearGradient id="roseInner" gradientUnits="userSpaceOnUse" x1="312" y1="318" x2="712" y2="762">
+      <stop offset="0%" stop-color="#F9DDD6"/>
+      <stop offset="50%" stop-color="#D78E7F"/>
+      <stop offset="100%" stop-color="#A85C50"/>
     </linearGradient>
   </defs>
-  <rect width="1024" height="1024" fill="url(#bgMulti)"/>
-  <!-- Inner Diamond facets (Diamond Blue -> Platinum) -->
+  <rect width="1024" height="1024" fill="url(#bgRose)"/>
+  <!-- Inner Diamond facets -->
   <polyline points="400,446 512,318 624,446"
-            fill="none" stroke="url(#diamondBlue)" stroke-width="13" stroke-linejoin="round" opacity="0.88"/>
+            fill="none" stroke="url(#roseInner)" stroke-width="13" stroke-linejoin="round" opacity="0.82"/>
   <polyline points="312,318 400,446 512,762 624,446 712,318"
-            fill="none" stroke="url(#diamondBlue)" stroke-width="15" stroke-linejoin="round" opacity="0.92"/>
-  <!-- Girdle line (Silver -> Platinum) -->
-  <polyline points="210,446 814,446" fill="none" stroke="url(#silverPlat)" stroke-width="15"/>
-  <!-- Outer Diamond Silhouette (24K Gold -> Rose Gold) -->
+            fill="none" stroke="url(#roseInner)" stroke-width="15" stroke-linejoin="round" opacity="0.88"/>
+  <!-- Girdle line -->
+  <polyline points="210,446 814,446" fill="none" stroke="url(#roseGirdle)" stroke-width="15" opacity="0.92"/>
+  <!-- Outer Diamond Silhouette -->
   <polygon points="312,318 712,318 814,446 512,762 210,446"
-           fill="none" stroke="url(#goldRose)" stroke-width="26" stroke-linejoin="round"/>
+           fill="none" stroke="url(#roseOuter)" stroke-width="26" stroke-linejoin="round"/>
 </svg>
