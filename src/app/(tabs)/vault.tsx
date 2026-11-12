@@ -27,6 +27,7 @@ const LOCATION_FILTERS: Array<'ALL' | CustodyLocation> = [
   'POOJA_ROOM',
   'GOLD_LOAN',
   'DAILY_WEAR',
+  'BORROWED',
 ];
 
 export default function VaultLedgerScreen() {

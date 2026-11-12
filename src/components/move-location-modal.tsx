@@ -13,6 +13,7 @@ const LOCATIONS: CustodyLocation[] = [
   'GOLD_LOAN',
   'DAILY_WEAR',
   'WITH_FAMILY',
+  'BORROWED',
 ];
 
 interface MoveLocationModalProps {

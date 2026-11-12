@@ -62,6 +62,7 @@ export default function DashboardScreen() {
       'POOJA_ROOM',
       'GOLD_LOAN',
       'DAILY_WEAR',
+      'BORROWED',
     ];
     return locations.map((loc) => {
       const matching = items.filter((i) => i.location === loc);

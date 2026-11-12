@@ -155,7 +155,7 @@ export const MetalVisuals: Record<
     label: 'Silver',
     color: VaultPalette.silver,
     tint: VaultPalette.silverTint,
-    icon: 'silverware-variant',
+    icon: 'circle-double',
   },
   DIAMOND: {
     label: 'Diamond',
@@ -216,6 +216,13 @@ export const LocationVisuals: Record<
     color: VaultPalette.violet,
     tint: VaultPalette.violetTint,
     icon: 'account-group-outline',
+  },
+  BORROWED: {
+    label: 'Borrowed by Someone',
+    shortLabel: 'Borrowed',
+    color: '#F472B6',
+    tint: 'rgba(244, 114, 182, 0.15)',
+    icon: 'account-arrow-right-outline',
   },
 };
 

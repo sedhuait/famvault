@@ -30,7 +30,13 @@ interface AddItemModalProps {
 }
 
 const METAL_TYPES: MetalType[] = ['GOLD', 'SILVER', 'DIAMOND', 'PLATINUM'];
-const LOCATIONS: CustodyLocation[] = ['BANK_LOCKER', 'HOME_SAFE', 'POOJA_ROOM', 'DAILY_WEAR'];
+const LOCATIONS: CustodyLocation[] = [
+  'BANK_LOCKER',
+  'HOME_SAFE',
+  'POOJA_ROOM',
+  'DAILY_WEAR',
+  'BORROWED',
+];
 const LOCATION_DETAIL_PRESETS = ['SBI Locker', 'HDFC Locker', 'Home Safe', 'Pooja Shelf'];
 const NOTE_PRESETS = ['Heirloom', 'Wedding Gift', '916 Hallmarked', 'Insured'];
 const JEWELER_PRESETS = ['GRT Jewellers', 'Tanishq', 'Malabar Gold', 'Kalyan Jewellers'];

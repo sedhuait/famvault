@@ -28,7 +28,8 @@ export type CustodyLocation =
   | 'POOJA_ROOM'
   | 'GOLD_LOAN'
   | 'DAILY_WEAR'
-  | 'WITH_FAMILY';
+  | 'WITH_FAMILY'
+  | 'BORROWED';
 
 export type HistoryActionType =
   | 'ITEM_CREATED'
