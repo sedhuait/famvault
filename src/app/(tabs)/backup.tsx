@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { ExportVaultModal } from '@/components/export-modal';
 import { VaultMaxWidth, VaultPalette } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
+import { exportVaultCsv, exportVaultPdf } from '@/utils/export-vault';
 import { formatDateTimeWithTime, formatINR } from '@/utils/formatters';
 import { summarizePortfolio } from '@/utils/valuation';
 
@@ -22,6 +24,7 @@ export default function BackupAndSecurityScreen() {
     items,
     history,
     rates,
+    members,
     valuationMode,
     biometricEnabled,
     setBiometricEnabled,
@@ -34,6 +37,8 @@ export default function BackupAndSecurityScreen() {
 
   const [backupStep, setBackupStep] = useState<string | null>(null);
   const [pdfModalVisible, setPdfModalVisible] = useState(false);
+  const [exportModalVisible, setExportModalVisible] = useState(false);
+  const [exportFeedback, setExportFeedback] = useState<string | null>(null);
 
   const storageMath = useMemo(() => {
     const photosKb = items.reduce((acc, i) => acc + (i.compressedPhotoKb ?? 0), 0);
@@ -172,24 +177,86 @@ export default function BackupAndSecurityScreen() {
             </Pressable>
           </View>
 
-          {/* PDF Insurance & Locker Audit Export */}
+          {/* Export Reports (CSV & PDF) */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <MaterialCommunityIcons name="file-pdf-box" size={22} color={VaultPalette.sky} />
-              <Text style={styles.cardTitle}>Insurance & Bank Locker Audit PDF</Text>
+              <MaterialCommunityIcons
+                name="file-export-outline"
+                size={22}
+                color={VaultPalette.sky}
+              />
+              <Text style={styles.cardTitle}>Export Vault Reports (CSV &amp; PDF)</Text>
             </View>
             <Text style={styles.rowSub}>
-              Generates a printable household schedule with item photos, weights, custody locations,
-              and attached GST bills.
+              Download a full spreadsheet (CSV) for CA/tax records or generate a printable A4
+              insurance &amp; bank locker audit dossier (PDF).
             </Text>
+
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Pressable
+                onPress={async () => {
+                  const res = await exportVaultCsv(items, rates);
+                  setExportFeedback(
+                    Platform.OS === 'web'
+                      ? `Downloaded ${res.fileName}`
+                      : `Exported ${res.fileName}`,
+                  );
+                }}
+                style={({ pressed }) => [
+                  styles.secondaryBtn,
+                  { flex: 1, borderColor: 'rgba(16, 185, 129, 0.4)' },
+                  pressed && { opacity: 0.8 },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name="file-delimited-outline"
+                  size={17}
+                  color={VaultPalette.emerald}
+                />
+                <Text style={[styles.secondaryBtnText, { color: VaultPalette.emerald }]}>
+                  Export CSV
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={async () => {
+                  const res = await exportVaultPdf({
+                    items,
+                    history,
+                    rates,
+                    members,
+                    valuationMode,
+                  });
+                  setExportFeedback(
+                    Platform.OS === 'web' ? 'Opened PDF print dialog' : `Generated ${res.fileName}`,
+                  );
+                }}
+                style={({ pressed }) => [
+                  styles.secondaryBtn,
+                  { flex: 1, borderColor: 'rgba(56, 189, 248, 0.4)' },
+                  pressed && { opacity: 0.8 },
+                ]}
+              >
+                <MaterialCommunityIcons name="file-pdf-box" size={18} color={VaultPalette.sky} />
+                <Text style={[styles.secondaryBtnText, { color: VaultPalette.sky }]}>
+                  Export PDF
+                </Text>
+              </Pressable>
+            </View>
+
+            {exportFeedback ? (
+              <View style={styles.progressBanner}>
+                <Ionicons name="checkmark-circle" size={16} color={VaultPalette.emerald} />
+                <Text style={styles.progressText}>{exportFeedback}</Text>
+              </View>
+            ) : null}
+
             <Pressable
               onPress={() => setPdfModalVisible(true)}
               style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
             >
-              <Ionicons name="document-text-outline" size={16} color={VaultPalette.sky} />
-              <Text style={[styles.secondaryBtnText, { color: VaultPalette.sky }]}>
-                Preview Audit Schedule PDF
-              </Text>
+              <Ionicons name="document-text-outline" size={16} color={VaultPalette.goldBright} />
+              <Text style={styles.secondaryBtnText}>Preview Audit Schedule &amp; CSV</Text>
             </Pressable>
           </View>
 
@@ -252,12 +319,29 @@ export default function BackupAndSecurityScreen() {
               ))}
             </ScrollView>
 
-            <Pressable onPress={() => setPdfModalVisible(false)} style={styles.primaryBtn}>
-              <Text style={styles.primaryBtnText}>Close Preview</Text>
-            </Pressable>
+            <View style={{ flexDirection: 'row', gap: 10 }}>
+              <Pressable
+                onPress={() => {
+                  setPdfModalVisible(false);
+                  setExportModalVisible(true);
+                }}
+                style={[styles.primaryBtn, { flex: 1 }]}
+              >
+                <Ionicons name="download-outline" size={16} color="#090D0B" />
+                <Text style={styles.primaryBtnText}>Export CSV / PDF</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => setPdfModalVisible(false)}
+                style={[styles.secondaryBtn, { flex: 1 }]}
+              >
+                <Text style={styles.secondaryBtnText}>Close</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
       </Modal>
+
+      <ExportVaultModal visible={exportModalVisible} onClose={() => setExportModalVisible(false)} />
     </SafeAreaView>
   );
 }

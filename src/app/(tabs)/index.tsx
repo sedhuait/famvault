@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddItemModal } from '@/components/add-item-modal';
+import { ExportVaultModal } from '@/components/export-modal';
 import {
   LocationVisuals,
   MetalVisuals,
@@ -38,6 +39,7 @@ export default function DashboardScreen() {
   } = useVault();
 
   const [addVisible, setAddVisible] = useState(false);
+  const [exportVisible, setExportVisible] = useState(false);
 
   const summary = useMemo(
     () => summarizePortfolio(items, rates, valuationMode),
@@ -96,6 +98,13 @@ export default function DashboardScreen() {
             </View>
 
             <View style={styles.headerActions}>
+              <Pressable
+                onPress={() => setExportVisible(true)}
+                style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
+              >
+                <Ionicons name="download-outline" size={16} color={VaultPalette.gold} />
+                <Text style={styles.iconBtnText}>Export</Text>
+              </Pressable>
               <Pressable
                 onPress={lockVault}
                 style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
@@ -430,6 +439,8 @@ export default function DashboardScreen() {
         onClose={() => setAddVisible(false)}
         onAdd={(payload) => addVaultItem(payload)}
       />
+
+      <ExportVaultModal visible={exportVisible} onClose={() => setExportVisible(false)} />
     </SafeAreaView>
   );
 }

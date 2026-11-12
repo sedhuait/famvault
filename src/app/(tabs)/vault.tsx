@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddItemModal } from '@/components/add-item-modal';
+import { ExportVaultModal } from '@/components/export-modal';
 import { VaultItemCard } from '@/components/vault-item-card';
 import {
   LocationVisuals,
@@ -35,6 +36,7 @@ export default function VaultLedgerScreen() {
   const [locationFilter, setLocationFilter] = useState<'ALL' | CustodyLocation>('ALL');
   const [ownerFilter, setOwnerFilter] = useState<string>('ALL');
   const [addVisible, setAddVisible] = useState(false);
+  const [exportVisible, setExportVisible] = useState(false);
 
   const owners = useMemo(
     () => ['ALL', ...Array.from(new Set(items.map((item) => item.ownerName)))],
@@ -79,6 +81,12 @@ export default function VaultLedgerScreen() {
           <View style={styles.headerActions}>
             <Pressable onPress={toggleUnitMode} style={styles.unitBtn}>
               <Text style={styles.unitBtnText}>{unitMode === 'GRAMS' ? 'g' : 'Pavan'}</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => setExportVisible(true)}
+              style={({ pressed }) => [styles.unitBtn, pressed && { opacity: 0.8 }]}
+            >
+              <Ionicons name="download-outline" size={16} color={VaultPalette.goldBright} />
             </Pressable>
             <Pressable
               onPress={() => setAddVisible(true)}
@@ -192,6 +200,13 @@ export default function VaultLedgerScreen() {
         visible={addVisible}
         onClose={() => setAddVisible(false)}
         onAdd={(payload) => addVaultItem(payload)}
+      />
+
+      <ExportVaultModal
+        visible={exportVisible}
+        onClose={() => setExportVisible(false)}
+        filteredItems={filteredItems}
+        scopeHint="Filtered Vault View"
       />
     </SafeAreaView>
   );

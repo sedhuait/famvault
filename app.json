@@ -40,7 +40,8 @@
         {
           "faceIDPermission": "Allow Tijori to unlock your family precious metals vault with Face ID."
         }
-      ]
+      ],
+      "expo-sharing"
     ],
     "experiments": {
       "typedRoutes": true,
