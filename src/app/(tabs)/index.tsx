@@ -7,11 +7,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AddItemModal } from '@/components/add-item-modal';
 import { ExportVaultModal } from '@/components/export-modal';
 import {
+  AccentThemeList,
+  AccentThemes,
   LocationVisuals,
   MetalVisuals,
   VaultFonts,
   VaultMaxWidth,
   VaultPalette,
+  type VaultPaletteType,
 } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import type { CbdtCategory, CustodyLocation, MetalType } from '@/types/vault';
@@ -32,6 +35,9 @@ export default function DashboardScreen() {
     unitMode,
     valuationMode,
     hidePrices,
+    accentTheme,
+    setAccentTheme,
+    palette,
     toggleUnitMode,
     toggleValuationMode,
     toggleHidePrices,
@@ -39,6 +45,14 @@ export default function DashboardScreen() {
     addVaultItem,
     addFamilyMember,
   } = useVault();
+
+  const styles = useMemo(() => createStyles(palette), [palette]);
+
+  const cycleAccentTheme = () => {
+    const idx = AccentThemeList.findIndex((t) => t.id === accentTheme);
+    const next = AccentThemeList[(idx + 1) % AccentThemeList.length];
+    setAccentTheme(next.id);
+  };
 
   const [addVisible, setAddVisible] = useState(false);
   const [exportVisible, setExportVisible] = useState(false);
@@ -88,11 +102,7 @@ export default function DashboardScreen() {
           <View style={styles.topBar}>
             <View style={styles.brandGroup}>
               <View style={styles.logoMark}>
-                <MaterialCommunityIcons
-                  name="safe-square-outline"
-                  size={20}
-                  color={VaultPalette.gold}
-                />
+                <MaterialCommunityIcons name="safe-square-outline" size={20} color={palette.gold} />
               </View>
               <View style={styles.brandTextCol}>
                 <Text style={styles.brandName} numberOfLines={1}>
@@ -113,14 +123,14 @@ export default function DashboardScreen() {
                 accessibilityLabel="Export CSV or PDF"
                 style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
               >
-                <Ionicons name="download-outline" size={17} color={VaultPalette.gold} />
+                <Ionicons name="download-outline" size={17} color={palette.gold} />
               </Pressable>
               <Pressable
                 onPress={lockVault}
                 accessibilityLabel="Lock Vault"
                 style={({ pressed }) => [styles.iconBtn, pressed && { opacity: 0.7 }]}
               >
-                <Ionicons name="lock-closed-outline" size={17} color={VaultPalette.gold} />
+                <Ionicons name="lock-closed-outline" size={17} color={palette.gold} />
               </Pressable>
               <Pressable
                 onPress={() => setAddVisible(true)}
@@ -150,18 +160,14 @@ export default function DashboardScreen() {
           <View style={styles.heroCard}>
             <View style={styles.heroTopControls}>
               <Pressable onPress={toggleValuationMode} style={styles.togglePill}>
-                <Ionicons name="swap-vertical" size={12} color={VaultPalette.goldBright} />
+                <Ionicons name="swap-vertical" size={12} color={palette.goldBright} />
                 <Text style={styles.togglePillText}>
                   {valuationMode === 'CASH' ? 'Cash Melt Value' : 'Store Replacement (+MC & GST)'}
                 </Text>
               </Pressable>
 
               <Pressable onPress={toggleUnitMode} style={styles.togglePill}>
-                <MaterialCommunityIcons
-                  name="scale-balance"
-                  size={12}
-                  color={VaultPalette.goldBright}
-                />
+                <MaterialCommunityIcons name="scale-balance" size={12} color={palette.goldBright} />
                 <Text style={styles.togglePillText}>
                   {unitMode === 'GRAMS' ? 'Grams (g)' : 'Pavan (8g)'}
                 </Text>
@@ -180,13 +186,18 @@ export default function DashboardScreen() {
                 <Ionicons
                   name={hidePrices ? 'eye-off-outline' : 'eye-outline'}
                   size={13}
-                  color={hidePrices ? VaultPalette.emerald : VaultPalette.goldBright}
+                  color={hidePrices ? VaultPalette.emerald : palette.goldBright}
                 />
                 <Text
                   style={[styles.togglePillText, hidePrices && { color: VaultPalette.emerald }]}
                 >
                   {hidePrices ? 'Prices Hidden' : 'Hide Prices'}
                 </Text>
+              </Pressable>
+
+              <Pressable onPress={cycleAccentTheme} style={styles.togglePill}>
+                <View style={[styles.themeDot, { backgroundColor: palette.gold }]} />
+                <Text style={styles.togglePillText}>{AccentThemes[accentTheme].label}</Text>
               </Pressable>
             </View>
 
@@ -428,7 +439,7 @@ export default function DashboardScreen() {
                 <Text style={styles.legendText}>GST Bill Attached</Text>
               </View>
               <View style={styles.legendItem}>
-                <View style={[styles.legendDot, { backgroundColor: VaultPalette.gold }]} />
+                <View style={[styles.legendDot, { backgroundColor: palette.gold }]} />
                 <Text style={styles.legendText}>Unbilled (Within CBDT Exemption)</Text>
               </View>
             </View>
@@ -519,9 +530,7 @@ export default function DashboardScreen() {
                     onPress={() => setNewMemberCategory(opt.cat)}
                     style={[styles.memberCatChip, active && styles.memberCatChipActive]}
                   >
-                    <Text
-                      style={[styles.memberCatText, active && { color: VaultPalette.goldBright }]}
-                    >
+                    <Text style={[styles.memberCatText, active && { color: palette.goldBright }]}>
                       {opt.label}
                     </Text>
                   </Pressable>
@@ -555,518 +564,526 @@ export default function DashboardScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: VaultPalette.bg,
-  },
-  scrollContent: {
-    paddingBottom: 32,
-  },
-  container: {
-    width: '100%',
-    maxWidth: VaultMaxWidth,
-    alignSelf: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    gap: 16,
-  },
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  brandGroup: {
-    flex: 1,
-    minWidth: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  brandTextCol: {
-    flex: 1,
-    minWidth: 0,
-  },
-  logoMark: {
-    width: 38,
-    height: 38,
-    borderRadius: 12,
-    backgroundColor: VaultPalette.goldTint,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brandName: {
-    fontSize: 20,
-    fontWeight: '700',
-    letterSpacing: 0.6,
-    color: VaultPalette.goldBright,
-    fontFamily: VaultFonts.serif,
-  },
-  bioVerifiedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  bioVerifiedText: {
-    fontSize: 11,
-    color: VaultPalette.emerald,
-    fontWeight: '500',
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    flexShrink: 0,
-  },
-  iconBtn: {
-    width: 36,
-    height: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 10,
-    backgroundColor: VaultPalette.surface,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-  },
-  addBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: VaultPalette.gold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  tickerBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.surface,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-  },
-  tickerLiveDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: VaultPalette.emerald,
-  },
-  tickerText: {
-    flex: 1,
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    fontVariant: ['tabular-nums'],
-  },
-  heroCard: {
-    backgroundColor: VaultPalette.surfaceElevated,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    padding: 18,
-    gap: 10,
-  },
-  heroTopControls: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 4,
-  },
-  togglePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 999,
-    backgroundColor: VaultPalette.goldTint,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-  },
-  togglePillText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: VaultPalette.goldBright,
-  },
-  heroLabel: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-  },
-  heroAmount: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: VaultPalette.text,
-    fontVariant: ['tabular-nums'],
-  },
-  heroMetricsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 6,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: VaultPalette.border,
-  },
-  heroMetric: {
-    flex: 1,
-    gap: 3,
-  },
-  heroMetricLabel: {
-    fontSize: 10,
-    color: VaultPalette.textMuted,
-    textTransform: 'uppercase',
-  },
-  heroMetricValue: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.text,
-    fontVariant: ['tabular-nums'],
-  },
-  heroDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: VaultPalette.border,
-    marginHorizontal: 10,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 4,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  sectionLink: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: VaultPalette.gold,
-  },
-  sectionCaption: {
-    fontSize: 12,
-    color: VaultPalette.textMuted,
-  },
-  metalGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-  },
-  metalCard: {
-    width: '48.5%',
-    flexGrow: 1,
-    minWidth: 155,
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 14,
-    gap: 5,
-  },
-  metalCardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
-  },
-  metalIconBox: {
-    width: 30,
-    height: 30,
-    borderRadius: 9,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  metalName: {
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  metalValue: {
-    fontSize: 19,
-    fontWeight: '800',
-    color: VaultPalette.text,
-    fontVariant: ['tabular-nums'],
-  },
-  metalWeight: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: VaultPalette.goldBright,
-  },
-  metalSub: {
-    fontSize: 11,
-    color: VaultPalette.textMuted,
-  },
-  custodyScroll: {
-    gap: 10,
-    paddingRight: 8,
-  },
-  custodyCard: {
-    width: 132,
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 12,
-    gap: 4,
-  },
-  custodyIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 4,
-  },
-  custodyLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-  },
-  custodyValue: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: VaultPalette.text,
-    fontVariant: ['tabular-nums'],
-  },
-  custodyCount: {
-    fontSize: 11,
-    color: VaultPalette.textMuted,
-  },
-  alertsStack: {
-    gap: 8,
-  },
-  alertCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 12,
-  },
-  alertBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  alertTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  alertSub: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-  },
-  cbdtCard: {
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 14,
-    gap: 12,
-  },
-  cbdtRow: {
-    gap: 6,
-  },
-  cbdtRowHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  cbdtMember: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  cbdtCategory: {
-    fontSize: 11,
-    color: VaultPalette.textMuted,
-  },
-  cbdtValues: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    fontWeight: '600',
-  },
-  progressTrack: {
-    height: 7,
-    borderRadius: 4,
-    backgroundColor: VaultPalette.surfaceElevated,
-    overflow: 'hidden',
-    position: 'relative',
-  },
-  progressUnbilled: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: VaultPalette.gold,
-    borderRadius: 4,
-  },
-  progressBilled: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    backgroundColor: VaultPalette.emerald,
-    borderRadius: 4,
-  },
-  cbdtLegend: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 14,
-    paddingTop: 4,
-    borderTopWidth: 1,
-    borderTopColor: VaultPalette.border,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  legendText: {
-    fontSize: 11,
-    color: VaultPalette.textMuted,
-  },
-  activityCard: {
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 14,
-  },
-  activityRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 10,
-    paddingVertical: 10,
-  },
-  activityDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: VaultPalette.border,
-  },
-  activityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: VaultPalette.gold,
-    marginTop: 5,
-  },
-  activityItemTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  activityDelta: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-  },
-  activityRemarks: {
-    fontSize: 11,
-    color: VaultPalette.textMuted,
-    fontStyle: 'italic',
-  },
-  activityDate: {
-    fontSize: 11,
-    color: VaultPalette.textMuted,
-  },
-  memberBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  memberCard: {
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    padding: 18,
-    gap: 12,
-    maxWidth: 440,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  memberTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  memberSub: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    lineHeight: 18,
-  },
-  memberInput: {
-    backgroundColor: VaultPalette.bg,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    borderRadius: 11,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: VaultPalette.text,
-    fontSize: 14,
-  },
-  memberCatList: {
-    gap: 8,
-  },
-  memberCatChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    backgroundColor: VaultPalette.bg,
-  },
-  memberCatChipActive: {
-    borderColor: VaultPalette.borderGold,
-    backgroundColor: VaultPalette.goldTint,
-  },
-  memberCatText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-  },
-  memberBtns: {
-    flexDirection: 'row',
-    gap: 10,
-    marginTop: 4,
-  },
-  memberCancelBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: VaultPalette.surfaceElevated,
-    alignItems: 'center',
-  },
-  memberCancelText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-  },
-  memberSaveBtn: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 12,
-    backgroundColor: VaultPalette.gold,
-    alignItems: 'center',
-  },
-  memberSaveText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#090D0B',
-  },
-});
+const createStyles = (palette: VaultPaletteType) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: VaultPalette.bg,
+    },
+    scrollContent: {
+      paddingBottom: 32,
+    },
+    container: {
+      width: '100%',
+      maxWidth: VaultMaxWidth,
+      alignSelf: 'center',
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      gap: 16,
+    },
+    topBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: 10,
+    },
+    brandGroup: {
+      flex: 1,
+      minWidth: 0,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    brandTextCol: {
+      flex: 1,
+      minWidth: 0,
+    },
+    logoMark: {
+      width: 38,
+      height: 38,
+      borderRadius: 12,
+      backgroundColor: palette.goldTint,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    brandName: {
+      fontSize: 20,
+      fontWeight: '700',
+      letterSpacing: 0.6,
+      color: palette.goldBright,
+      fontFamily: VaultFonts.serif,
+    },
+    bioVerifiedRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    bioVerifiedText: {
+      fontSize: 11,
+      color: VaultPalette.emerald,
+      fontWeight: '500',
+    },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      flexShrink: 0,
+    },
+    iconBtn: {
+      width: 36,
+      height: 36,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 10,
+      backgroundColor: VaultPalette.surface,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+    },
+    addBtn: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: palette.gold,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    tickerBar: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: VaultPalette.surface,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 9,
+    },
+    tickerLiveDot: {
+      width: 7,
+      height: 7,
+      borderRadius: 4,
+      backgroundColor: VaultPalette.emerald,
+    },
+    tickerText: {
+      flex: 1,
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      fontVariant: ['tabular-nums'],
+    },
+    heroCard: {
+      backgroundColor: VaultPalette.surfaceElevated,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      padding: 18,
+      gap: 10,
+    },
+    heroTopControls: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+      marginBottom: 4,
+    },
+    togglePill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 999,
+      backgroundColor: palette.goldTint,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+    },
+    togglePillText: {
+      fontSize: 11,
+      fontWeight: '600',
+      color: palette.goldBright,
+    },
+    themeDot: {
+      width: 9,
+      height: 9,
+      borderRadius: 5,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.35)',
+    },
+    heroLabel: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.8,
+    },
+    heroAmount: {
+      fontSize: 34,
+      fontWeight: '800',
+      color: VaultPalette.text,
+      fontVariant: ['tabular-nums'],
+    },
+    heroMetricsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: 6,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: VaultPalette.border,
+    },
+    heroMetric: {
+      flex: 1,
+      gap: 3,
+    },
+    heroMetricLabel: {
+      fontSize: 10,
+      color: VaultPalette.textMuted,
+      textTransform: 'uppercase',
+    },
+    heroMetricValue: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: VaultPalette.text,
+      fontVariant: ['tabular-nums'],
+    },
+    heroDivider: {
+      width: 1,
+      height: 28,
+      backgroundColor: VaultPalette.border,
+      marginHorizontal: 10,
+    },
+    sectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginTop: 4,
+    },
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    sectionLink: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: palette.gold,
+    },
+    sectionCaption: {
+      fontSize: 12,
+      color: VaultPalette.textMuted,
+    },
+    metalGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 10,
+    },
+    metalCard: {
+      width: '48.5%',
+      flexGrow: 1,
+      minWidth: 155,
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 14,
+      gap: 5,
+    },
+    metalCardTop: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginBottom: 4,
+    },
+    metalIconBox: {
+      width: 30,
+      height: 30,
+      borderRadius: 9,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    metalName: {
+      fontSize: 13,
+      fontWeight: '700',
+    },
+    metalValue: {
+      fontSize: 19,
+      fontWeight: '800',
+      color: VaultPalette.text,
+      fontVariant: ['tabular-nums'],
+    },
+    metalWeight: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: palette.goldBright,
+    },
+    metalSub: {
+      fontSize: 11,
+      color: VaultPalette.textMuted,
+    },
+    custodyScroll: {
+      gap: 10,
+      paddingRight: 8,
+    },
+    custodyCard: {
+      width: 132,
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 15,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 12,
+      gap: 4,
+    },
+    custodyIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 4,
+    },
+    custodyLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    custodyValue: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: VaultPalette.text,
+      fontVariant: ['tabular-nums'],
+    },
+    custodyCount: {
+      fontSize: 11,
+      color: VaultPalette.textMuted,
+    },
+    alertsStack: {
+      gap: 8,
+    },
+    alertCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 14,
+      borderWidth: 1,
+      padding: 12,
+    },
+    alertBadge: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    alertTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    alertSub: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+    },
+    cbdtCard: {
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 14,
+      gap: 12,
+    },
+    cbdtRow: {
+      gap: 6,
+    },
+    cbdtRowHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    cbdtMember: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    cbdtCategory: {
+      fontSize: 11,
+      color: VaultPalette.textMuted,
+    },
+    cbdtValues: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      fontWeight: '600',
+    },
+    progressTrack: {
+      height: 7,
+      borderRadius: 4,
+      backgroundColor: VaultPalette.surfaceElevated,
+      overflow: 'hidden',
+      position: 'relative',
+    },
+    progressUnbilled: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: palette.gold,
+      borderRadius: 4,
+    },
+    progressBilled: {
+      position: 'absolute',
+      left: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: VaultPalette.emerald,
+      borderRadius: 4,
+    },
+    cbdtLegend: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 14,
+      paddingTop: 4,
+      borderTopWidth: 1,
+      borderTopColor: VaultPalette.border,
+    },
+    legendItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+    },
+    legendDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+    },
+    legendText: {
+      fontSize: 11,
+      color: VaultPalette.textMuted,
+    },
+    activityCard: {
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 14,
+    },
+    activityRow: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: 10,
+      paddingVertical: 10,
+    },
+    activityDivider: {
+      borderBottomWidth: 1,
+      borderBottomColor: VaultPalette.border,
+    },
+    activityDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
+      backgroundColor: palette.gold,
+      marginTop: 5,
+    },
+    activityItemTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    activityDelta: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+    },
+    activityRemarks: {
+      fontSize: 11,
+      color: VaultPalette.textMuted,
+      fontStyle: 'italic',
+    },
+    activityDate: {
+      fontSize: 11,
+      color: VaultPalette.textMuted,
+    },
+    memberBackdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.75)',
+      justifyContent: 'center',
+      padding: 20,
+    },
+    memberCard: {
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      padding: 18,
+      gap: 12,
+      maxWidth: 440,
+      width: '100%',
+      alignSelf: 'center',
+    },
+    memberTitle: {
+      fontSize: 17,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    memberSub: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      lineHeight: 18,
+    },
+    memberInput: {
+      backgroundColor: VaultPalette.bg,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      borderRadius: 11,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      color: VaultPalette.text,
+      fontSize: 14,
+    },
+    memberCatList: {
+      gap: 8,
+    },
+    memberCatChip: {
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      backgroundColor: VaultPalette.bg,
+    },
+    memberCatChipActive: {
+      borderColor: palette.borderGold,
+      backgroundColor: palette.goldTint,
+    },
+    memberCatText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    memberBtns: {
+      flexDirection: 'row',
+      gap: 10,
+      marginTop: 4,
+    },
+    memberCancelBtn: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 12,
+      backgroundColor: VaultPalette.surfaceElevated,
+      alignItems: 'center',
+    },
+    memberCancelText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    memberSaveBtn: {
+      flex: 1,
+      paddingVertical: 12,
+      borderRadius: 12,
+      backgroundColor: palette.gold,
+      alignItems: 'center',
+    },
+    memberSaveText: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: '#090D0B',
+    },
+  });

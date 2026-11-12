@@ -1,6 +1,6 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Modal,
   Platform,
@@ -12,7 +12,12 @@ import {
   View,
 } from 'react-native';
 
-import { LocationVisuals, MetalVisuals, VaultPalette } from '@/constants/vault-theme';
+import {
+  LocationVisuals,
+  MetalVisuals,
+  VaultPalette,
+  type VaultPaletteType,
+} from '@/constants/vault-theme';
 import { type AddItemPayload, useVault } from '@/context/vault-context';
 import type { CustodyLocation, ItemCategory, MetalType, Purity } from '@/types/vault';
 import { getPurityLabel } from '@/utils/formatters';
@@ -42,7 +47,8 @@ const DEFAULT_CATEGORY: Record<MetalType, ItemCategory> = {
 };
 
 export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
-  const { members } = useVault();
+  const { members, palette } = useVault();
+  const styles = useMemo(() => createStyles(palette), [palette]);
   const [title, setTitle] = useState('');
   const [metalType, setMetalType] = useState<MetalType>('GOLD');
   const [purity, setPurity] = useState<Purity>('GOLD_22K');
@@ -209,12 +215,12 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
                     style={[
                       styles.chip,
                       active && {
-                        borderColor: VaultPalette.gold,
-                        backgroundColor: VaultPalette.goldTint,
+                        borderColor: palette.gold,
+                        backgroundColor: palette.goldTint,
                       },
                     ]}
                   >
-                    <Text style={[styles.chipText, active && { color: VaultPalette.goldBright }]}>
+                    <Text style={[styles.chipText, active && { color: palette.goldBright }]}>
                       {getPurityLabel(p)}
                     </Text>
                   </Pressable>
@@ -269,12 +275,12 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
                     style={[
                       styles.chip,
                       active && {
-                        borderColor: VaultPalette.gold,
-                        backgroundColor: VaultPalette.goldTint,
+                        borderColor: palette.gold,
+                        backgroundColor: palette.goldTint,
                       },
                     ]}
                   >
-                    <Text style={[styles.chipText, active && { color: VaultPalette.goldBright }]}>
+                    <Text style={[styles.chipText, active && { color: palette.goldBright }]}>
                       {owner}
                     </Text>
                   </Pressable>
@@ -364,7 +370,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
                     onPress={() => handlePickPhoto('gallery')}
                     style={({ pressed }) => [styles.uploadBtn, pressed && { opacity: 0.8 }]}
                   >
-                    <Ionicons name="images-outline" size={16} color={VaultPalette.goldBright} />
+                    <Ionicons name="images-outline" size={16} color={palette.goldBright} />
                     <Text style={styles.uploadBtnText}>Upload Jewel Pic</Text>
                   </Pressable>
                   {Platform.OS !== 'web' ? (
@@ -372,7 +378,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
                       onPress={() => handlePickPhoto('camera')}
                       style={({ pressed }) => [styles.uploadBtn, pressed && { opacity: 0.8 }]}
                     >
-                      <Ionicons name="camera-outline" size={16} color={VaultPalette.goldBright} />
+                      <Ionicons name="camera-outline" size={16} color={palette.goldBright} />
                       <Text style={styles.uploadBtnText}>Camera</Text>
                     </Pressable>
                   ) : null}
@@ -442,7 +448,7 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
                     onPress={handlePickInvoiceImage}
                     style={({ pressed }) => [styles.uploadBtn, pressed && { opacity: 0.8 }]}
                   >
-                    <Ionicons name="image-outline" size={16} color={VaultPalette.goldBright} />
+                    <Ionicons name="image-outline" size={16} color={palette.goldBright} />
                     <Text style={styles.uploadBtnText}>Bill Photo</Text>
                   </Pressable>
                 </View>
@@ -486,193 +492,194 @@ export function AddItemModal({ visible, onClose, onAdd }: AddItemModalProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: VaultPalette.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    borderTopWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    padding: 20,
-    maxHeight: '90%',
-    maxWidth: 640,
-    width: '100%',
-    alignSelf: 'center',
-    gap: 12,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    marginTop: 2,
-  },
-  closeBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: VaultPalette.surfaceElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scrollArea: {
-    flexShrink: 1,
-  },
-  body: {
-    gap: 12,
-    paddingTop: 4,
-    paddingBottom: 8,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-  },
-  rowWrap: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    backgroundColor: VaultPalette.surfaceElevated,
-  },
-  chipText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-  },
-  field: {
-    gap: 6,
-  },
-  rowTwo: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  input: {
-    backgroundColor: VaultPalette.bg,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: VaultPalette.text,
-    fontSize: 14,
-  },
-  uploadCard: {
-    backgroundColor: VaultPalette.bg,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 12,
-    gap: 10,
-  },
-  uploadHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  uploadTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  uploadSub: {
-    fontSize: 11,
-    color: VaultPalette.textMuted,
-    marginTop: 2,
-  },
-  uploadBtnRow: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  uploadBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    backgroundColor: VaultPalette.surfaceElevated,
-  },
-  uploadBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: VaultPalette.goldBright,
-  },
-  previewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: VaultPalette.surfaceElevated,
-    borderRadius: 10,
-    padding: 8,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-  },
-  thumbImg: {
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-    backgroundColor: VaultPalette.surface,
-  },
-  pdfThumb: {
-    width: 44,
-    height: 44,
-    borderRadius: 8,
-    backgroundColor: VaultPalette.crimsonTint,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fileName: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  fileMeta: {
-    fontSize: 11,
-    color: VaultPalette.emerald,
-  },
-  removeBtn: {
-    padding: 6,
-  },
-  errorText: {
-    fontSize: 12,
-    color: VaultPalette.crimson,
-  },
-  saveBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.gold,
-    borderRadius: 14,
-    paddingVertical: 14,
-  },
-  saveBtnText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#090D0B',
-  },
-});
+const createStyles = (palette: VaultPaletteType) =>
+  StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.75)',
+      justifyContent: 'flex-end',
+    },
+    sheet: {
+      backgroundColor: VaultPalette.surface,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      borderTopWidth: 1,
+      borderColor: palette.borderGold,
+      padding: 20,
+      maxHeight: '90%',
+      maxWidth: 640,
+      width: '100%',
+      alignSelf: 'center',
+      gap: 12,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      gap: 10,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    subtitle: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      marginTop: 2,
+    },
+    closeBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: VaultPalette.surfaceElevated,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    scrollArea: {
+      flexShrink: 1,
+    },
+    body: {
+      gap: 12,
+      paddingTop: 4,
+      paddingBottom: 8,
+    },
+    label: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    rowWrap: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    chip: {
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      backgroundColor: VaultPalette.surfaceElevated,
+    },
+    chipText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    field: {
+      gap: 6,
+    },
+    rowTwo: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    input: {
+      backgroundColor: VaultPalette.bg,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      color: VaultPalette.text,
+      fontSize: 14,
+    },
+    uploadCard: {
+      backgroundColor: VaultPalette.bg,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 12,
+      gap: 10,
+    },
+    uploadHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    uploadTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    uploadSub: {
+      fontSize: 11,
+      color: VaultPalette.textMuted,
+      marginTop: 2,
+    },
+    uploadBtnRow: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    uploadBtn: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 6,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      backgroundColor: VaultPalette.surfaceElevated,
+    },
+    uploadBtnText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: palette.goldBright,
+    },
+    previewRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      backgroundColor: VaultPalette.surfaceElevated,
+      borderRadius: 10,
+      padding: 8,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+    },
+    thumbImg: {
+      width: 44,
+      height: 44,
+      borderRadius: 8,
+      backgroundColor: VaultPalette.surface,
+    },
+    pdfThumb: {
+      width: 44,
+      height: 44,
+      borderRadius: 8,
+      backgroundColor: VaultPalette.crimsonTint,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    fileName: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    fileMeta: {
+      fontSize: 11,
+      color: VaultPalette.emerald,
+    },
+    removeBtn: {
+      padding: 6,
+    },
+    errorText: {
+      fontSize: 12,
+      color: VaultPalette.crimson,
+    },
+    saveBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: palette.gold,
+      borderRadius: 14,
+      paddingVertical: 14,
+    },
+    saveBtnText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: '#090D0B',
+    },
+  });

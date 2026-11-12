@@ -1,9 +1,9 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { LocationVisuals, VaultPalette } from '@/constants/vault-theme';
-import type { MoveLocationPayload } from '@/context/vault-context';
+import { LocationVisuals, VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
+import { type MoveLocationPayload, useVaultPalette } from '@/context/vault-context';
 import type { CustodyLocation, VaultItem } from '@/types/vault';
 
 const LOCATIONS: CustodyLocation[] = [
@@ -23,6 +23,8 @@ interface MoveLocationModalProps {
 }
 
 export function MoveLocationModal({ visible, item, onClose, onSubmit }: MoveLocationModalProps) {
+  const palette = useVaultPalette();
+  const styles = useMemo(() => createStyles(palette), [palette]);
   const [selectedLoc, setSelectedLoc] = useState<CustodyLocation>(item.location);
   const [detail, setDetail] = useState<string>(item.locationDetail ?? '');
   const [remarks, setRemarks] = useState<string>('');
@@ -190,131 +192,132 @@ export function MoveLocationModal({ visible, item, onClose, onSubmit }: MoveLoca
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.72)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: VaultPalette.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    borderTopWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    padding: 20,
-    maxHeight: '88%',
-    maxWidth: 640,
-    width: '100%',
-    alignSelf: 'center',
-    gap: 16,
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  sheetTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  sheetSubtitle: {
-    fontSize: 12,
-    color: VaultPalette.gold,
-    marginTop: 2,
-  },
-  closeBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: VaultPalette.surfaceElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scrollBody: {
-    gap: 14,
-    paddingBottom: 8,
-  },
-  sectionLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-  },
-  locGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  locChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 12,
-    paddingVertical: 9,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    backgroundColor: VaultPalette.surfaceElevated,
-  },
-  locChipText: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    fontWeight: '600',
-  },
-  fieldGroup: {
-    gap: 6,
-  },
-  fieldLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-  },
-  input: {
-    backgroundColor: VaultPalette.bg,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 11,
-    color: VaultPalette.text,
-    fontSize: 14,
-  },
-  textArea: {
-    minHeight: 72,
-    textAlignVertical: 'top',
-  },
-  loanSection: {
-    padding: 12,
-    borderRadius: 14,
-    backgroundColor: VaultPalette.crimsonTint,
-    borderWidth: 1,
-    borderColor: 'rgba(244, 63, 94, 0.35)',
-    gap: 10,
-  },
-  loanHeading: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#FDA4AF',
-  },
-  rowTwo: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  confirmBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.gold,
-    borderRadius: 14,
-    paddingVertical: 14,
-  },
-  confirmBtnText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#090D0B',
-  },
-});
+const createStyles = (palette: VaultPaletteType) =>
+  StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0, 0, 0, 0.72)',
+      justifyContent: 'flex-end',
+    },
+    sheet: {
+      backgroundColor: VaultPalette.surface,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      borderTopWidth: 1,
+      borderColor: palette.borderGold,
+      padding: 20,
+      maxHeight: '88%',
+      maxWidth: 640,
+      width: '100%',
+      alignSelf: 'center',
+      gap: 16,
+    },
+    sheetHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    sheetTitle: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    sheetSubtitle: {
+      fontSize: 12,
+      color: palette.gold,
+      marginTop: 2,
+    },
+    closeBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: VaultPalette.surfaceElevated,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    scrollBody: {
+      gap: 14,
+      paddingBottom: 8,
+    },
+    sectionLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+      textTransform: 'uppercase',
+      letterSpacing: 0.6,
+    },
+    locGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    locChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 12,
+      paddingVertical: 9,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      backgroundColor: VaultPalette.surfaceElevated,
+    },
+    locChipText: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      fontWeight: '600',
+    },
+    fieldGroup: {
+      gap: 6,
+    },
+    fieldLabel: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    input: {
+      backgroundColor: VaultPalette.bg,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      borderRadius: 12,
+      paddingHorizontal: 12,
+      paddingVertical: 11,
+      color: VaultPalette.text,
+      fontSize: 14,
+    },
+    textArea: {
+      minHeight: 72,
+      textAlignVertical: 'top',
+    },
+    loanSection: {
+      padding: 12,
+      borderRadius: 14,
+      backgroundColor: VaultPalette.crimsonTint,
+      borderWidth: 1,
+      borderColor: 'rgba(244, 63, 94, 0.35)',
+      gap: 10,
+    },
+    loanHeading: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: '#FDA4AF',
+    },
+    rowTwo: {
+      flexDirection: 'row',
+      gap: 10,
+    },
+    confirmBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: palette.gold,
+      borderRadius: 14,
+      paddingVertical: 14,
+    },
+    confirmBtnText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: '#090D0B',
+    },
+  });

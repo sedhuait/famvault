@@ -2,7 +2,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useMemo, useState } from 'react';
 import { Modal, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-import { VaultPalette } from '@/constants/vault-theme';
+import { VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import type { VaultItem } from '@/types/vault';
 import {
@@ -27,7 +27,8 @@ export function ExportVaultModal({
   filteredItems,
   scopeHint,
 }: ExportVaultModalProps) {
-  const { items, history, rates, members, valuationMode, hidePrices } = useVault();
+  const { items, history, rates, members, valuationMode, hidePrices, palette } = useVault();
+  const styles = useMemo(() => createStyles(palette), [palette]);
 
   const hasSubset = Boolean(filteredItems && filteredItems.length !== items.length);
   const [useFiltered, setUseFiltered] = useState<boolean>(hasSubset);
@@ -202,7 +203,7 @@ export function ExportVaultModal({
             <Ionicons
               name={showCsvPreview ? 'chevron-up' : 'chevron-down'}
               size={14}
-              color={VaultPalette.gold}
+              color={palette.gold}
             />
           </Pressable>
 
@@ -219,167 +220,168 @@ export function ExportVaultModal({
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    backgroundColor: VaultPalette.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    borderTopWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    padding: 20,
-    maxHeight: '85%',
-    maxWidth: 640,
-    width: '100%',
-    alignSelf: 'center',
-    gap: 14,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: VaultPalette.gold,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  closeBtn: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: VaultPalette.surfaceElevated,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scopeSwitch: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  scopeChip: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    backgroundColor: VaultPalette.bg,
-    alignItems: 'center',
-  },
-  scopeChipActive: {
-    borderColor: VaultPalette.borderGold,
-    backgroundColor: VaultPalette.goldTint,
-  },
-  scopeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-  },
-  scopeTextActive: {
-    color: VaultPalette.goldBright,
-  },
-  optionsList: {
-    gap: 10,
-  },
-  optionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: VaultPalette.bg,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    borderRadius: 16,
-    padding: 14,
-  },
-  optionCardPressed: {
-    borderColor: VaultPalette.borderGold,
-    backgroundColor: VaultPalette.surfaceElevated,
-  },
-  optionIcon: {
-    width: 46,
-    height: 46,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionTextCol: {
-    flex: 1,
-    gap: 3,
-  },
-  optionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  optionSub: {
-    fontSize: 11,
-    color: VaultPalette.textSecondary,
-    lineHeight: 16,
-  },
-  optionActionPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: VaultPalette.emeraldTint,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
-  optionActionText: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  successBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.emeraldTint,
-    borderRadius: 10,
-    padding: 10,
-  },
-  successText: {
-    fontSize: 12,
-    color: VaultPalette.emerald,
-    fontWeight: '600',
-    flex: 1,
-  },
-  errorText: {
-    fontSize: 12,
-    color: VaultPalette.crimson,
-  },
-  previewToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 5,
-    paddingVertical: 4,
-  },
-  previewToggleText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.gold,
-  },
-  csvBox: {
-    maxHeight: 180,
-    backgroundColor: VaultPalette.bg,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 10,
-  },
-  csvText: {
-    fontSize: 11,
-    color: VaultPalette.textSecondary,
-    fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
-    lineHeight: 16,
-  },
-});
+const createStyles = (palette: VaultPaletteType) =>
+  StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.75)',
+      justifyContent: 'flex-end',
+    },
+    sheet: {
+      backgroundColor: VaultPalette.surface,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      borderTopWidth: 1,
+      borderColor: palette.borderGold,
+      padding: 20,
+      maxHeight: '85%',
+      maxWidth: 640,
+      width: '100%',
+      alignSelf: 'center',
+      gap: 14,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    subtitle: {
+      fontSize: 12,
+      color: palette.gold,
+      fontWeight: '600',
+      marginTop: 2,
+    },
+    closeBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      backgroundColor: VaultPalette.surfaceElevated,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    scopeSwitch: {
+      flexDirection: 'row',
+      gap: 8,
+    },
+    scopeChip: {
+      flex: 1,
+      paddingVertical: 8,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      backgroundColor: VaultPalette.bg,
+      alignItems: 'center',
+    },
+    scopeChipActive: {
+      borderColor: palette.borderGold,
+      backgroundColor: palette.goldTint,
+    },
+    scopeText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    scopeTextActive: {
+      color: palette.goldBright,
+    },
+    optionsList: {
+      gap: 10,
+    },
+    optionCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      backgroundColor: VaultPalette.bg,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      borderRadius: 16,
+      padding: 14,
+    },
+    optionCardPressed: {
+      borderColor: palette.borderGold,
+      backgroundColor: VaultPalette.surfaceElevated,
+    },
+    optionIcon: {
+      width: 46,
+      height: 46,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    optionTextCol: {
+      flex: 1,
+      gap: 3,
+    },
+    optionTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    optionSub: {
+      fontSize: 11,
+      color: VaultPalette.textSecondary,
+      lineHeight: 16,
+    },
+    optionActionPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: VaultPalette.emeraldTint,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
+    },
+    optionActionText: {
+      fontSize: 12,
+      fontWeight: '700',
+    },
+    successBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: VaultPalette.emeraldTint,
+      borderRadius: 10,
+      padding: 10,
+    },
+    successText: {
+      fontSize: 12,
+      color: VaultPalette.emerald,
+      fontWeight: '600',
+      flex: 1,
+    },
+    errorText: {
+      fontSize: 12,
+      color: VaultPalette.crimson,
+    },
+    previewToggle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 5,
+      paddingVertical: 4,
+    },
+    previewToggleText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: palette.gold,
+    },
+    csvBox: {
+      maxHeight: 180,
+      backgroundColor: VaultPalette.bg,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 10,
+    },
+    csvText: {
+      fontSize: 11,
+      color: VaultPalette.textSecondary,
+      fontFamily: Platform.select({ ios: 'Menlo', android: 'monospace', default: 'monospace' }),
+      lineHeight: 16,
+    },
+  });

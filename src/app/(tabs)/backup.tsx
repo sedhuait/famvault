@@ -13,7 +13,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ExportVaultModal } from '@/components/export-modal';
-import { VaultMaxWidth, VaultPalette } from '@/constants/vault-theme';
+import {
+  AccentThemeList,
+  VaultMaxWidth,
+  VaultPalette,
+  type VaultPaletteType,
+} from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import { exportVaultCsv, exportVaultPdf } from '@/utils/export-vault';
 import { displayINR, formatDateTimeWithTime } from '@/utils/formatters';
@@ -28,6 +33,9 @@ export default function BackupAndSecurityScreen() {
     valuationMode,
     hidePrices,
     setHidePrices,
+    accentTheme,
+    setAccentTheme,
+    palette,
     biometricEnabled,
     setBiometricEnabled,
     lockVault,
@@ -36,6 +44,8 @@ export default function BackupAndSecurityScreen() {
     isProUnlocked,
     setIsProUnlocked,
   } = useVault();
+
+  const styles = useMemo(() => createStyles(palette), [palette]);
 
   const [backupStep, setBackupStep] = useState<string | null>(null);
   const [pdfModalVisible, setPdfModalVisible] = useState(false);
@@ -88,10 +98,42 @@ export default function BackupAndSecurityScreen() {
             </View>
           </View>
 
+          {/* Vault Color Theme */}
+          <View style={styles.card}>
+            <View style={styles.cardHeader}>
+              <Ionicons name="color-palette-outline" size={20} color={palette.gold} />
+              <Text style={styles.cardTitle}>Vault Color</Text>
+            </View>
+            <Text style={styles.rowSub}>Choose your preferred metallic accent finish</Text>
+            <View style={styles.themeRow}>
+              {AccentThemeList.map((theme) => {
+                const active = accentTheme === theme.id;
+                return (
+                  <Pressable
+                    key={theme.id}
+                    onPress={() => setAccentTheme(theme.id)}
+                    style={[
+                      styles.themeChip,
+                      active && {
+                        borderColor: palette.gold,
+                        backgroundColor: palette.goldTint,
+                      },
+                    ]}
+                  >
+                    <View style={[styles.themeSwatch, { backgroundColor: theme.gold }]} />
+                    <Text style={[styles.themeChipText, active && { color: palette.goldBright }]}>
+                      {theme.label}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+          </View>
+
           {/* Biometric Lock Controls */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Ionicons name="finger-print" size={20} color={VaultPalette.gold} />
+              <Ionicons name="finger-print" size={20} color={palette.gold} />
               <Text style={styles.cardTitle}>Biometric Vault Lock</Text>
             </View>
 
@@ -105,8 +147,8 @@ export default function BackupAndSecurityScreen() {
               <Switch
                 value={biometricEnabled}
                 onValueChange={setBiometricEnabled}
-                trackColor={{ false: VaultPalette.border, true: VaultPalette.goldDim }}
-                thumbColor={biometricEnabled ? VaultPalette.goldBright : VaultPalette.textMuted}
+                trackColor={{ false: VaultPalette.border, true: palette.goldDim }}
+                thumbColor={biometricEnabled ? palette.goldBright : VaultPalette.textMuted}
               />
             </View>
 
@@ -129,7 +171,7 @@ export default function BackupAndSecurityScreen() {
               onPress={lockVault}
               style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
             >
-              <Ionicons name="lock-closed" size={16} color={VaultPalette.goldBright} />
+              <Ionicons name="lock-closed" size={16} color={palette.goldBright} />
               <Text style={styles.secondaryBtnText}>Test Biometric Lock Screen Now</Text>
             </Pressable>
           </View>
@@ -272,7 +314,7 @@ export default function BackupAndSecurityScreen() {
               onPress={() => setPdfModalVisible(true)}
               style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
             >
-              <Ionicons name="document-text-outline" size={16} color={VaultPalette.goldBright} />
+              <Ionicons name="document-text-outline" size={16} color={palette.goldBright} />
               <Text style={styles.secondaryBtnText}>Preview Audit Schedule &amp; CSV</Text>
             </Pressable>
           </View>
@@ -287,8 +329,8 @@ export default function BackupAndSecurityScreen() {
               <Switch
                 value={isProUnlocked}
                 onValueChange={setIsProUnlocked}
-                trackColor={{ false: VaultPalette.border, true: VaultPalette.goldDim }}
-                thumbColor={isProUnlocked ? VaultPalette.goldBright : VaultPalette.textMuted}
+                trackColor={{ false: VaultPalette.border, true: palette.goldDim }}
+                thumbColor={isProUnlocked ? palette.goldBright : VaultPalette.textMuted}
               />
             </View>
             <Text style={styles.rowSub}>
@@ -363,232 +405,261 @@ export default function BackupAndSecurityScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: VaultPalette.bg,
-  },
-  scrollContent: {
-    paddingBottom: 32,
-  },
-  container: {
-    width: '100%',
-    maxWidth: VaultMaxWidth,
-    alignSelf: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    gap: 14,
-  },
-  header: {
-    marginBottom: 2,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: VaultPalette.text,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    marginTop: 2,
-  },
-  card: {
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 16,
-    gap: 12,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  cardTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  rowBetween: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  rowLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: VaultPalette.text,
-  },
-  rowSub: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    lineHeight: 18,
-  },
-  backupTimestamp: {
-    fontSize: 12,
-    color: VaultPalette.emerald,
-    fontWeight: '600',
-  },
-  footprintBox: {
-    backgroundColor: VaultPalette.bg,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 12,
-    gap: 7,
-  },
-  footprintRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 8,
-  },
-  footprintLabel: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    flex: 1,
-  },
-  footprintVal: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.text,
-    fontVariant: ['tabular-nums'],
-  },
-  footprintTotal: {
-    marginTop: 4,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: VaultPalette.border,
-  },
-  footprintTotalLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.goldBright,
-  },
-  footprintTotalVal: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: VaultPalette.goldBright,
-  },
-  progressBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.emeraldTint,
-    padding: 10,
-    borderRadius: 10,
-  },
-  progressText: {
-    fontSize: 12,
-    color: VaultPalette.emerald,
-    fontWeight: '600',
-  },
-  primaryBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.gold,
-    borderRadius: 12,
-    paddingVertical: 13,
-  },
-  primaryBtnText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#090D0B',
-  },
-  secondaryBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.surfaceElevated,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    borderRadius: 12,
-    paddingVertical: 11,
-  },
-  secondaryBtnText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: VaultPalette.goldBright,
-  },
-  proCard: {
-    borderColor: VaultPalette.borderGold,
-    backgroundColor: VaultPalette.surfaceElevated,
-  },
-  proHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  proBadge: {
-    fontSize: 10,
-    fontWeight: '800',
-    color: VaultPalette.gold,
-    letterSpacing: 1.2,
-  },
-  proTitle: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: VaultPalette.text,
-    marginTop: 2,
-  },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    justifyContent: 'center',
-    padding: 18,
-  },
-  modalCard: {
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    padding: 18,
-    gap: 12,
-    maxWidth: 560,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  modalMeta: {
-    fontSize: 12,
-    color: VaultPalette.gold,
-    fontWeight: '600',
-  },
-  pdfRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: VaultPalette.bg,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 10,
-  },
-  pdfItemName: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  pdfItemMeta: {
-    fontSize: 11,
-    color: VaultPalette.textSecondary,
-    marginTop: 2,
-  },
-  pdfBillTag: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: VaultPalette.emerald,
-  },
-});
+const createStyles = (palette: VaultPaletteType) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: VaultPalette.bg,
+    },
+    scrollContent: {
+      paddingBottom: 32,
+    },
+    container: {
+      width: '100%',
+      maxWidth: VaultMaxWidth,
+      alignSelf: 'center',
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      gap: 14,
+    },
+    header: {
+      marginBottom: 2,
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: VaultPalette.text,
+    },
+    subtitle: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      marginTop: 2,
+    },
+    card: {
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 16,
+      gap: 12,
+    },
+    cardHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    cardTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    rowBetween: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
+    rowLabel: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: VaultPalette.text,
+    },
+    rowSub: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      lineHeight: 18,
+    },
+    backupTimestamp: {
+      fontSize: 12,
+      color: VaultPalette.emerald,
+      fontWeight: '600',
+    },
+    footprintBox: {
+      backgroundColor: VaultPalette.bg,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 12,
+      gap: 7,
+    },
+    footprintRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: 8,
+    },
+    footprintLabel: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      flex: 1,
+    },
+    footprintVal: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.text,
+      fontVariant: ['tabular-nums'],
+    },
+    footprintTotal: {
+      marginTop: 4,
+      paddingTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: VaultPalette.border,
+    },
+    themeRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 8,
+    },
+    themeChip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingHorizontal: 14,
+      paddingVertical: 9,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      backgroundColor: VaultPalette.bg,
+    },
+    themeSwatch: {
+      width: 14,
+      height: 14,
+      borderRadius: 7,
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.25)',
+    },
+    themeChipText: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: VaultPalette.textSecondary,
+    },
+    footprintTotalLabel: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: palette.goldBright,
+    },
+    footprintTotalVal: {
+      fontSize: 14,
+      fontWeight: '800',
+      color: palette.goldBright,
+    },
+    progressBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: VaultPalette.emeraldTint,
+      padding: 10,
+      borderRadius: 10,
+    },
+    progressText: {
+      fontSize: 12,
+      color: VaultPalette.emerald,
+      fontWeight: '600',
+    },
+    primaryBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: palette.gold,
+      borderRadius: 12,
+      paddingVertical: 13,
+    },
+    primaryBtnText: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: '#090D0B',
+    },
+    secondaryBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: VaultPalette.surfaceElevated,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      borderRadius: 12,
+      paddingVertical: 11,
+    },
+    secondaryBtnText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: palette.goldBright,
+    },
+    proCard: {
+      borderColor: palette.borderGold,
+      backgroundColor: VaultPalette.surfaceElevated,
+    },
+    proHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    proBadge: {
+      fontSize: 10,
+      fontWeight: '800',
+      color: palette.gold,
+      letterSpacing: 1.2,
+    },
+    proTitle: {
+      fontSize: 16,
+      fontWeight: '800',
+      color: VaultPalette.text,
+      marginTop: 2,
+    },
+    modalBackdrop: {
+      flex: 1,
+      backgroundColor: 'rgba(0,0,0,0.75)',
+      justifyContent: 'center',
+      padding: 18,
+    },
+    modalCard: {
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      padding: 18,
+      gap: 12,
+      maxWidth: 560,
+      width: '100%',
+      alignSelf: 'center',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    modalTitle: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    modalMeta: {
+      fontSize: 12,
+      color: palette.gold,
+      fontWeight: '600',
+    },
+    pdfRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      backgroundColor: VaultPalette.bg,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 10,
+    },
+    pdfItemName: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    pdfItemMeta: {
+      fontSize: 11,
+      color: VaultPalette.textSecondary,
+      marginTop: 2,
+    },
+    pdfBillTag: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: VaultPalette.emerald,
+    },
+  });

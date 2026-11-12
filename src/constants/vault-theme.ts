@@ -2,25 +2,73 @@ import { Platform } from 'react-native';
 
 import type { CustodyLocation, MetalType } from '@/types/vault';
 
-export const VaultPalette = {
+export type AccentThemeId = 'GOLD' | 'ROSE_GOLD' | 'SILVER';
+
+export interface AccentThemeOption {
+  id: AccentThemeId;
+  label: string;
+  gold: string;
+  goldBright: string;
+  goldDim: string;
+  goldTint: string;
+  borderGold: string;
+}
+
+export const AccentThemes: Record<AccentThemeId, AccentThemeOption> = {
+  GOLD: {
+    id: 'GOLD',
+    label: 'Gold',
+    gold: '#D4AF37',
+    goldBright: '#F6DC8A',
+    goldDim: '#8F721D',
+    goldTint: 'rgba(212, 175, 55, 0.14)',
+    borderGold: 'rgba(212, 175, 55, 0.38)',
+  },
+  ROSE_GOLD: {
+    id: 'ROSE_GOLD',
+    label: 'Rose Gold',
+    gold: '#E0A296',
+    goldBright: '#F5CEC6',
+    goldDim: '#9B645A',
+    goldTint: 'rgba(224, 162, 150, 0.14)',
+    borderGold: 'rgba(229, 178, 166, 0.36)',
+  },
+  SILVER: {
+    id: 'SILVER',
+    label: 'Silver',
+    gold: '#CBD5E1',
+    goldBright: '#F1F5F9',
+    goldDim: '#64748B',
+    goldTint: 'rgba(203, 213, 225, 0.15)',
+    borderGold: 'rgba(203, 213, 225, 0.38)',
+  },
+};
+
+export const AccentThemeList: AccentThemeOption[] = [
+  AccentThemes.GOLD,
+  AccentThemes.ROSE_GOLD,
+  AccentThemes.SILVER,
+];
+
+const BaseVaultPalette = {
   // Core brushed platinum surfaces
   bg: '#0B0C10',
   surface: '#14161D',
   surfaceElevated: '#1C1F28',
   surfaceGlass: 'rgba(28, 31, 40, 0.90)',
   border: '#2A2E3B',
-  borderGold: 'rgba(229, 178, 166, 0.36)',
+  borderGold: AccentThemes.ROSE_GOLD.borderGold,
 
   // Platinum typography
   text: '#F4F5F7',
   textSecondary: '#B5BCC9',
   textMuted: '#7C8494',
 
-  // Signature Rose Gold accents
-  gold: '#E0A296',
-  goldBright: '#F5CEC6',
-  goldDim: '#9B645A',
-  goldTint: 'rgba(224, 162, 150, 0.14)',
+  // Signature Rose Gold accents (default)
+  gold: AccentThemes.ROSE_GOLD.gold,
+  goldBright: AccentThemes.ROSE_GOLD.goldBright,
+  goldDim: AccentThemes.ROSE_GOLD.goldDim,
+  goldTint: AccentThemes.ROSE_GOLD.goldTint,
 
   // Platinum, Diamond & semantic tones
   emerald: '#34D399',
@@ -38,6 +86,50 @@ export const VaultPalette = {
   platinum: '#CBD5E1',
   platinumTint: 'rgba(203, 213, 225, 0.14)',
 } as const;
+
+export interface VaultPaletteType {
+  readonly bg: string;
+  readonly surface: string;
+  readonly surfaceElevated: string;
+  readonly surfaceGlass: string;
+  readonly border: string;
+  readonly borderGold: string;
+  readonly text: string;
+  readonly textSecondary: string;
+  readonly textMuted: string;
+  readonly gold: string;
+  readonly goldBright: string;
+  readonly goldDim: string;
+  readonly goldTint: string;
+  readonly emerald: string;
+  readonly emeraldTint: string;
+  readonly amber: string;
+  readonly amberTint: string;
+  readonly crimson: string;
+  readonly crimsonTint: string;
+  readonly sky: string;
+  readonly skyTint: string;
+  readonly violet: string;
+  readonly violetTint: string;
+  readonly silver: string;
+  readonly silverTint: string;
+  readonly platinum: string;
+  readonly platinumTint: string;
+}
+
+export const VaultPalette: VaultPaletteType = BaseVaultPalette;
+
+export function getVaultPalette(themeId: AccentThemeId): VaultPaletteType {
+  const accent = AccentThemes[themeId];
+  return {
+    ...BaseVaultPalette,
+    gold: accent.gold,
+    goldBright: accent.goldBright,
+    goldDim: accent.goldDim,
+    goldTint: accent.goldTint,
+    borderGold: accent.borderGold,
+  };
+}
 
 export const MetalVisuals: Record<
   MetalType,

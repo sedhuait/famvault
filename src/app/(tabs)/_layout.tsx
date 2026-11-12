@@ -3,13 +3,16 @@ import { Tabs } from 'expo-router';
 import { Platform } from 'react-native';
 
 import { VaultPalette } from '@/constants/vault-theme';
+import { useVaultPalette } from '@/context/vault-context';
 
 export default function TabsLayout() {
+  const palette = useVaultPalette();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: VaultPalette.goldBright,
+        tabBarActiveTintColor: palette.goldBright,
         tabBarInactiveTintColor: VaultPalette.textMuted,
         tabBarStyle: {
           backgroundColor: VaultPalette.surface,
@@ -33,7 +36,7 @@ export default function TabsLayout() {
             <Ionicons
               name="shield-checkmark-outline"
               size={size}
-              color={focused ? VaultPalette.goldBright : VaultPalette.textMuted}
+              color={focused ? palette.goldBright : VaultPalette.textMuted}
             />
           ),
         }}
@@ -46,7 +49,7 @@ export default function TabsLayout() {
             <MaterialCommunityIcons
               name="safe-square-outline"
               size={size}
-              color={focused ? VaultPalette.goldBright : VaultPalette.textMuted}
+              color={focused ? palette.goldBright : VaultPalette.textMuted}
             />
           ),
         }}
@@ -59,7 +62,7 @@ export default function TabsLayout() {
             <Ionicons
               name="stats-chart-outline"
               size={size}
-              color={focused ? VaultPalette.goldBright : VaultPalette.textMuted}
+              color={focused ? palette.goldBright : VaultPalette.textMuted}
             />
           ),
         }}
@@ -72,7 +75,7 @@ export default function TabsLayout() {
             <Ionicons
               name="cloud-done-outline"
               size={size}
-              color={focused ? VaultPalette.goldBright : VaultPalette.textMuted}
+              color={focused ? palette.goldBright : VaultPalette.textMuted}
             />
           ),
         }}

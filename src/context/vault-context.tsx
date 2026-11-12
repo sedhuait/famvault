@@ -3,7 +3,12 @@ import type React from 'react';
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { Platform } from 'react-native';
 
-import { LocationVisuals } from '@/constants/vault-theme';
+import {
+  type AccentThemeId,
+  getVaultPalette,
+  LocationVisuals,
+  type VaultPaletteType,
+} from '@/constants/vault-theme';
 import {
   FAMILY_MEMBERS,
   INITIAL_BULLION_RATES,
@@ -69,6 +74,8 @@ interface VaultContextValue {
   unitMode: WeightUnitMode;
   valuationMode: ValuationMode;
   hidePrices: boolean;
+  accentTheme: AccentThemeId;
+  palette: VaultPaletteType;
   isUnlocked: boolean;
   biometricEnabled: boolean;
   lastBackupAt: string;
@@ -79,6 +86,7 @@ interface VaultContextValue {
   toggleValuationMode: () => void;
   setHidePrices: (hidden: boolean) => void;
   toggleHidePrices: () => void;
+  setAccentTheme: (theme: AccentThemeId) => void;
   unlockVault: () => void;
   lockVault: () => void;
   setBiometricEnabled: (enabled: boolean) => void;
@@ -118,6 +126,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
   const [unitMode, setUnitMode] = useState<WeightUnitMode>('GRAMS');
   const [valuationMode, setValuationMode] = useState<ValuationMode>('CASH');
   const [hidePrices, setHidePrices] = useState<boolean>(false);
+  const [accentTheme, setAccentThemeState] = useState<AccentThemeId>('ROSE_GOLD');
   const [isUnlocked, setIsUnlocked] = useState<boolean>(false);
   const [biometricEnabled, setBiometricEnabled] = useState<boolean>(true);
   const [lastBackupAt, setLastBackupAt] = useState<string>('2026-11-12T05:15:00Z');
@@ -137,6 +146,13 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
     triggerHaptic('light');
     setHidePrices((prev) => !prev);
   }, []);
+
+  const setAccentTheme = useCallback((next: AccentThemeId) => {
+    triggerHaptic('light');
+    setAccentThemeState(next);
+  }, []);
+
+  const palette = useMemo(() => getVaultPalette(accentTheme), [accentTheme]);
 
   const unlockVault = useCallback(() => {
     triggerHaptic('success');
@@ -423,6 +439,8 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       unitMode,
       valuationMode,
       hidePrices,
+      accentTheme,
+      palette,
       isUnlocked,
       biometricEnabled,
       lastBackupAt,
@@ -433,6 +451,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       toggleValuationMode,
       setHidePrices,
       toggleHidePrices,
+      setAccentTheme,
       unlockVault,
       lockVault,
       setBiometricEnabled,
@@ -455,6 +474,8 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       unitMode,
       valuationMode,
       hidePrices,
+      accentTheme,
+      palette,
       isUnlocked,
       biometricEnabled,
       lastBackupAt,
@@ -462,6 +483,7 @@ export function VaultProvider({ children }: { children: React.ReactNode }) {
       toggleUnitMode,
       toggleValuationMode,
       toggleHidePrices,
+      setAccentTheme,
       unlockVault,
       lockVault,
       updateRate,
@@ -485,4 +507,8 @@ export function useVault(): VaultContextValue {
     throw new Error('useVault must be used within a VaultProvider');
   }
   return ctx;
+}
+
+export function useVaultPalette(): VaultPaletteType {
+  return useVault().palette;
 }

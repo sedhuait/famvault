@@ -1,16 +1,17 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { VaultFonts, VaultPalette } from '@/constants/vault-theme';
+import { VaultFonts, VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 
 const DEMO_PIN = '123456';
 
 export function BiometricGate() {
-  const { unlockVault, biometricEnabled, hidePrices, items } = useVault();
+  const { unlockVault, biometricEnabled, hidePrices, items, palette } = useVault();
+  const styles = useMemo(() => createStyles(palette), [palette]);
   const [authStatus, setAuthStatus] = useState<'IDLE' | 'SCANNING' | 'VERIFIED' | 'PIN'>('IDLE');
   const [hardwareLabel, setHardwareLabel] = useState<string>('Face ID / Biometric');
   const [pinInput, setPinInput] = useState<string>('');
@@ -146,11 +147,7 @@ export function BiometricGate() {
         {/* Crest & Brand Header */}
         <View style={styles.brandHeader}>
           <View style={styles.crestBadge}>
-            <MaterialCommunityIcons
-              name="safe-square-outline"
-              size={28}
-              color={VaultPalette.gold}
-            />
+            <MaterialCommunityIcons name="safe-square-outline" size={28} color={palette.gold} />
           </View>
           <Text style={styles.brandTitle}>Famvault</Text>
           <Text style={styles.brandSubtitle}>Indian Family Precious Metals & Custody Vault</Text>
@@ -185,7 +182,7 @@ export function BiometricGate() {
                 onPress={() => setAuthStatus('IDLE')}
                 style={({ pressed }) => [styles.keyButtonGhost, pressed && styles.keyButtonPressed]}
               >
-                <Ionicons name="finger-print" size={22} color={VaultPalette.gold} />
+                <Ionicons name="finger-print" size={22} color={palette.gold} />
               </Pressable>
               <Pressable
                 onPress={() => handlePinDigit('0')}
@@ -214,8 +211,7 @@ export function BiometricGate() {
                   {
                     transform: [{ scale: pulseAnim }],
                     opacity: ringOpacity,
-                    borderColor:
-                      authStatus === 'VERIFIED' ? VaultPalette.emerald : VaultPalette.gold,
+                    borderColor: authStatus === 'VERIFIED' ? VaultPalette.emerald : palette.gold,
                   },
                 ]}
               />
@@ -231,10 +227,10 @@ export function BiometricGate() {
                   <MaterialCommunityIcons
                     name="face-recognition"
                     size={52}
-                    color={VaultPalette.goldBright}
+                    color={palette.goldBright}
                   />
                 ) : (
-                  <Ionicons name="finger-print" size={54} color={VaultPalette.gold} />
+                  <Ionicons name="finger-print" size={54} color={palette.gold} />
                 )}
               </View>
             </Pressable>
@@ -279,7 +275,7 @@ export function BiometricGate() {
             <Text style={styles.trustText}>100% On-Device</Text>
           </View>
           <View style={styles.trustPill}>
-            <Ionicons name="cloud-done-outline" size={12} color={VaultPalette.gold} />
+            <Ionicons name="cloud-done-outline" size={12} color={palette.gold} />
             <Text style={styles.trustText}>Private Cloud Backup</Text>
           </View>
         </View>
@@ -288,205 +284,206 @@ export function BiometricGate() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: VaultPalette.bg,
-  },
-  inner: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingVertical: 28,
-    maxWidth: 480,
-    width: '100%',
-    alignSelf: 'center',
-  },
-  brandHeader: {
-    alignItems: 'center',
-    marginTop: 12,
-    gap: 8,
-  },
-  crestBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: 18,
-    backgroundColor: VaultPalette.goldTint,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  brandTitle: {
-    fontSize: 30,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-    color: VaultPalette.goldBright,
-    fontFamily: VaultFonts.serif,
-  },
-  brandSubtitle: {
-    fontSize: 13,
-    color: VaultPalette.textSecondary,
-    textAlign: 'center',
-  },
-  biometricCenter: {
-    alignItems: 'center',
-    width: '100%',
-    gap: 14,
-  },
-  scannerTouchable: {
-    width: 148,
-    height: 148,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  scannerOuterRing: {
-    position: 'absolute',
-    width: 144,
-    height: 144,
-    borderRadius: 72,
-    borderWidth: 1.5,
-  },
-  scannerCircle: {
-    width: 112,
-    height: 112,
-    borderRadius: 56,
-    backgroundColor: VaultPalette.surfaceElevated,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scannerCircleVerified: {
-    borderColor: VaultPalette.emerald,
-    backgroundColor: VaultPalette.emeraldTint,
-  },
-  statusTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  statusSub: {
-    fontSize: 13,
-    color: VaultPalette.textSecondary,
-    marginBottom: 8,
-  },
-  unlockPrimaryBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.gold,
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 14,
-    width: '100%',
-  },
-  unlockPrimaryText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#090D0B',
-  },
-  pinFallbackBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  pinFallbackText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: VaultPalette.gold,
-  },
-  pinContainer: {
-    width: '100%',
-    alignItems: 'center',
-    gap: 12,
-  },
-  pinHeading: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  pinHint: {
-    fontSize: 12,
-    color: VaultPalette.textMuted,
-  },
-  pinDotsRow: {
-    flexDirection: 'row',
-    gap: 14,
-    marginVertical: 8,
-  },
-  pinDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    borderWidth: 1.5,
-    borderColor: VaultPalette.borderGold,
-    backgroundColor: 'transparent',
-  },
-  pinDotFilled: {
-    backgroundColor: VaultPalette.gold,
-    borderColor: VaultPalette.goldBright,
-  },
-  pinError: {
-    fontSize: 12,
-    color: VaultPalette.crimson,
-  },
-  keypad: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: 264,
-    justifyContent: 'space-between',
-    gap: 12,
-    marginTop: 6,
-  },
-  keyButton: {
-    width: 78,
-    height: 54,
-    borderRadius: 14,
-    backgroundColor: VaultPalette.surfaceElevated,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  keyButtonGhost: {
-    width: 78,
-    height: 54,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  keyButtonPressed: {
-    backgroundColor: VaultPalette.goldTint,
-    borderColor: VaultPalette.borderGold,
-  },
-  keyText: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: VaultPalette.text,
-  },
-  trustFooter: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  trustPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: VaultPalette.surface,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-  },
-  trustText: {
-    fontSize: 11,
-    color: VaultPalette.textSecondary,
-    fontWeight: '500',
-  },
-});
+const createStyles = (palette: VaultPaletteType) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: VaultPalette.bg,
+    },
+    inner: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 24,
+      paddingVertical: 28,
+      maxWidth: 480,
+      width: '100%',
+      alignSelf: 'center',
+    },
+    brandHeader: {
+      alignItems: 'center',
+      marginTop: 12,
+      gap: 8,
+    },
+    crestBadge: {
+      width: 56,
+      height: 56,
+      borderRadius: 18,
+      backgroundColor: palette.goldTint,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    brandTitle: {
+      fontSize: 30,
+      fontWeight: '700',
+      letterSpacing: 1.2,
+      color: palette.goldBright,
+      fontFamily: VaultFonts.serif,
+    },
+    brandSubtitle: {
+      fontSize: 13,
+      color: VaultPalette.textSecondary,
+      textAlign: 'center',
+    },
+    biometricCenter: {
+      alignItems: 'center',
+      width: '100%',
+      gap: 14,
+    },
+    scannerTouchable: {
+      width: 148,
+      height: 148,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 8,
+    },
+    scannerOuterRing: {
+      position: 'absolute',
+      width: 144,
+      height: 144,
+      borderRadius: 72,
+      borderWidth: 1.5,
+    },
+    scannerCircle: {
+      width: 112,
+      height: 112,
+      borderRadius: 56,
+      backgroundColor: VaultPalette.surfaceElevated,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    scannerCircleVerified: {
+      borderColor: VaultPalette.emerald,
+      backgroundColor: VaultPalette.emeraldTint,
+    },
+    statusTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    statusSub: {
+      fontSize: 13,
+      color: VaultPalette.textSecondary,
+      marginBottom: 8,
+    },
+    unlockPrimaryBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: 8,
+      backgroundColor: palette.gold,
+      paddingHorizontal: 24,
+      paddingVertical: 14,
+      borderRadius: 14,
+      width: '100%',
+    },
+    unlockPrimaryText: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: '#090D0B',
+    },
+    pinFallbackBtn: {
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+    },
+    pinFallbackText: {
+      fontSize: 13,
+      fontWeight: '600',
+      color: palette.gold,
+    },
+    pinContainer: {
+      width: '100%',
+      alignItems: 'center',
+      gap: 12,
+    },
+    pinHeading: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    pinHint: {
+      fontSize: 12,
+      color: VaultPalette.textMuted,
+    },
+    pinDotsRow: {
+      flexDirection: 'row',
+      gap: 14,
+      marginVertical: 8,
+    },
+    pinDot: {
+      width: 14,
+      height: 14,
+      borderRadius: 7,
+      borderWidth: 1.5,
+      borderColor: palette.borderGold,
+      backgroundColor: 'transparent',
+    },
+    pinDotFilled: {
+      backgroundColor: palette.gold,
+      borderColor: palette.goldBright,
+    },
+    pinError: {
+      fontSize: 12,
+      color: VaultPalette.crimson,
+    },
+    keypad: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      width: 264,
+      justifyContent: 'space-between',
+      gap: 12,
+      marginTop: 6,
+    },
+    keyButton: {
+      width: 78,
+      height: 54,
+      borderRadius: 14,
+      backgroundColor: VaultPalette.surfaceElevated,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    keyButtonGhost: {
+      width: 78,
+      height: 54,
+      borderRadius: 14,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    keyButtonPressed: {
+      backgroundColor: palette.goldTint,
+      borderColor: palette.borderGold,
+    },
+    keyText: {
+      fontSize: 22,
+      fontWeight: '600',
+      color: VaultPalette.text,
+    },
+    trustFooter: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'center',
+      gap: 10,
+    },
+    trustPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 999,
+      backgroundColor: VaultPalette.surface,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+    },
+    trustText: {
+      fontSize: 11,
+      color: VaultPalette.textSecondary,
+      fontWeight: '500',
+    },
+  });

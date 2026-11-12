@@ -1,7 +1,7 @@
 import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 
 import { BiometricGate } from '@/components/biometric-gate';
@@ -10,61 +10,64 @@ import { useVault, VaultProvider } from '@/context/vault-context';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
-const VaultNavigationTheme = {
-  ...DarkTheme,
-  colors: {
-    ...DarkTheme.colors,
-    primary: VaultPalette.gold,
-    background: VaultPalette.bg,
-    card: VaultPalette.surface,
-    text: VaultPalette.text,
-    border: VaultPalette.border,
-    notification: VaultPalette.gold,
-  },
-};
-
 function VaultRootNavigator() {
-  const { isUnlocked } = useVault();
+  const { isUnlocked, palette } = useVault();
 
   useEffect(() => {
     SplashScreen.hideAsync().catch(() => {});
   }, []);
 
+  const navTheme = useMemo(
+    () => ({
+      ...DarkTheme,
+      colors: {
+        ...DarkTheme.colors,
+        primary: palette.gold,
+        background: palette.bg,
+        card: palette.surface,
+        text: palette.text,
+        border: palette.border,
+        notification: palette.gold,
+      },
+    }),
+    [palette],
+  );
+
   return (
-    <View style={{ flex: 1, backgroundColor: VaultPalette.bg }}>
-      {!isUnlocked ? (
-        <BiometricGate />
-      ) : (
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: VaultPalette.bg },
-          }}
-        >
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="item/[id]"
-            options={{
-              headerShown: true,
-              headerTitle: 'Asset Custody Ledger',
-              headerStyle: { backgroundColor: VaultPalette.surface },
-              headerTintColor: VaultPalette.goldBright,
-              headerBackTitle: 'Vault',
+    <ThemeProvider value={navTheme}>
+      <View style={{ flex: 1, backgroundColor: VaultPalette.bg }}>
+        {!isUnlocked ? (
+          <BiometricGate />
+        ) : (
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              contentStyle: { backgroundColor: palette.bg },
             }}
-          />
-        </Stack>
-      )}
-    </View>
+          >
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="item/[id]"
+              options={{
+                headerShown: true,
+                headerTitle: 'Asset Custody Ledger',
+                headerStyle: { backgroundColor: palette.surface },
+                headerTintColor: palette.goldBright,
+                headerBackTitle: 'Vault',
+              }}
+            />
+          </Stack>
+        )}
+      </View>
+    </ThemeProvider>
   );
 }
 
 export default function RootLayout() {
   return (
-    <ThemeProvider value={VaultNavigationTheme}>
+    <VaultProvider>
       <StatusBar style="light" />
-      <VaultProvider>
-        <VaultRootNavigator />
-      </VaultProvider>
-    </ThemeProvider>
+      <VaultRootNavigator />
+    </VaultProvider>
   );
 }

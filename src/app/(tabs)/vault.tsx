@@ -12,6 +12,7 @@ import {
   MetalVisuals,
   VaultMaxWidth,
   VaultPalette,
+  type VaultPaletteType,
 } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import type { CustodyLocation, MetalType } from '@/types/vault';
@@ -35,10 +36,13 @@ export default function VaultLedgerScreen() {
     unitMode,
     valuationMode,
     hidePrices,
+    palette,
     toggleUnitMode,
     toggleHidePrices,
     addVaultItem,
   } = useVault();
+
+  const styles = useMemo(() => createStyles(palette), [palette]);
 
   const [search, setSearch] = useState('');
   const [metalFilter, setMetalFilter] = useState<'ALL' | MetalType>('ALL');
@@ -101,7 +105,7 @@ export default function VaultLedgerScreen() {
               <Ionicons
                 name={hidePrices ? 'eye-off-outline' : 'eye-outline'}
                 size={16}
-                color={hidePrices ? VaultPalette.emerald : VaultPalette.goldBright}
+                color={hidePrices ? VaultPalette.emerald : palette.goldBright}
               />
             </Pressable>
             <Pressable onPress={toggleUnitMode} style={styles.unitBtn}>
@@ -111,7 +115,7 @@ export default function VaultLedgerScreen() {
               onPress={() => setExportVisible(true)}
               style={({ pressed }) => [styles.unitBtn, pressed && { opacity: 0.8 }]}
             >
-              <Ionicons name="download-outline" size={16} color={VaultPalette.goldBright} />
+              <Ionicons name="download-outline" size={16} color={palette.goldBright} />
             </Pressable>
             <Pressable
               onPress={() => setAddVisible(true)}
@@ -238,135 +242,136 @@ export default function VaultLedgerScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: VaultPalette.bg,
-  },
-  container: {
-    flex: 1,
-    width: '100%',
-    maxWidth: VaultMaxWidth,
-    alignSelf: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    gap: 12,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: VaultPalette.text,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: VaultPalette.gold,
-    fontWeight: '600',
-    marginTop: 2,
-  },
-  headerActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  unitBtn: {
-    paddingHorizontal: 11,
-    paddingVertical: 8,
-    borderRadius: 10,
-    backgroundColor: VaultPalette.surface,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-  },
-  unitBtnText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: VaultPalette.goldBright,
-  },
-  addBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: VaultPalette.gold,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-  },
-  addBtnText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#090D0B',
-  },
-  searchBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: VaultPalette.text,
-  },
-  filtersBlock: {
-    gap: 8,
-  },
-  chipRow: {
-    gap: 7,
-    paddingRight: 10,
-  },
-  chip: {
-    paddingHorizontal: 11,
-    paddingVertical: 6,
-    borderRadius: 999,
-    backgroundColor: VaultPalette.surface,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-  },
-  chipActive: {
-    backgroundColor: VaultPalette.goldTint,
-    borderColor: VaultPalette.borderGold,
-  },
-  chipOwnerActive: {
-    backgroundColor: VaultPalette.emeraldTint,
-    borderColor: VaultPalette.emerald,
-  },
-  chipText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.textSecondary,
-  },
-  chipTextActive: {
-    color: VaultPalette.goldBright,
-  },
-  listContent: {
-    gap: 10,
-    paddingBottom: 28,
-  },
-  emptyCard: {
-    alignItems: 'center',
-    padding: 32,
-    borderRadius: 16,
-    backgroundColor: VaultPalette.surface,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    gap: 6,
-  },
-  emptyTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: VaultPalette.text,
-  },
-  emptySub: {
-    fontSize: 12,
-    color: VaultPalette.textMuted,
-  },
-});
+const createStyles = (palette: VaultPaletteType) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: VaultPalette.bg,
+    },
+    container: {
+      flex: 1,
+      width: '100%',
+      maxWidth: VaultMaxWidth,
+      alignSelf: 'center',
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      gap: 12,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: VaultPalette.text,
+    },
+    subtitle: {
+      fontSize: 12,
+      color: palette.gold,
+      fontWeight: '600',
+      marginTop: 2,
+    },
+    headerActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    unitBtn: {
+      paddingHorizontal: 11,
+      paddingVertical: 8,
+      borderRadius: 10,
+      backgroundColor: VaultPalette.surface,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+    },
+    unitBtnText: {
+      fontSize: 12,
+      fontWeight: '700',
+      color: palette.goldBright,
+    },
+    addBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: palette.gold,
+      paddingHorizontal: 12,
+      paddingVertical: 8,
+      borderRadius: 10,
+    },
+    addBtnText: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: '#090D0B',
+    },
+    searchBox: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 14,
+      color: VaultPalette.text,
+    },
+    filtersBlock: {
+      gap: 8,
+    },
+    chipRow: {
+      gap: 7,
+      paddingRight: 10,
+    },
+    chip: {
+      paddingHorizontal: 11,
+      paddingVertical: 6,
+      borderRadius: 999,
+      backgroundColor: VaultPalette.surface,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+    },
+    chipActive: {
+      backgroundColor: palette.goldTint,
+      borderColor: palette.borderGold,
+    },
+    chipOwnerActive: {
+      backgroundColor: VaultPalette.emeraldTint,
+      borderColor: VaultPalette.emerald,
+    },
+    chipText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.textSecondary,
+    },
+    chipTextActive: {
+      color: palette.goldBright,
+    },
+    listContent: {
+      gap: 10,
+      paddingBottom: 28,
+    },
+    emptyCard: {
+      alignItems: 'center',
+      padding: 32,
+      borderRadius: 16,
+      backgroundColor: VaultPalette.surface,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      gap: 6,
+    },
+    emptyTitle: {
+      fontSize: 15,
+      fontWeight: '700',
+      color: VaultPalette.text,
+    },
+    emptySub: {
+      fontSize: 12,
+      color: VaultPalette.textMuted,
+    },
+  });

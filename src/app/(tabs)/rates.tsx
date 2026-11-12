@@ -1,34 +1,36 @@
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { VaultMaxWidth, VaultPalette } from '@/constants/vault-theme';
+import { VaultMaxWidth, VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import { INITIAL_BULLION_RATES } from '@/data/mock-vault';
 import type { Purity } from '@/types/vault';
 import { formatINR, GRAMS_PER_PAVAN, getPurityLabel } from '@/utils/formatters';
 
-const RATE_ROWS: Array<{
+const getRateRows = (
+  palette: VaultPaletteType,
+): Array<{
   purity: Purity;
   subtitle: string;
   unitLabel: string;
   multiplier: number;
   accent: string;
-}> = [
+}> => [
   {
     purity: 'GOLD_24K',
     subtitle: 'IBJA 999 Bullion / SGB',
     unitLabel: 'per 10g',
     multiplier: 10,
-    accent: VaultPalette.goldBright,
+    accent: palette.goldBright,
   },
   {
     purity: 'GOLD_22K',
     subtitle: '916 Hallmarked Jewelry',
     unitLabel: 'per 10g',
     multiplier: 10,
-    accent: VaultPalette.gold,
+    accent: palette.gold,
   },
   {
     purity: 'GOLD_18K',
@@ -61,7 +63,9 @@ const RATE_ROWS: Array<{
 ];
 
 export default function RatesAndCalcScreen() {
-  const { rates, updateRate } = useVault();
+  const { rates, updateRate, palette } = useVault();
+  const styles = useMemo(() => createStyles(palette), [palette]);
+  const RATE_ROWS = useMemo(() => getRateRows(palette), [palette]);
 
   // Grams <-> Pavan calculator
   const [gramsInput, setGramsInput] = useState('48');
@@ -144,7 +148,7 @@ export default function RatesAndCalcScreen() {
               <Text style={styles.subtitle}>IBJA Benchmark • Live Vault Re-pricing</Text>
             </View>
             <Pressable onPress={resetRates} style={styles.resetBtn}>
-              <Ionicons name="refresh" size={14} color={VaultPalette.gold} />
+              <Ionicons name="refresh" size={14} color={palette.gold} />
               <Text style={styles.resetText}>Reset</Text>
             </Pressable>
           </View>
@@ -195,7 +199,7 @@ export default function RatesAndCalcScreen() {
           {/* Grams <-> Pavan Converter */}
           <View style={styles.calcCard}>
             <View style={styles.calcHeader}>
-              <MaterialCommunityIcons name="scale-balance" size={18} color={VaultPalette.gold} />
+              <MaterialCommunityIcons name="scale-balance" size={18} color={palette.gold} />
               <Text style={styles.calcTitle}>Grams ↔ Sovereign / Pavan (1 Pavan = 8g)</Text>
             </View>
             <View style={styles.calcRow}>
@@ -211,7 +215,7 @@ export default function RatesAndCalcScreen() {
               <Ionicons
                 name="swap-horizontal"
                 size={20}
-                color={VaultPalette.gold}
+                color={palette.gold}
                 style={{ marginTop: 18 }}
               />
               <View style={styles.calcField}>
@@ -313,210 +317,211 @@ export default function RatesAndCalcScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: VaultPalette.bg,
-  },
-  scrollContent: {
-    paddingBottom: 32,
-  },
-  container: {
-    width: '100%',
-    maxWidth: VaultMaxWidth,
-    alignSelf: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    gap: 14,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: VaultPalette.text,
-  },
-  subtitle: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-    marginTop: 2,
-  },
-  resetBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 11,
-    paddingVertical: 7,
-    borderRadius: 10,
-    backgroundColor: VaultPalette.surface,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-  },
-  resetText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.gold,
-  },
-  simBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    backgroundColor: VaultPalette.goldTint,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    borderRadius: 14,
-    padding: 12,
-  },
-  simTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.goldBright,
-  },
-  simSub: {
-    fontSize: 11,
-    color: VaultPalette.textSecondary,
-    marginTop: 1,
-  },
-  simBtns: {
-    flexDirection: 'row',
-    gap: 6,
-  },
-  simStepBtn: {
-    backgroundColor: VaultPalette.surface,
-    borderWidth: 1,
-    borderColor: VaultPalette.borderGold,
-    borderRadius: 8,
-    paddingHorizontal: 9,
-    paddingVertical: 6,
-  },
-  simStepText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: VaultPalette.goldBright,
-  },
-  ratesCard: {
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    paddingHorizontal: 14,
-  },
-  rateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 12,
-  },
-  rateDivider: {
-    borderBottomWidth: 1,
-    borderBottomColor: VaultPalette.border,
-  },
-  rateTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  rateSub: {
-    fontSize: 11,
-    color: VaultPalette.textMuted,
-    marginTop: 2,
-  },
-  ratePrice: {
-    fontSize: 16,
-    fontWeight: '800',
-    color: VaultPalette.text,
-    fontVariant: ['tabular-nums'],
-  },
-  rateUnit: {
-    fontSize: 11,
-    color: VaultPalette.textSecondary,
-    marginTop: 2,
-    fontVariant: ['tabular-nums'],
-  },
-  calcCard: {
-    backgroundColor: VaultPalette.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 14,
-    gap: 12,
-  },
-  calcHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  calcTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: VaultPalette.text,
-    flexShrink: 1,
-  },
-  calcRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  calcField: {
-    flex: 1,
-    gap: 5,
-  },
-  calcLabel: {
-    fontSize: 11,
-    color: VaultPalette.textSecondary,
-    fontWeight: '600',
-  },
-  input: {
-    backgroundColor: VaultPalette.bg,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    borderRadius: 11,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    color: VaultPalette.text,
-    fontSize: 15,
-    fontWeight: '700',
-    fontVariant: ['tabular-nums'],
-  },
-  breakdownBox: {
-    backgroundColor: VaultPalette.bg,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: VaultPalette.border,
-    padding: 12,
-    gap: 7,
-  },
-  breakdownRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  breakdownLabel: {
-    fontSize: 12,
-    color: VaultPalette.textSecondary,
-  },
-  breakdownVal: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: VaultPalette.text,
-    fontVariant: ['tabular-nums'],
-  },
-  breakdownTotalRow: {
-    marginTop: 4,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: VaultPalette.border,
-  },
-  breakdownTotalLabel: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: VaultPalette.emerald,
-  },
-  breakdownTotalVal: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: VaultPalette.emerald,
-    fontVariant: ['tabular-nums'],
-  },
-});
+const createStyles = (palette: VaultPaletteType) =>
+  StyleSheet.create({
+    safeArea: {
+      flex: 1,
+      backgroundColor: VaultPalette.bg,
+    },
+    scrollContent: {
+      paddingBottom: 32,
+    },
+    container: {
+      width: '100%',
+      maxWidth: VaultMaxWidth,
+      alignSelf: 'center',
+      paddingHorizontal: 16,
+      paddingTop: 12,
+      gap: 14,
+    },
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    title: {
+      fontSize: 22,
+      fontWeight: '800',
+      color: VaultPalette.text,
+    },
+    subtitle: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+      marginTop: 2,
+    },
+    resetBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      paddingHorizontal: 11,
+      paddingVertical: 7,
+      borderRadius: 10,
+      backgroundColor: VaultPalette.surface,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+    },
+    resetText: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: palette.gold,
+    },
+    simBanner: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      backgroundColor: palette.goldTint,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      borderRadius: 14,
+      padding: 12,
+    },
+    simTitle: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: palette.goldBright,
+    },
+    simSub: {
+      fontSize: 11,
+      color: VaultPalette.textSecondary,
+      marginTop: 1,
+    },
+    simBtns: {
+      flexDirection: 'row',
+      gap: 6,
+    },
+    simStepBtn: {
+      backgroundColor: VaultPalette.surface,
+      borderWidth: 1,
+      borderColor: palette.borderGold,
+      borderRadius: 8,
+      paddingHorizontal: 9,
+      paddingVertical: 6,
+    },
+    simStepText: {
+      fontSize: 11,
+      fontWeight: '700',
+      color: palette.goldBright,
+    },
+    ratesCard: {
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      paddingHorizontal: 14,
+    },
+    rateRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: 12,
+    },
+    rateDivider: {
+      borderBottomWidth: 1,
+      borderBottomColor: VaultPalette.border,
+    },
+    rateTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+    },
+    rateSub: {
+      fontSize: 11,
+      color: VaultPalette.textMuted,
+      marginTop: 2,
+    },
+    ratePrice: {
+      fontSize: 16,
+      fontWeight: '800',
+      color: VaultPalette.text,
+      fontVariant: ['tabular-nums'],
+    },
+    rateUnit: {
+      fontSize: 11,
+      color: VaultPalette.textSecondary,
+      marginTop: 2,
+      fontVariant: ['tabular-nums'],
+    },
+    calcCard: {
+      backgroundColor: VaultPalette.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 14,
+      gap: 12,
+    },
+    calcHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    calcTitle: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: VaultPalette.text,
+      flexShrink: 1,
+    },
+    calcRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    calcField: {
+      flex: 1,
+      gap: 5,
+    },
+    calcLabel: {
+      fontSize: 11,
+      color: VaultPalette.textSecondary,
+      fontWeight: '600',
+    },
+    input: {
+      backgroundColor: VaultPalette.bg,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      borderRadius: 11,
+      paddingHorizontal: 12,
+      paddingVertical: 10,
+      color: VaultPalette.text,
+      fontSize: 15,
+      fontWeight: '700',
+      fontVariant: ['tabular-nums'],
+    },
+    breakdownBox: {
+      backgroundColor: VaultPalette.bg,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: VaultPalette.border,
+      padding: 12,
+      gap: 7,
+    },
+    breakdownRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+    },
+    breakdownLabel: {
+      fontSize: 12,
+      color: VaultPalette.textSecondary,
+    },
+    breakdownVal: {
+      fontSize: 12,
+      fontWeight: '600',
+      color: VaultPalette.text,
+      fontVariant: ['tabular-nums'],
+    },
+    breakdownTotalRow: {
+      marginTop: 4,
+      paddingTop: 8,
+      borderTopWidth: 1,
+      borderTopColor: VaultPalette.border,
+    },
+    breakdownTotalLabel: {
+      fontSize: 13,
+      fontWeight: '700',
+      color: VaultPalette.emerald,
+    },
+    breakdownTotalVal: {
+      fontSize: 15,
+      fontWeight: '800',
+      color: VaultPalette.emerald,
+      fontVariant: ['tabular-nums'],
+    },
+  });
