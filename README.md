@@ -26,11 +26,11 @@ All vault data is **encrypted on-device** using a PIN- or Biometric-protected ke
 | **Expo Slug**             | `goldfile`                             |
 | **URL Scheme**            | `goldfile://`                          |
 | **Version**               | `1.0.0`                                |
-| **iOS Bundle Identifier** | `com.goldfile.app`                     |
+| **iOS Bundle Identifier** | `in.codera.goldfile`                   |
 | **iOS Build Number**      | `1`                                    |
 | **iOS Tablet Support**    | `false` (`supportsTablet: false`)      |
 | **iOS Export Compliance** | `ITSAppUsesNonExemptEncryption: false` |
-| **Android Package Name**  | `com.goldfile.app`                     |
+| **Android Package Name**  | `in.codera.goldfile`                   |
 | **EAS Project ID**        | `7282513a-3668-49cb-b8b9-2fdb3d773ecb` |
 | **Expo Owner**            | `codera.in`                            |
 
@@ -140,7 +140,7 @@ Recommended `eas.json` profiles:
 2. Go to **Certificates, Identifiers & Profiles → Identifiers → `+` → App IDs → App**.
 3. Register the exact Bundle ID:
    - **Description:** `GoldFile`
-   - **Bundle ID (Explicit):** `com.goldfile.app`
+   - **Bundle ID (Explicit):** `in.codera.goldfile`
    - **Capabilities:** Enable **iCloud** (iCloud Documents, if using native iCloud container) and **Face ID** (handled via `NSFaceIDUsageDescription`).
 
 ### Step 2: Create the App in App Store Connect
@@ -150,8 +150,8 @@ Recommended `eas.json` profiles:
    - **Platforms:** `iOS`
    - **Name:** `GoldFile`
    - **Primary Language:** `English (U.S.)` or `English (U.K.)`
-   - **Bundle ID:** `com.goldfile.app`
-   - **SKU:** `com-goldfile-app-001`
+   - **Bundle ID:** `in.codera.goldfile`
+   - **SKU:** `in-codera-goldfile-001`
    - **User Access:** Full Access
 3. **App Privacy Declarations:**
    - **Data Collection:** Select **"No, we do not collect data from this app"** (GoldFile is 100% offline; all records, photos, and bills stay on-device or in the user's own iCloud/Google Drive).
@@ -182,7 +182,7 @@ npx eas-cli@latest submit --platform ios --profile production
    - **Default language:** `English`
    - **App or game:** `App`
    - **Free or paid:** `Free` (or Paid)
-3. **Package Name:** Must match `app.json` → `com.goldfile.app` (verified when you upload your first `.aab`).
+3. **Package Name:** Must match `app.json` → `in.codera.goldfile` (verified when you upload your first `.aab`).
 
 ### Step 2: Complete Play Console Declarations
 

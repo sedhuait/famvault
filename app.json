@@ -9,7 +9,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/images/icon.png",
-      "bundleIdentifier": "com.goldfile.app",
+      "bundleIdentifier": "in.codera.goldfile",
       "buildNumber": "1",
       "supportsTablet": false,
       "infoPlist": {
@@ -17,7 +17,7 @@
       }
     },
     "android": {
-      "package": "com.goldfile.app",
+      "package": "in.codera.goldfile",
       "adaptiveIcon": {
         "backgroundColor": "#09080A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
