@@ -265,7 +265,7 @@
       font-weight: 700;
     }
 
-    /* Phone Showcase */
+    /* Phone Showcase & iPhone Template */
     .phone-stage {
       display: flex;
       flex-direction: column;
@@ -273,30 +273,155 @@
       gap: 16px;
     }
 
-    .phone-frame {
-      width: min(330px, 86vw);
-      padding: 12px;
-      border-radius: 42px;
-      background: linear-gradient(160deg, #2b1744 0%, #12091c 100%);
-      border: 1px solid var(--border-strong);
+    .iphone-device {
+      position: relative;
+      margin: 0 auto;
+      background: linear-gradient(155deg, #3d235c 0%, #1c0e30 45%, #0f071a 100%);
+      border: 2.5px solid rgba(245, 197, 66, 0.45);
       box-shadow:
-        0 30px 70px rgba(0, 0, 0, 0.8),
-        0 0 90px rgba(245, 197, 66, 0.16);
+        inset 0 0 0 2px #0c0714,
+        0 25px 65px rgba(0, 0, 0, 0.85),
+        0 0 75px rgba(245, 197, 66, 0.16);
+      user-select: none;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
-    .phone-screen {
+    .iphone-device:hover {
+      transform: translateY(-3px);
+      box-shadow:
+        inset 0 0 0 2px #0c0714,
+        0 30px 75px rgba(0, 0, 0, 0.9),
+        0 0 95px rgba(245, 197, 66, 0.24);
+    }
+
+    /* Side button silhouettes */
+    .iphone-device::before {
+      content: "";
+      position: absolute;
+      left: -4px;
+      top: 85px;
+      width: 2.5px;
+      height: 38px;
+      background: rgba(245, 197, 66, 0.45);
+      border-radius: 2px 0 0 2px;
+      box-shadow: 0 50px 0 rgba(245, 197, 66, 0.45), 0 95px 0 rgba(245, 197, 66, 0.45);
+    }
+
+    .iphone-device::after {
+      content: "";
+      position: absolute;
+      right: -4px;
+      top: 105px;
+      width: 2.5px;
+      height: 55px;
+      background: rgba(245, 197, 66, 0.45);
+      border-radius: 0 2px 2px 0;
+    }
+
+    .iphone-hero {
+      width: min(330px, 86vw);
+      padding: 10px;
+      border-radius: 48px;
+    }
+
+    .iphone-mini {
       width: 100%;
-      border-radius: 32px;
+      max-width: 280px;
+      padding: 8px;
+      border-radius: 40px;
+    }
+
+    .iphone-screen {
+      position: relative;
+      width: 100%;
       overflow: hidden;
       background: #0c0714;
-      aspect-ratio: 430 / 932;
+      aspect-ratio: 472 / 1024;
+      display: flex;
     }
 
-    .phone-screen img {
+    .iphone-hero .iphone-screen {
+      border-radius: 38px;
+    }
+
+    .iphone-mini .iphone-screen {
+      border-radius: 32px;
+    }
+
+    .iphone-screen img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       display: block;
+    }
+
+    /* Dynamic Island */
+    .iphone-island {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #000;
+      border-radius: 999px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.95);
+      pointer-events: none;
+    }
+
+    .iphone-hero .iphone-island {
+      top: 10px;
+      width: 82px;
+      height: 22px;
+      padding-right: 8px;
+    }
+
+    .iphone-mini .iphone-island {
+      top: 8px;
+      width: 68px;
+      height: 18px;
+      padding-right: 6px;
+    }
+
+    .iphone-camera-dot {
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #24426b 0%, #060b13 70%);
+      box-shadow: inset 0 0 1px 1px rgba(255, 255, 255, 0.18);
+    }
+
+    .iphone-hero .iphone-camera-dot {
+      width: 8px;
+      height: 8px;
+    }
+
+    .iphone-mini .iphone-camera-dot {
+      width: 6.5px;
+      height: 6.5px;
+    }
+
+    /* Bottom Home Indicator */
+    .iphone-home-bar {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.65);
+      border-radius: 999px;
+      z-index: 10;
+      pointer-events: none;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    }
+
+    .iphone-hero .iphone-home-bar {
+      bottom: 8px;
+      width: 110px;
+      height: 4px;
+    }
+
+    .iphone-mini .iphone-home-bar {
+      bottom: 6px;
+      width: 90px;
+      height: 3.5px;
     }
 
     .screen-pills {
@@ -409,26 +534,19 @@
     .shot-card {
       background: var(--bg-elevated);
       border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 16px;
+      border-radius: 28px;
+      padding: 24px 20px 20px;
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      align-items: center;
+      gap: 18px;
+      text-align: center;
+      transition: border-color 0.2s ease, transform 0.2s ease;
     }
 
-    .shot-img-wrap {
-      border-radius: 18px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: #0c0714;
-      aspect-ratio: 430 / 932;
-    }
-
-    .shot-img-wrap img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
+    .shot-card:hover {
+      border-color: var(--border-strong);
+      transform: translateY(-2px);
     }
 
     .shot-meta h3 {
@@ -646,14 +764,16 @@
 
         <!-- Interactive Real Screenshot Preview -->
         <div class="phone-stage">
-          <div class="phone-frame">
-            <div class="phone-screen">
+          <div class="iphone-device iphone-hero">
+            <div class="iphone-island"><span class="iphone-camera-dot"></span></div>
+            <div class="iphone-screen">
               <img
                 id="hero-phone-img"
                 src="./assets/screenshots/home.png"
                 alt="GoldFile Home Dashboard screenshot"
               />
             </div>
+            <div class="iphone-home-bar"></div>
           </div>
           <div class="screen-pills" role="tablist" aria-label="App screen selector">
             <button type="button" class="screen-pill active" data-src="./assets/screenshots/home.png" data-alt="GoldFile Home Dashboard">Home</button>
@@ -727,8 +847,12 @@
 
         <div class="gallery-grid">
           <div class="shot-card">
-            <div class="shot-img-wrap">
-              <img src="./assets/screenshots/onboarding.png" alt="GoldFile Onboarding Screen" loading="lazy" />
+            <div class="iphone-device iphone-mini">
+              <div class="iphone-island"><span class="iphone-camera-dot"></span></div>
+              <div class="iphone-screen">
+                <img src="./assets/screenshots/onboarding.png" alt="GoldFile Onboarding Screen" loading="lazy" />
+              </div>
+              <div class="iphone-home-bar"></div>
             </div>
             <div class="shot-meta">
               <h3>Encrypted Onboarding</h3>
@@ -737,8 +861,12 @@
           </div>
 
           <div class="shot-card">
-            <div class="shot-img-wrap">
-              <img src="./assets/screenshots/home.png" alt="GoldFile Home Dashboard" loading="lazy" />
+            <div class="iphone-device iphone-mini">
+              <div class="iphone-island"><span class="iphone-camera-dot"></span></div>
+              <div class="iphone-screen">
+                <img src="./assets/screenshots/home.png" alt="GoldFile Home Dashboard" loading="lazy" />
+              </div>
+              <div class="iphone-home-bar"></div>
             </div>
             <div class="shot-meta">
               <h3>Wealth &amp; Custody Dashboard</h3>
@@ -747,8 +875,12 @@
           </div>
 
           <div class="shot-card">
-            <div class="shot-img-wrap">
-              <img src="./assets/screenshots/vault.png" alt="GoldFile Inventory Screen" loading="lazy" />
+            <div class="iphone-device iphone-mini">
+              <div class="iphone-island"><span class="iphone-camera-dot"></span></div>
+              <div class="iphone-screen">
+                <img src="./assets/screenshots/vault.png" alt="GoldFile Inventory Screen" loading="lazy" />
+              </div>
+              <div class="iphone-home-bar"></div>
             </div>
             <div class="shot-meta">
               <h3>Filterable Asset Vault</h3>
@@ -757,8 +889,12 @@
           </div>
 
           <div class="shot-card">
-            <div class="shot-img-wrap">
-              <img src="./assets/screenshots/detail.png" alt="GoldFile Asset Custody Ledger" loading="lazy" />
+            <div class="iphone-device iphone-mini">
+              <div class="iphone-island"><span class="iphone-camera-dot"></span></div>
+              <div class="iphone-screen">
+                <img src="./assets/screenshots/detail.png" alt="GoldFile Asset Custody Ledger" loading="lazy" />
+              </div>
+              <div class="iphone-home-bar"></div>
             </div>
             <div class="shot-meta">
               <h3>Item Ledger &amp; Bills</h3>
@@ -767,8 +903,12 @@
           </div>
 
           <div class="shot-card">
-            <div class="shot-img-wrap">
-              <img src="./assets/screenshots/rates.png" alt="GoldFile Gold Rates & Calculators" loading="lazy" />
+            <div class="iphone-device iphone-mini">
+              <div class="iphone-island"><span class="iphone-camera-dot"></span></div>
+              <div class="iphone-screen">
+                <img src="./assets/screenshots/rates.png" alt="GoldFile Gold Rates & Calculators" loading="lazy" />
+              </div>
+              <div class="iphone-home-bar"></div>
             </div>
             <div class="shot-meta">
               <h3>Rates &amp; Showroom Estimator</h3>
@@ -777,8 +917,12 @@
           </div>
 
           <div class="shot-card">
-            <div class="shot-img-wrap">
-              <img src="./assets/screenshots/settings.png" alt="GoldFile Settings Screen" loading="lazy" />
+            <div class="iphone-device iphone-mini">
+              <div class="iphone-island"><span class="iphone-camera-dot"></span></div>
+              <div class="iphone-screen">
+                <img src="./assets/screenshots/settings.png" alt="GoldFile Settings Screen" loading="lazy" />
+              </div>
+              <div class="iphone-home-bar"></div>
             </div>
             <div class="shot-meta">
               <h3>Privacy, Theme &amp; Exports</h3>
