@@ -35,7 +35,7 @@ export interface VaultSnapshot {
 }
 
 interface EncryptedBackupEnvelope {
-  format: 'FAMVAULT_ENCRYPTED_V1';
+  format: 'GOLDFILE_ENCRYPTED_V1' | 'FAMVAULT_ENCRYPTED_V1';
   exportedAt: string;
   salt: string;
   checksum: string;
@@ -93,7 +93,7 @@ export function encryptVaultBackup(snapshot: VaultSnapshot, pin: string): string
   const cipherBytes = xorBytesWithKey(plainBytes, `${pin}:${salt}`);
 
   const envelope: EncryptedBackupEnvelope = {
-    format: 'FAMVAULT_ENCRYPTED_V1',
+    format: 'GOLDFILE_ENCRYPTED_V1',
     exportedAt: new Date().toISOString(),
     salt,
     checksum,
@@ -112,12 +112,12 @@ export function decryptVaultBackup(rawText: string, pin: string): VaultSnapshot 
   }
 
   if (
-    parsed.format !== 'FAMVAULT_ENCRYPTED_V1' ||
+    (parsed.format !== 'GOLDFILE_ENCRYPTED_V1' && parsed.format !== 'FAMVAULT_ENCRYPTED_V1') ||
     typeof parsed.salt !== 'string' ||
     typeof parsed.checksum !== 'string' ||
     typeof parsed.payload !== 'string'
   ) {
-    throw new Error('Unsupported Famvault encrypted file.');
+    throw new Error('Unsupported GoldFile encrypted file.');
   }
 
   const cipherBytes = base64ToBytes(parsed.payload);

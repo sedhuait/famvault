@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { FamvaultLogo } from '@/components/famvault-logo';
+import { GoldFileLogo } from '@/components/goldfile-logo';
 import { VaultFonts, VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 
@@ -100,7 +100,7 @@ export function BiometricGate() {
 
     try {
       const result = await LocalAuthentication.authenticateAsync({
-        promptMessage: 'Decrypt & Unlock Famvault',
+        promptMessage: 'Decrypt & Unlock GoldFile',
         fallbackLabel: 'Use 6-Digit PIN',
         cancelLabel: 'Use PIN',
       });
@@ -147,8 +147,8 @@ export function BiometricGate() {
       <View style={styles.inner}>
         {/* Crest & Brand Header */}
         <View style={styles.brandHeader}>
-          <FamvaultLogo size={56} borderRadius={18} />
-          <Text style={styles.brandTitle}>Famvault</Text>
+          <GoldFileLogo size={56} borderRadius={18} />
+          <Text style={styles.brandTitle}>GoldFile</Text>
           <Text style={styles.brandSubtitle}>Indian Family Precious Metals & Custody Vault</Text>
         </View>
 

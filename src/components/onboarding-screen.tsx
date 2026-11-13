@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { FamvaultLogo } from '@/components/famvault-logo';
+import { GoldFileLogo } from '@/components/goldfile-logo';
 import { VaultFonts, VaultPalette, type VaultPaletteType } from '@/constants/vault-theme';
 import { useVault } from '@/context/vault-context';
 import { pickAndRestoreBackupFile } from '@/utils/vault-storage';
@@ -110,8 +110,8 @@ export function OnboardingScreen() {
         <View style={styles.container}>
           {/* Hero */}
           <View style={styles.hero}>
-            <FamvaultLogo size={64} />
-            <Text style={styles.brandTitle}>Famvault</Text>
+            <GoldFileLogo size={64} />
+            <Text style={styles.brandTitle}>GoldFile</Text>
             <Text style={styles.brandSub}>
               Private Family Jewelry, Bullion &amp; Locker Custody Vault
             </Text>
@@ -236,7 +236,7 @@ export function OnboardingScreen() {
               style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
             >
               <Ionicons name="cloud-download-outline" size={16} color={palette.goldBright} />
-              <Text style={styles.secondaryBtnText}>Restore from .famvault Backup</Text>
+              <Text style={styles.secondaryBtnText}>Restore from .goldfile / .famvault Backup</Text>
             </Pressable>
           </View>
         </View>

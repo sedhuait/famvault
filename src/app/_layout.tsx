@@ -5,7 +5,7 @@ import { useEffect, useMemo } from 'react';
 import { View } from 'react-native';
 
 import { BiometricGate } from '@/components/biometric-gate';
-import { FamvaultLogo } from '@/components/famvault-logo';
+import { GoldFileLogo } from '@/components/goldfile-logo';
 import { OnboardingScreen } from '@/components/onboarding-screen';
 import { VaultPalette } from '@/constants/vault-theme';
 import { useVault, VaultProvider } from '@/context/vault-context';
@@ -40,7 +40,7 @@ function VaultRootNavigator() {
       <View style={{ flex: 1, backgroundColor: VaultPalette.bg }}>
         {vaultStatus === 'LOADING' ? (
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-            <FamvaultLogo size={64} />
+            <GoldFileLogo size={64} />
           </View>
         ) : vaultStatus === 'ONBOARDING' ? (
           <OnboardingScreen />

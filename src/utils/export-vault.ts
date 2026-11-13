@@ -180,7 +180,7 @@ export function buildVaultReportHtml(params: {
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Famvault Family Audit Report</title>
+  <title>GoldFile Family Audit Report</title>
   <style>
     @page { size: A4; margin: 16mm; }
     * { box-sizing: border-box; }
@@ -238,7 +238,7 @@ export function buildVaultReportHtml(params: {
 <body>
   <div class="header">
     <div>
-      <h1 class="brand">Famvault</h1>
+      <h1 class="brand">GoldFile</h1>
       <div class="subtitle">Family Precious Metals, Insurance &amp; Bank Locker Audit Schedule${scopeLabel ? ` · ${escapeHtml(scopeLabel)}` : ''}</div>
     </div>
     <div class="meta">
@@ -318,7 +318,7 @@ export function buildVaultReportHtml(params: {
   </table>
 
   <div class="footer">
-    <span>Famvault · 100% On-Device Private Storage</span>
+    <span>GoldFile · 100% On-Device Private Storage</span>
     <span>24K ₹${rates.GOLD_24K.toLocaleString('en-IN')}/g · 22K ₹${rates.GOLD_22K.toLocaleString('en-IN')}/g · Silver ₹${rates.SILVER_999}/g</span>
   </div>
 </body>
@@ -336,7 +336,7 @@ export async function exportVaultCsv(
   rates: BullionRatesPerGram,
 ): Promise<ExportResult> {
   const dateStamp = new Date().toISOString().slice(0, 10);
-  const fileName = `famvault-${dateStamp}.csv`;
+  const fileName = `goldfile-${dateStamp}.csv`;
   const csv = buildVaultCsv(items, rates);
 
   if (Platform.OS === 'web') {
@@ -360,7 +360,7 @@ export async function exportVaultCsv(
     await Sharing.shareAsync(file.uri, {
       mimeType: 'text/csv',
       UTI: 'public.comma-separated-values-text',
-      dialogTitle: 'Export Famvault CSV',
+      dialogTitle: 'Export GoldFile CSV',
     });
   }
 
@@ -376,7 +376,7 @@ export async function exportVaultPdf(params: {
   scopeLabel?: string;
 }): Promise<ExportResult> {
   const dateStamp = new Date().toISOString().slice(0, 10);
-  const fileName = `famvault-audit-schedule-${dateStamp}.pdf`;
+  const fileName = `goldfile-audit-schedule-${dateStamp}.pdf`;
   const html = buildVaultReportHtml(params);
 
   if (Platform.OS === 'web') {
@@ -414,7 +414,7 @@ export async function exportVaultPdf(params: {
     await Sharing.shareAsync(uri, {
       mimeType: 'application/pdf',
       UTI: '.pdf',
-      dialogTitle: 'Export Famvault Audit PDF',
+      dialogTitle: 'Export GoldFile Audit PDF',
     });
   }
 

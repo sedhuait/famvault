@@ -166,7 +166,7 @@ const SAMPLE_ITEMS = [
   },
 ];
 
-describe('Famvault valuation engine', () => {
+describe('GoldFile valuation engine', () => {
   it('calculates cash melt vs replacement value for jewelry, bullion, and SGB', () => {
     const jewelryCash = calculateItemValuation(SAMPLE_ITEMS[0], TEST_RATES, 'CASH');
     assert.equal(jewelryCash.cashMeltValue, 48 * 7745);
@@ -263,7 +263,7 @@ describe('Famvault valuation engine', () => {
   });
 });
 
-describe('Famvault formatters', () => {
+describe('GoldFile formatters', () => {
   it('formats and masks INR values across all magnitudes', () => {
     assert.equal(formatINR(0), '₹0');
     assert.equal(formatINR(-12500), '₹-12,500');
@@ -301,7 +301,7 @@ describe('Famvault formatters', () => {
   });
 });
 
-describe('Famvault encrypted storage & .famvault backup', () => {
+describe('GoldFile encrypted storage & .goldfile backup', () => {
   const snapshot = {
     version: 1,
     savedAt: '2026-11-12T10:00:00Z',
@@ -327,13 +327,23 @@ describe('Famvault encrypted storage & .famvault backup', () => {
     assert.ok(!encrypted.includes('492817'));
 
     const parsed = JSON.parse(encrypted);
-    assert.equal(parsed.format, 'FAMVAULT_ENCRYPTED_V1');
+    assert.equal(parsed.format, 'GOLDFILE_ENCRYPTED_V1');
 
     const restored = decryptVaultBackup(encrypted, '492817');
     assert.equal(restored.items.length, SAMPLE_ITEMS.length);
     assert.equal(restored.items[6].location, 'BORROWED');
     assert.equal(restored.vaultPin, '492817');
     assert.equal(restored.sharedMembers[0].name, 'Wife');
+  });
+
+  it('restores legacy FAMVAULT_ENCRYPTED_V1 backups for seamless backward compatibility', () => {
+    const encrypted = encryptVaultBackup(snapshot, '492817');
+    const legacy = JSON.parse(encrypted);
+    legacy.format = 'FAMVAULT_ENCRYPTED_V1';
+    const legacyJson = JSON.stringify(legacy);
+
+    const restored = decryptVaultBackup(legacyJson, '492817');
+    assert.equal(restored.items.length, SAMPLE_ITEMS.length);
   });
 
   it('rejects wrong PIN, invalid JSON, unsupported format, tampered data, and incomplete records', () => {
@@ -343,7 +353,7 @@ describe('Famvault encrypted storage & .famvault backup', () => {
     assert.throws(() => decryptVaultBackup('not-json', '492817'), /Invalid encrypted vault/);
     assert.throws(
       () => decryptVaultBackup(JSON.stringify({ format: 'OTHER' }), '492817'),
-      /Unsupported Famvault/,
+      /Unsupported GoldFile/,
     );
 
     const parsed = JSON.parse(encrypted);
@@ -358,7 +368,7 @@ describe('Famvault encrypted storage & .famvault backup', () => {
   });
 });
 
-describe('Famvault initial seed data integrity', () => {
+describe('GoldFile initial seed data integrity', () => {
   it('validates all mock vault items, members, and positive valuations', () => {
     assert.ok(INITIAL_VAULT_ITEMS.length >= 6);
     assert.ok(FAMILY_MEMBERS.length >= 4);

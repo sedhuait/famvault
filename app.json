@@ -1,15 +1,15 @@
 {
   "expo": {
-    "name": "Famvault",
-    "slug": "famvault",
+    "name": "GoldFile",
+    "slug": "goldfile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "famvault",
+    "scheme": "goldfile",
     "userInterfaceStyle": "automatic",
     "ios": {
       "icon": "./assets/images/icon.png",
-      "bundleIdentifier": "com.famvault.app",
+      "bundleIdentifier": "com.goldfile.app",
       "buildNumber": "1",
       "supportsTablet": false,
       "infoPlist": {
@@ -17,7 +17,7 @@
       }
     },
     "android": {
-      "package": "com.famvault.app",
+      "package": "com.goldfile.app",
       "adaptiveIcon": {
         "backgroundColor": "#09080A",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -48,14 +48,14 @@
       [
         "expo-local-authentication",
         {
-          "faceIDPermission": "Allow Famvault to unlock your family precious metals vault with Face ID."
+          "faceIDPermission": "Allow GoldFile to unlock your family precious metals vault with Face ID."
         }
       ],
       [
         "expo-image-picker",
         {
-          "photosPermission": "Allow Famvault to attach jewelry photos and invoice images.",
-          "cameraPermission": "Allow Famvault to capture jewelry photos and GST bills."
+          "photosPermission": "Allow GoldFile to attach jewelry photos and invoice images.",
+          "cameraPermission": "Allow GoldFile to capture jewelry photos and GST bills."
         }
       ],
       "expo-sharing",

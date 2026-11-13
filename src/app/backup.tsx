@@ -274,7 +274,7 @@ export default function BackupAndSecurityScreen() {
             <View style={styles.footprintBox}>
               <View style={styles.footprintRow}>
                 <Text style={styles.footprintLabel}>Folder</Text>
-                <Text style={styles.footprintVal}>Famvault Family</Text>
+                <Text style={styles.footprintVal}>GoldFile Family</Text>
               </View>
               <View style={styles.footprintRow}>
                 <Text style={styles.footprintLabel}>Conflict Mode</Text>
@@ -403,7 +403,7 @@ export default function BackupAndSecurityScreen() {
         <View style={styles.modalBackdrop}>
           <View style={styles.modalCard}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>Famvault Insurance &amp; Locker Schedule</Text>
+              <Text style={styles.modalTitle}>GoldFile Insurance &amp; Locker Schedule</Text>
               <Pressable onPress={() => setPdfModalVisible(false)}>
                 <Ionicons name="close" size={22} color={VaultPalette.textSecondary} />
               </Pressable>

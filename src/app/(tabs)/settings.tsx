@@ -323,11 +323,11 @@ export default function SettingsScreen() {
             </Pressable>
           </View>
 
-          {/* Famvault Pro */}
+          {/* GoldFile Pro */}
           <View style={[styles.card, styles.proCard]}>
             <View style={styles.rowBetween}>
               <View style={{ flex: 1 }}>
-                <Text style={styles.proBadge}>Famvault Pro · Lifetime</Text>
+                <Text style={styles.proBadge}>GoldFile Pro · Lifetime</Text>
                 <Text style={styles.proTitle}>₹499 One-Time Family Unlock</Text>
               </View>
               <Switch
@@ -353,7 +353,7 @@ export default function SettingsScreen() {
               Questions, feedback, or backup help? Contact us directly by email.
             </Text>
             <Pressable
-              onPress={() => Linking.openURL('mailto:sedhu@codera.in?subject=Famvault%20Support')}
+              onPress={() => Linking.openURL('mailto:sedhu@codera.in?subject=GoldFile%20Support')}
               style={({ pressed }) => [styles.secondaryBtn, pressed && { opacity: 0.8 }]}
             >
               <Ionicons name="mail-outline" size={16} color={palette.goldBright} />

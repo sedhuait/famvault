@@ -5,7 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddItemModal } from '@/components/add-item-modal';
-import { FamvaultLogo } from '@/components/famvault-logo';
+import { GoldFileLogo } from '@/components/goldfile-logo';
 import { VaultItemCard } from '@/components/vault-item-card';
 import {
   CategoryVisuals,
@@ -82,7 +82,7 @@ export default function VaultLedgerScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.brandRow}>
-            <FamvaultLogo size={34} />
+            <GoldFileLogo size={34} />
             <View style={{ flex: 1, minWidth: 0 }}>
               <Text style={styles.title} numberOfLines={1}>
                 Family Vault

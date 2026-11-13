@@ -1,8 +1,8 @@
-# Famvault — Encrypted Offline Family Gold & Precious Asset Vault
+# GoldFile — Encrypted Offline Family Gold & Precious Asset Vault
 
-**Famvault** is a 100% offline, privacy-first mobile application built with Expo and React Native for Indian families to catalog, value, track, and audit their precious assets — Gold, Silver, Diamonds, Platinum, Sovereign Gold Bonds (SGB), Digital Gold, and Temple/Antique ornaments.
+**GoldFile** is a 100% offline, privacy-first mobile application built with Expo and React Native for Indian families to catalog, value, track, and audit their precious assets — Gold, Silver, Diamonds, Platinum, Sovereign Gold Bonds (SGB), Digital Gold, and Temple/Antique ornaments.
 
-All vault data is **encrypted on-device** using a PIN- or Biometric-protected key (`expo-secure-store` + `expo-local-authentication`) and never leaves your phone unless you explicitly export an encrypted `.famvault` backup to iCloud Drive, Google Drive, or a local PDF/CSV audit report.
+All vault data is **encrypted on-device** using a PIN- or Biometric-protected key (`expo-secure-store` + `expo-local-authentication`) and never leaves your phone unless you explicitly export an encrypted `.goldfile` backup to iCloud Drive, Google Drive, or a local PDF/CSV audit report.
 
 ---
 
@@ -14,7 +14,7 @@ All vault data is **encrypted on-device** using a PIN- or Biometric-protected ke
 - **Custody & Family Beneficiary Audit:** Track whether items are in a **Bank Locker**, **Home Safe**, **Pooja Room**, **Daily Wear**, **Gold Loan**, or **Borrowed**, with transfer logs and family member attribution (_Self, Wife, Amma, Daughter, Son, Joint_).
 - **CBDT Safe-Limit Compliance:** Automatic tracking against CBDT circular gold holding guidelines per family member.
 - **Bills & Photo Vault:** Attach ornament photos and purchase invoice PDFs/images locally on-device.
-- **Backup & Export:** Password-encrypted `.famvault` backups (iCloud / Google Drive / Files) plus printable **PDF Audit Reports** and **CSV** exports.
+- **Backup & Export:** Password-encrypted `.goldfile` backups (iCloud / Google Drive / Files) plus printable **PDF Audit Reports** and **CSV** exports.
 
 ---
 
@@ -22,15 +22,15 @@ All vault data is **encrypted on-device** using a PIN- or Biometric-protected ke
 
 | Property                  | Value                                  |
 | ------------------------- | -------------------------------------- |
-| **App Name**              | `Famvault`                             |
-| **Expo Slug**             | `famvault`                             |
-| **URL Scheme**            | `famvault://`                          |
+| **App Name**              | `GoldFile`                             |
+| **Expo Slug**             | `goldfile`                             |
+| **URL Scheme**            | `goldfile://`                          |
 | **Version**               | `1.0.0`                                |
-| **iOS Bundle Identifier** | `com.famvault.app`                     |
+| **iOS Bundle Identifier** | `com.goldfile.app`                     |
 | **iOS Build Number**      | `1`                                    |
 | **iOS Tablet Support**    | `false` (`supportsTablet: false`)      |
 | **iOS Export Compliance** | `ITSAppUsesNonExemptEncryption: false` |
-| **Android Package Name**  | `com.famvault.app`                     |
+| **Android Package Name**  | `com.goldfile.app`                     |
 | **EAS Project ID**        | `7282513a-3668-49cb-b8b9-2fdb3d773ecb` |
 | **Expo Owner**            | `codera.in`                            |
 
@@ -41,11 +41,11 @@ Configured automatically via Expo config plugins in `app.json`:
 #### iOS (`Info.plist`)
 
 - **`NSFaceIDUsageDescription`** (`expo-local-authentication`):
-  `"Famvault uses Face ID to unlock your encrypted family vault and protect sensitive asset records."`
+  `"Allow GoldFile to unlock your family precious metals vault with Face ID."`
 - **`NSPhotoLibraryUsageDescription`** (`expo-image-picker`):
-  `"Famvault needs access to your photos to attach ornament photos and purchase bills."`
+  `"Allow GoldFile to attach jewelry photos and invoice images."`
 - **`NSCameraUsageDescription`** (`expo-image-picker`):
-  `"Famvault needs camera access to photograph ornaments and jewelry bills."`
+  `"Allow GoldFile to capture jewelry photos and GST bills."`
 
 #### Android (`AndroidManifest.xml`)
 
@@ -139,8 +139,8 @@ Recommended `eas.json` profiles:
 1. Sign in to [Apple Developer](https://developer.apple.com/account) with your paid Apple Developer Program membership.
 2. Go to **Certificates, Identifiers & Profiles → Identifiers → `+` → App IDs → App**.
 3. Register the exact Bundle ID:
-   - **Description:** `Famvault`
-   - **Bundle ID (Explicit):** `com.famvault.app`
+   - **Description:** `GoldFile`
+   - **Bundle ID (Explicit):** `com.goldfile.app`
    - **Capabilities:** Enable **iCloud** (iCloud Documents, if using native iCloud container) and **Face ID** (handled via `NSFaceIDUsageDescription`).
 
 ### Step 2: Create the App in App Store Connect
@@ -148,15 +148,15 @@ Recommended `eas.json` profiles:
 1. Go to [App Store Connect](https://appstoreconnect.apple.com) → **My Apps** → **`+` (New App)**.
 2. Fill in:
    - **Platforms:** `iOS`
-   - **Name:** `Famvault`
+   - **Name:** `GoldFile`
    - **Primary Language:** `English (U.S.)` or `English (U.K.)`
-   - **Bundle ID:** `com.famvault.app`
-   - **SKU:** `com-famvault-app-001`
+   - **Bundle ID:** `com.goldfile.app`
+   - **SKU:** `com-goldfile-app-001`
    - **User Access:** Full Access
 3. **App Privacy Declarations:**
-   - **Data Collection:** Select **"No, we do not collect data from this app"** (Famvault is 100% offline; all records, photos, and bills stay on-device or in the user's own iCloud/Google Drive).
+   - **Data Collection:** Select **"No, we do not collect data from this app"** (GoldFile is 100% offline; all records, photos, and bills stay on-device or in the user's own iCloud/Google Drive).
 4. **Encryption / Export Compliance:**
-   - `ITSAppUsesNonExemptEncryption` is already set to `false` in `app.json` because Famvault only uses standard OS-provided / exempt local encryption for user data protection.
+   - `ITSAppUsesNonExemptEncryption` is already set to `false` in `app.json` because GoldFile only uses standard OS-provided / exempt local encryption for user data protection.
 5. **App Review Information:**
    - Provide a demo note explaining that onboarding sets a local 6-digit PIN (or enables sample vault data) and no server login is required.
 
@@ -178,11 +178,11 @@ npx eas-cli@latest submit --platform ios --profile production
 
 1. Sign in to [Google Play Console](https://play.google.com/console) → **Create app**.
 2. Fill in:
-   - **App name:** `Famvault`
+   - **App name:** `GoldFile`
    - **Default language:** `English`
    - **App or game:** `App`
    - **Free or paid:** `Free` (or Paid)
-3. **Package Name:** Must match `app.json` → `com.famvault.app` (verified when you upload your first `.aab`).
+3. **Package Name:** Must match `app.json` → `com.goldfile.app` (verified when you upload your first `.aab`).
 
 ### Step 2: Complete Play Console Declarations
 
@@ -216,7 +216,7 @@ npx eas-cli@latest submit --platform android --profile production
 
 ## Landing Website (`website/`)
 
-The `website/` folder contains a standalone, zero-dependency, responsive single-page marketing website showcasing Famvault with real app screenshots.
+The `website/` folder contains a standalone, zero-dependency, responsive single-page marketing website showcasing GoldFile with real app screenshots.
 
 - **Entry point:** `website/index.html`
 - **Store Links:** Update the `APPLE_STORE_URL` and `GOOGLE_PLAY_URL` constants in `website/index.html` (or the `<a id="apple-store-link">` / `<a id="google-play-link">` hrefs) once your store listings are live.

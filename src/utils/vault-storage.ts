@@ -13,19 +13,26 @@ import {
 
 export { decryptVaultBackup, encryptVaultBackup, type SharedFamilyMember, type VaultSnapshot };
 
-const ENCRYPTED_STORAGE_KEY = 'famvault_encrypted_v1';
-const ENCRYPTED_FILE_NAME = 'famvault-vault.enc';
-const BIOMETRIC_PIN_KEY = 'famvault_bio_pin';
+const ENCRYPTED_STORAGE_KEY = 'goldfile_encrypted_v1';
+const LEGACY_STORAGE_KEY = 'famvault_encrypted_v1';
+const ENCRYPTED_FILE_NAME = 'goldfile-vault.enc';
+const LEGACY_FILE_NAME = 'famvault-vault.enc';
+const BIOMETRIC_PIN_KEY = 'goldfile_bio_pin';
+const LEGACY_BIOMETRIC_PIN_KEY = 'famvault_bio_pin';
 
 export async function hasEncryptedVault(): Promise<boolean> {
   try {
     if (Platform.OS === 'web') {
       if (typeof localStorage === 'undefined') return false;
-      return Boolean(localStorage.getItem(ENCRYPTED_STORAGE_KEY));
+      return Boolean(
+        localStorage.getItem(ENCRYPTED_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY),
+      );
     }
 
     const file = new File(Paths.document, ENCRYPTED_FILE_NAME);
-    return file.exists;
+    if (file.exists) return true;
+    const legacyFile = new File(Paths.document, LEGACY_FILE_NAME);
+    return legacyFile.exists;
   } catch {
     return false;
   }
@@ -52,11 +59,19 @@ export async function unlockAndDecryptVault(pin: string): Promise<VaultSnapshot>
   let raw: string | null = null;
 
   if (Platform.OS === 'web') {
-    raw = typeof localStorage !== 'undefined' ? localStorage.getItem(ENCRYPTED_STORAGE_KEY) : null;
+    raw =
+      typeof localStorage !== 'undefined'
+        ? localStorage.getItem(ENCRYPTED_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY)
+        : null;
   } else {
     const file = new File(Paths.document, ENCRYPTED_FILE_NAME);
     if (file.exists) {
       raw = await file.text();
+    } else {
+      const legacyFile = new File(Paths.document, LEGACY_FILE_NAME);
+      if (legacyFile.exists) {
+        raw = await legacyFile.text();
+      }
     }
   }
 
@@ -79,7 +94,9 @@ export async function saveBiometricPin(pin: string): Promise<void> {
 export async function getBiometricPin(): Promise<string | null> {
   if (Platform.OS === 'web') return null;
   try {
-    return await SecureStore.getItemAsync(BIOMETRIC_PIN_KEY);
+    const current = await SecureStore.getItemAsync(BIOMETRIC_PIN_KEY);
+    if (current) return current;
+    return await SecureStore.getItemAsync(LEGACY_BIOMETRIC_PIN_KEY);
   } catch {
     return null;
   }
@@ -89,6 +106,7 @@ export async function clearBiometricPin(): Promise<void> {
   if (Platform.OS === 'web') return;
   try {
     await SecureStore.deleteItemAsync(BIOMETRIC_PIN_KEY);
+    await SecureStore.deleteItemAsync(LEGACY_BIOMETRIC_PIN_KEY);
   } catch {
     // Ignore
   }
@@ -100,7 +118,7 @@ export async function exportEncryptedBackupFile(
   providerLabel: string,
 ): Promise<{ fileName: string; method: 'WEB_DOWNLOAD' | 'NATIVE_SHARE' }> {
   const dateStamp = new Date().toISOString().slice(0, 10);
-  const fileName = `famvault-backup-${dateStamp}.famvault`;
+  const fileName = `goldfile-backup-${dateStamp}.goldfile`;
   const encrypted = encryptVaultBackup(snapshot, pin);
 
   if (Platform.OS === 'web') {

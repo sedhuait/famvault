@@ -5,7 +5,7 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AddItemModal } from '@/components/add-item-modal';
-import { FamvaultLogo } from '@/components/famvault-logo';
+import { GoldFileLogo } from '@/components/goldfile-logo';
 import {
   LocationVisuals,
   MetalVisuals,
@@ -89,10 +89,10 @@ export default function DashboardScreen() {
           {/* Top Biometric Status Header */}
           <View style={styles.topBar}>
             <View style={styles.brandGroup}>
-              <FamvaultLogo size={38} borderRadius={12} />
+              <GoldFileLogo size={38} borderRadius={12} />
               <View style={styles.brandTextCol}>
                 <Text style={styles.brandName} numberOfLines={1}>
-                  Famvault
+                  GoldFile
                 </Text>
                 <View style={styles.bioVerifiedRow}>
                   <Ionicons name="shield-checkmark" size={11} color={VaultPalette.emerald} />
