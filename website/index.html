@@ -11,16 +11,16 @@
   <link rel="icon" type="image/png" href="./assets/logo.png" />
   <style>
     :root {
-      --bg: #09080a;
-      --bg-elevated: #121015;
-      --bg-card: #17141b;
-      --border: rgba(232, 180, 162, 0.16);
-      --border-strong: rgba(232, 180, 162, 0.34);
-      --rose: #e8b4a2;
-      --rose-bright: #f4d0c3;
-      --rose-dim: #b68372;
-      --text: #f7f4f2;
-      --text-muted: #a69fa4;
+      --bg: #0c0714;
+      --bg-elevated: #150d22;
+      --bg-card: #1c112d;
+      --border: rgba(245, 197, 66, 0.18);
+      --border-strong: rgba(245, 197, 66, 0.38);
+      --gold: #f5c542;
+      --gold-bright: #ffe072;
+      --gold-dim: #c69214;
+      --text: #fbf8fc;
+      --text-muted: #b4a6c4;
       --emerald: #4ade80;
       --radius: 20px;
       --max-w: 1160px;
@@ -42,8 +42,8 @@
 
     body {
       background:
-        radial-gradient(900px 520px at 85% -10%, rgba(232, 180, 162, 0.14), transparent 60%),
-        radial-gradient(760px 440px at 10% 15%, rgba(232, 180, 162, 0.08), transparent 55%),
+        radial-gradient(900px 520px at 85% -10%, rgba(245, 197, 66, 0.16), transparent 60%),
+        radial-gradient(780px 460px at 10% 15%, rgba(147, 51, 234, 0.18), transparent 55%),
         var(--bg);
       line-height: 1.6;
       overflow-x: hidden;
@@ -68,7 +68,7 @@
       z-index: 40;
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      background: rgba(9, 8, 10, 0.8);
+      background: rgba(12, 7, 20, 0.82);
       border-bottom: 1px solid var(--border);
     }
 
@@ -106,7 +106,7 @@
     }
 
     .nav-links a:hover {
-      color: var(--rose-bright);
+      color: var(--gold-bright);
     }
 
     .nav-cta {
@@ -115,16 +115,16 @@
       gap: 8px;
       padding: 9px 16px;
       border-radius: 999px;
-      background: rgba(232, 180, 162, 0.14);
+      background: rgba(245, 197, 66, 0.14);
       border: 1px solid var(--border-strong);
-      color: var(--rose-bright);
+      color: var(--gold-bright);
       font-size: 0.88rem;
       font-weight: 600;
       transition: transform 0.15s ease, background 0.15s ease;
     }
 
     .nav-cta:hover {
-      background: rgba(232, 180, 162, 0.24);
+      background: rgba(245, 197, 66, 0.24);
       transform: translateY(-1px);
     }
 
@@ -147,8 +147,8 @@
       padding: 6px 14px;
       border-radius: 999px;
       border: 1px solid var(--border-strong);
-      background: rgba(232, 180, 162, 0.08);
-      color: var(--rose-bright);
+      background: rgba(245, 197, 66, 0.09);
+      color: var(--gold-bright);
       font-size: 0.82rem;
       font-weight: 600;
       margin-bottom: 20px;
@@ -170,7 +170,7 @@
     }
 
     .gradient-text {
-      background: linear-gradient(135deg, #fff5f1 0%, var(--rose) 55%, #d69884 100%);
+      background: linear-gradient(135deg, #fff7dc 0%, var(--gold) 50%, #d97706 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -207,18 +207,18 @@
 
     .store-btn:hover {
       transform: translateY(-2px);
-      border-color: var(--rose);
-      background: #1f1a24;
+      border-color: var(--gold);
+      background: #25173d;
     }
 
     .store-btn.primary {
-      background: linear-gradient(135deg, #f0c5b6 0%, #df9f8b 100%);
-      color: #160f12;
+      background: linear-gradient(135deg, #ffe072 0%, #f59e0b 100%);
+      color: #1a0f00;
       border-color: transparent;
     }
 
     .store-btn.primary:hover {
-      background: linear-gradient(135deg, #f6d3c7 0%, #e7ab98 100%);
+      background: linear-gradient(135deg, #ffea8f 0%, #fbbf24 100%);
     }
 
     .store-btn svg {
@@ -261,7 +261,7 @@
     }
 
     .trust-item span {
-      color: var(--rose);
+      color: var(--gold);
       font-weight: 700;
     }
 
@@ -277,18 +277,18 @@
       width: min(330px, 86vw);
       padding: 12px;
       border-radius: 42px;
-      background: linear-gradient(160deg, #2b242c 0%, #120f14 100%);
+      background: linear-gradient(160deg, #2b1744 0%, #12091c 100%);
       border: 1px solid var(--border-strong);
       box-shadow:
-        0 30px 70px rgba(0, 0, 0, 0.7),
-        0 0 80px rgba(232, 180, 162, 0.12);
+        0 30px 70px rgba(0, 0, 0, 0.8),
+        0 0 90px rgba(245, 197, 66, 0.16);
     }
 
     .phone-screen {
       width: 100%;
       border-radius: 32px;
       overflow: hidden;
-      background: #09080a;
+      background: #0c0714;
       aspect-ratio: 430 / 932;
     }
 
@@ -320,9 +320,9 @@
 
     .screen-pill.active,
     .screen-pill:hover {
-      color: var(--rose-bright);
-      border-color: var(--rose);
-      background: rgba(232, 180, 162, 0.14);
+      color: var(--gold-bright);
+      border-color: var(--gold);
+      background: rgba(245, 197, 66, 0.15);
     }
 
     /* Sections */
@@ -337,7 +337,7 @@
     }
 
     .section-kicker {
-      color: var(--rose);
+      color: var(--gold);
       font-size: 0.82rem;
       font-weight: 700;
       text-transform: uppercase;
@@ -382,9 +382,9 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      background: rgba(232, 180, 162, 0.12);
+      background: rgba(245, 197, 66, 0.12);
       border: 1px solid var(--border-strong);
-      color: var(--rose-bright);
+      color: var(--gold-bright);
       font-size: 1.2rem;
       margin-bottom: 16px;
     }
@@ -420,7 +420,7 @@
       border-radius: 18px;
       overflow: hidden;
       border: 1px solid var(--border);
-      background: #09080a;
+      background: #0c0714;
       aspect-ratio: 430 / 932;
     }
 
@@ -434,7 +434,7 @@
     .shot-meta h3 {
       font-size: 1rem;
       margin-bottom: 4px;
-      color: var(--rose-bright);
+      color: var(--gold-bright);
     }
 
     .shot-meta p {
@@ -444,7 +444,7 @@
 
     /* Privacy Banner */
     .privacy-box {
-      background: linear-gradient(145deg, rgba(232, 180, 162, 0.1), rgba(23, 20, 27, 0.95));
+      background: linear-gradient(145deg, rgba(245, 197, 66, 0.1), rgba(28, 17, 45, 0.96));
       border: 1px solid var(--border-strong);
       border-radius: 28px;
       padding: 40px;
@@ -478,7 +478,7 @@
     }
 
     .privacy-list strong {
-      color: var(--rose-bright);
+      color: var(--gold-bright);
     }
 
     .cta-box {
@@ -526,8 +526,8 @@
       bottom: 24px;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: #1f1a24;
-      border: 1px solid var(--rose);
+      background: #24143a;
+      border: 1px solid var(--gold);
       color: var(--text);
       padding: 12px 20px;
       border-radius: 999px;
@@ -838,7 +838,7 @@
   <footer>
     <div class="container footer-inner">
       <div>&copy; <span id="year"></span> GoldFile (`com.goldfile.app`). All rights reserved.</div>
-      <div>Support &amp; Privacy Inquiries: <a href="mailto:sedhu@codera.in" style="color: var(--rose-bright);">sedhu@codera.in</a></div>
+      <div>Support &amp; Privacy Inquiries: <a href="mailto:sedhu@codera.in" style="color: var(--gold-bright);">sedhu@codera.in</a></div>
     </div>
   </footer>
 
