@@ -335,23 +335,29 @@
       position: relative;
       width: 100%;
       overflow: hidden;
-      background: #0c0714;
+      background: #09080a;
       aspect-ratio: 472 / 1024;
       display: flex;
+      flex-direction: column;
     }
 
     .iphone-hero .iphone-screen {
       border-radius: 38px;
+      padding-top: 36px;
     }
 
     .iphone-mini .iphone-screen {
       border-radius: 32px;
+      padding-top: 28px;
     }
 
     .iphone-screen img {
       width: 100%;
       height: 100%;
+      flex: 1;
+      min-height: 0;
       object-fit: cover;
+      object-position: top center;
       display: block;
     }
 
@@ -371,16 +377,16 @@
     }
 
     .iphone-hero .iphone-island {
-      top: 10px;
-      width: 82px;
-      height: 22px;
+      top: 9px;
+      width: 80px;
+      height: 20px;
       padding-right: 8px;
     }
 
     .iphone-mini .iphone-island {
-      top: 8px;
-      width: 68px;
-      height: 18px;
+      top: 6px;
+      width: 64px;
+      height: 16px;
       padding-right: 6px;
     }
 
